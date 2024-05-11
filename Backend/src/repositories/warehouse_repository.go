@@ -12,7 +12,6 @@ import (
 )
 
 type WarehouseRepositoryI interface {
-	// Warehouse
 	GetWarehouses() (*[]model.Warehouses, *models.INVError)
 	GetWarehouseByName(name *string) (*model.Warehouses, *models.INVError)
 	CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
@@ -24,8 +23,7 @@ type WarehouseRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-// Warehouse
-func (mr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INVError) {
+func (wr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INVError) {
 	var warehouses []model.Warehouses
 
 	// Create the query
@@ -36,7 +34,7 @@ func (mr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INV
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &warehouses)
+	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &warehouses)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -48,7 +46,7 @@ func (mr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INV
 	return &warehouses, nil
 }
 
-func (mr *WarehouseRepository) GetWarehouseByName(name *string) (*model.Warehouses, *models.INVError) {
+func (wr *WarehouseRepository) GetWarehouseByName(name *string) (*model.Warehouses, *models.INVError) {
 	var warehouse model.Warehouses
 
 	// Create the query
@@ -61,7 +59,7 @@ func (mr *WarehouseRepository) GetWarehouseByName(name *string) (*model.Warehous
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &warehouse)
+	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &warehouse)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_NOT_FOUND
@@ -72,7 +70,7 @@ func (mr *WarehouseRepository) GetWarehouseByName(name *string) (*model.Warehous
 	return &warehouse, nil
 }
 
-func (mr *WarehouseRepository) CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError) {
+func (wr *WarehouseRepository) CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -88,7 +86,7 @@ func (mr *WarehouseRepository) CreateWarehouse(warehouse *model.Warehouses) (*uu
 		)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(wr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -105,7 +103,7 @@ func (mr *WarehouseRepository) CreateWarehouse(warehouse *model.Warehouses) (*uu
 	return &uuid, nil
 }
 
-func (mr *WarehouseRepository) UpdateWarehouse(warehouse *model.Warehouses) *models.INVError {
+func (wr *WarehouseRepository) UpdateWarehouse(warehouse *model.Warehouses) *models.INVError {
 
 	// Create the update statement
 	updateQuery := table.Warehouses.UPDATE(
@@ -117,7 +115,7 @@ func (mr *WarehouseRepository) UpdateWarehouse(warehouse *model.Warehouses) *mod
 	).WHERE(table.Warehouses.ID.EQ(mysql.String(warehouse.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(wr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -134,7 +132,7 @@ func (mr *WarehouseRepository) UpdateWarehouse(warehouse *model.Warehouses) *mod
 	return nil
 }
 
-func (mr *WarehouseRepository) DeleteWarehouse(warehouseId *uuid.UUID) *models.INVError {
+func (wr *WarehouseRepository) DeleteWarehouse(warehouseId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }
