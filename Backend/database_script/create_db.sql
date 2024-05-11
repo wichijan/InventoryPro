@@ -46,10 +46,16 @@ CREATE TABLE items(
     damaged BOOLEAN,
     damaged_description TEXT,
     quantity INT,
-    shelf_id VARCHAR(36),
     status_id VARCHAR(36),
-    FOREIGN KEY (status_id) REFERENCES item_status(id),
-    FOREIGN KEY (shelf_id) REFERENCES shelves(id)
+    FOREIGN KEY (status_id) REFERENCES item_status(id)
+);
+
+Create table items_in_shelve(
+    id VARCHAR(36) PRIMARY KEY,
+    item_id VARCHAR(36) UNIQUE,
+    shelve_id VARCHAR(36),
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (shelve_id) REFERENCES shelves(id)
 );
 
 create table subjects(
