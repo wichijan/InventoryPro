@@ -32,3 +32,6 @@ __debug_bin*
 
 # git patch files
 *.patch
+
+# internal only
+first-install-db.sh
