@@ -131,8 +131,7 @@ Insert into
         class_four,
         damaged,
         damaged_description,
-        quantity,
-        shelf_id
+        quantity
     )
 values
     (
@@ -146,12 +145,10 @@ values
         0,
         /* false */
         Null,
-        1,
-        "0a75123a-9736-4c60-a10c-16e76aced3d2"
-        /* Small Shelve */
+        1
     ),
     (
-        UUID(),
+        "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
         'Pen',
         'A pen is a writing instrument used to apply ink to a surface, usually paper, for writing or drawing.',
         0,
@@ -160,12 +157,10 @@ values
         0,
         0,
         NULL,
-        20,
-        "0a75123a-9736-4c60-a10c-16e76aced3d2"
-        /* Small Shelve */
+        20
     ),
     (
-        UUID(),
+        "7791a294-94de-4cbf-9243-3f7210664f92",
         'Pencil',
         'A pencil is an implement for writing or drawing, constructed of a narrow, solid pigment core in a protective casing that prevents the core from being broken or marking the user’s hand.',
         0,
@@ -174,12 +169,10 @@ values
         0,
         0,
         NULL,
-        30,
-        "0a75123a-9736-4c60-a10c-16e76aced3d2"
-        /* Small Shelve */
+        30
     ),
     (
-        UUID(),
+        "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
         'Eraser',
         'An eraser, also known as a rubber, is an article of stationery that is used for removing marks from paper or skin.',
         0,
@@ -188,7 +181,37 @@ values
         1,
         0,
         NULL,
-        40,
+        40
+    );
+
+Insert into
+    items_in_shelve(
+        id,
+        item_id,
+        shelve_id
+    )
+values
+    (
+        UUID(),
+        "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
+        "0a75123a-9736-4c60-a10c-16e76aced3d2"
+        /* Small Shelve */
+    ),
+    (
+        UUID(),
+        "7791a294-94de-4cbf-9243-3f7210664f92",
+        "0a75123a-9736-4c60-a10c-16e76aced3d2"
+        /* Small Shelve */
+    ),
+    (
+        UUID(),
+        "d2b6b0f5-a9b9-4ab5-9644-75407c9e9dfb",
+        "0a75123a-9736-4c60-a10c-16e76aced3d2"
+        /* Small Shelve */
+    ),
+    (
+        UUID(),
+        "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
         "0a75123a-9736-4c60-a10c-16e76aced3d2"
         /* Small Shelve */
     );
