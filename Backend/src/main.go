@@ -1,10 +1,18 @@
 package main
 
-import "log"
+import (
+	"context"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
+
+	"github.com/wichijan/InventoryPro/src/managers"
+)
 
 func main() {
-	log.Print("Hello, World!")
-	/*log.Println("Initializing database connection...")
+	log.Println("Initializing database connection...")
 	dbConnection, err := managers.InitializeDB()
 	if err != nil {
 		panic(err)
@@ -39,5 +47,4 @@ func main() {
 	}
 
 	os.Exit(0)
-	*/
 }
