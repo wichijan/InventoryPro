@@ -1,1 +1,7 @@
-<h1 class="text-3xl font-bold underline">Hello world!</h1>
+<script>
+  import LandingPage from "$lib/_layout/LandingPage.svelte";
+  import { fade } from "svelte/transition";
+</script>
+
+
+<LandingPage />
