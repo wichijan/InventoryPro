@@ -1,7 +1,7 @@
 <script lang="ts">
-  let email = "";
-  let password = "";
-  let passwordError = "";
+  let email: string = "";
+  let password: string = "";
+  let passwordError: string = "";
 
   const validatePassword = () => {
     const regex =
@@ -18,44 +18,65 @@
   }
 </script>
 
-<div class="min-h-screen flex justify-center items-center">
+<div class="min-h-screen bg-gray-800 flex justify-center items-center">
   <div
-    class="max-w-xs w-full m-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl"
+    class="max-w-xs w-full m-auto bg-gray-700 rounded-xl shadow-md overflow-hidden md:max-w-2xl px-4 py-6"
   >
-    <h2 class="text-center py-5 text-4xl font-bold text-blue-800 mb-4">
+    <h2
+      class="text-center text-4xl font-extrabold text-white tracking-widest hover:text-blue-300 mb-4 duration-300"
+    >
       Login
     </h2>
-    <form class="py-8 px-4 md:p-8" on:submit={login}>
-      <div class="my-5 text-sm">
-        <label for="username" class="block text-black"
-          >Email <span class="-ml-1 text-red-500">*</span></label
-        >
-        <input
-          bind:value={email}
-          type="text"
-          class="w-full px-5 py-3 border rounded-lg focus:outline-none"
-          placeholder="Email"
-          required
-        />
+    <form class="mt-8 space-y-6" on:submit={login}>
+      <div>
+        <label for="username" class="text-white text-lg font-bold">
+          Email
+        </label>
+        <div class="mt-1 rounded-md shadow-sm">
+          <input
+            bind:value={email}
+            type="text"
+            class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
+            placeholder="Email"
+            required
+          />
+        </div>
       </div>
-      <div class="my-5 text-sm;">
-        <label for="password" class="block text-black"
-          >Password <span class="-ml-1 text-red-500">*</span></label
-        >
-        <input
-          bind:value={password}
-          on:input={validatePassword}
-          type="password"
-          class="w-full px-5 py-3 border rounded-lg focus:outline-none"
-          placeholder="Password"
-          required
-        />
-        <p class="text-red-500 text-sm mt-2">{passwordError}</p>
+      <div>
+        <label for="password" class="text-white text-lg font-bold">
+          Password
+        </label>
+        <div class="mt-1 rounded-md shadow-sm">
+          <input
+            bind:value={password}
+            on:input={validatePassword}
+            type="password"
+            class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
+            placeholder="Password"
+            required
+          />
+          <p class="text-red-600 text-sm mt-2">{passwordError}</p>
+        </div>
       </div>
+      <!-- Need to be registerd and remember me-->
+      <div class="flex justify-between">
+        <div class="flex flex-row w-max gap-1">
+          <input type="checkbox" class="mx-auto my-auto rounded" />
+          <label for="remember" class="text-white text-sm font-bold my-auto"
+            >Remember me</label
+          >
+        </div>
+        <a
+          href="/auth/register"
+          class="text-white text-sm font-bold hover:text-blue-300 duration-300"
+          >Need to register?</a
+        >
+      </div>
+
       <button
         type="submit"
         disabled={passwordError}
-        class="block w-full rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 py-3 text-white text-center font-semibold text-sm focus:outline-none"
+        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg font-bold text-white bg-purple-500 hover:bg-purple-500 hover:text-black rounded-md duration-300"
         >Login</button
       >
     </form>
