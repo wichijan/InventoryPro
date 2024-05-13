@@ -8,54 +8,82 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
-type RoororepositoryI interface {
-	GetShelves() (*[]model.Shelves, *models.INVError)
-	CreateShelve(shelve *model.Shelves) (*uuid.UUID, *models.INVError)
-	UpdateShelve(shelve *model.Shelves) *models.INVError
-	DeleteShelve(shelveId *uuid.UUID) *models.INVError
+type RoomRepositoryI interface {
+	GetRooms() (*[]model.Rooms, *models.INVError)
+	GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INVError)
+	GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError)
+	GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWithShelves, *models.INVError)
+	CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError)
+	UpdateRoom(room *model.Rooms) *models.INVError
+	DeleteRoom(roomId *uuid.UUID) *models.INVError
 }
 
-type Roororepository struct {
+type RoomRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (ror *Roororepository) GetShelves() (*[]model.Shelves, *models.INVError) {
-	var shelves []model.Shelves
+func (ror *RoomRepository) GetRooms() (*[]model.Rooms, *models.INVError) {
+	var rooms []model.Rooms
 
-	// Create the query 
+	// Create the query
 	stmt := mysql.SELECT(
-		table.Shelves.AllColumns,
+		table.Rooms.AllColumns,
 	).FROM(
-		table.Shelves,
+		table.Rooms,
 	)
 
 	// Execute the query
-	err := stmt.Query(ror.DatabaseManager.GetDatabaseConnection(), &shelves)
+	err := stmt.Query(ror.DatabaseManager.GetDatabaseConnection(), &rooms)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
-	if len(shelves) == 0 {
+	if len(rooms) == 0 {
 		return nil, inv_errors.INV_NOT_FOUND
 	}
 
-	return &shelves, nil
+	return &rooms, nil
 }
 
-func (ror *Roororepository) CreateShelve(shelve *model.Shelves) (*uuid.UUID, *models.INVError) {
+func (wr *RoomRepository) GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INVError) {
+	var rooms model.Rooms
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Rooms.AllColumns,
+	).FROM(
+		table.Rooms,
+	).WHERE(
+		table.Rooms.ID.EQ(utils.MySqlString(id.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &rooms)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_NOT_FOUND
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &rooms, nil
+}
+
+func (ror *RoomRepository) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
-	insertQuery := table.Shelves.INSERT(
-		table.Shelves.ID,
-		table.Shelves.ShelveTypeID,
-		table.Shelves.RoomID,
+	insertQuery := table.Rooms.INSERT(
+		table.Rooms.ID,
+		table.Rooms.Name,
+		table.Rooms.WarehouseID,
 	).VALUES(
 		uuid.String(),
-		shelve.ShelveTypeID,
-		shelve.RoomID,
+		room.Name,
+		room.WarehouseID,
 	)
 
 	// Execute the query
@@ -76,15 +104,15 @@ func (ror *Roororepository) CreateShelve(shelve *model.Shelves) (*uuid.UUID, *mo
 	return &uuid, nil
 }
 
-func (ror *Roororepository) UpdateShelve(shelve *model.Shelves) *models.INVError {
+func (ror *RoomRepository) UpdateRoom(room *model.Rooms) *models.INVError {
 	// Create the update statement
-	updateQuery := table.Shelves.UPDATE(
-		table.Shelves.ShelveTypeID,
-		table.Shelves.RoomID,
+	updateQuery := table.Rooms.UPDATE(
+		table.Rooms.Name,
+		table.Rooms.WarehouseID,
 	).SET(
-		shelve.ShelveTypeID,
-		shelve.RoomID,
-	).WHERE(table.Shelves.ID.EQ(mysql.String(shelve.ID)))
+		room.Name,
+		room.WarehouseID,
+	).WHERE(table.Rooms.ID.EQ(mysql.String(room.ID)))
 
 	// Execute the query
 	rows, err := updateQuery.Exec(ror.DatabaseManager.GetDatabaseConnection())
@@ -104,7 +132,57 @@ func (ror *Roororepository) UpdateShelve(shelve *model.Shelves) *models.INVError
 	return nil
 }
 
-func (ror *Roororepository) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
+func (ror *RoomRepository) DeleteRoom(roomId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
+}
+
+func (wr *RoomRepository) GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError) {
+	var rooms []models.RoomWithShelves
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Rooms.AllColumns,
+		table.Shelves.AllColumns,
+	).FROM(
+		table.Rooms.
+			LEFT_JOIN(table.Shelves, table.Shelves.RoomID.EQ(table.Rooms.ID)),
+	)
+
+	// Execute the query
+	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &rooms)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_NOT_FOUND
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &rooms, nil
+}
+
+func (wr *RoomRepository) GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWithShelves, *models.INVError) {
+	var rooms models.RoomWithShelves
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Rooms.AllColumns,
+		table.Shelves.AllColumns,
+	).FROM(
+		table.Rooms.
+			LEFT_JOIN(table.Shelves, table.Shelves.RoomID.EQ(table.Rooms.ID)),
+	).WHERE(
+		table.Rooms.ID.EQ(utils.MySqlString(id.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &rooms)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_NOT_FOUND
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &rooms, nil
 }

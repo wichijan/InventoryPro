@@ -19,7 +19,7 @@ import (
 // @Success 200 {array} model.Warehouses
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /warehouses [get]
-func GetWarehouses(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+func GetWarehousesHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		warehouses, inv_err := warehouseCtrl.GetWarehouses()
 		if inv_err != nil {
@@ -41,7 +41,7 @@ func GetWarehouses(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFu
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /warehouses/{id} [get]
-func GetWarehouseById(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+func GetWarehouseByIdHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -69,7 +69,7 @@ func GetWarehouseById(warehouseCtrl controllers.WarehouseControllerI) gin.Handle
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /warehouses/{id} [get]
-func GetWarehousesWithRooms(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+func GetWarehousesWithRoomsHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		warehouses, inv_err := warehouseCtrl.GetWarehousesWithRooms()
 		if inv_err != nil {
@@ -91,7 +91,7 @@ func GetWarehousesWithRooms(warehouseCtrl controllers.WarehouseControllerI) gin.
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /warehouses/{id} [get]
-func GetWarehouseByIdWithRooms(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+func GetWarehouseByIdWithRoomsHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -118,7 +118,7 @@ func GetWarehouseByIdWithRooms(warehouseCtrl controllers.WarehouseControllerI) g
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /warehouses [post]
-func CreateWarehouse(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+func CreateWarehouseHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var warehouse model.Warehouses
 		err := c.ShouldBindJSON(&warehouse)
@@ -147,7 +147,7 @@ func CreateWarehouse(warehouseCtrl controllers.WarehouseControllerI) gin.Handler
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /warehouses [put]
-func UpdateWarehouse(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+func UpdateWarehouseHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var warehouse model.Warehouses
 		err := c.ShouldBindJSON(&warehouse)
