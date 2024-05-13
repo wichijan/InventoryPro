@@ -12,7 +12,7 @@ type WarehouseControllerI interface {
 	GetWarehouses() (*[]model.Warehouses, *models.INVError)
 	GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError)
 	GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError)
-	GetWarehouseByIdWithRooms(id *uuid.UUID) (*model.Warehouses, *models.INVError)
+	GetWarehouseByIdWithRooms(id *uuid.UUID) (*models.WarehouseWithRooms, *models.INVError)
 	CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
 	UpdateWarehouse(warehouse *model.Warehouses) *models.INVError
 	DeleteWarehouse(warehouse_id *uuid.UUID) *models.INVError
@@ -71,7 +71,7 @@ func (mc *WarehouseController) GetWarehousesWithRooms() (*[]models.WarehouseWith
 	return warehouse, nil
 }
 
-func (mc *WarehouseController) GetWarehouseByIdWithRooms(id *uuid.UUID) (*model.Warehouses, *models.INVError) {
+func (mc *WarehouseController) GetWarehouseByIdWithRooms(id *uuid.UUID) (*models.WarehouseWithRooms, *models.INVError) {
 	warehouse, inv_errors := mc.WarehouseRepo.GetWarehouseByIdWithRooms(id)
 	if inv_errors != nil {
 		return nil, inv_errors

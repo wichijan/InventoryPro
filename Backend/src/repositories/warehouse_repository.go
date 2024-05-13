@@ -15,7 +15,7 @@ type WarehouseRepositoryI interface {
 	GetWarehouses() (*[]model.Warehouses, *models.INVError)
 	GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError)
 	GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError)
-	GetWarehouseByIdWithRooms(id *uuid.UUID) (*model.Warehouses, *models.INVError)
+	GetWarehouseByIdWithRooms(id *uuid.UUID) (*models.WarehouseWithRooms, *models.INVError)
 	CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
 	UpdateWarehouse(Warehouse *model.Warehouses) *models.INVError
 	DeleteWarehouse(warehouseId *uuid.UUID) *models.INVError
@@ -164,8 +164,8 @@ func (wr *WarehouseRepository) GetWarehousesWithRooms() (*[]models.WarehouseWith
 	return &warehouse, nil
 }
 
-func (wr *WarehouseRepository) GetWarehouseByIdWithRooms(id *uuid.UUID) (*model.Warehouses, *models.INVError) {
-	var warehouse model.Warehouses
+func (wr *WarehouseRepository) GetWarehouseByIdWithRooms(id *uuid.UUID) (*models.WarehouseWithRooms, *models.INVError) {
+	var warehouse models.WarehouseWithRooms
 
 	// Create the query
 	stmt := mysql.SELECT(

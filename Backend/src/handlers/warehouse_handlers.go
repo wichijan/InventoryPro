@@ -30,7 +30,6 @@ func GetWarehouses(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFu
 	}
 }
 
-
 // @Summary Get warehouse by id
 // @Description Get warehouse by id
 // @Tags Warehouses
@@ -73,6 +72,34 @@ func GetWarehouseById(warehouseCtrl controllers.WarehouseControllerI) gin.Handle
 func GetWarehousesWithRooms(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		warehouses, inv_err := warehouseCtrl.GetWarehousesWithRooms()
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, warehouses)
+	}
+}
+
+// @Summary Get warehouse by id
+// @Description Get warehouse by id
+// @Tags Warehouses
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Warehouse id"
+// @Success 200 {object} model.Warehouses
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 404 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /warehouses/{id} [get]
+func GetWarehouseByIdWithRooms(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		warehouses, inv_err := warehouseCtrl.GetWarehouseByIdWithRooms(&id)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
