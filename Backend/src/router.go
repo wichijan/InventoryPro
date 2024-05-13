@@ -13,6 +13,7 @@ import (
 
 type Controllers struct {
 	WarehouseController controllers.WarehouseControllerI
+	RoomController controllers.RoomControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -36,19 +37,36 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	roomRepo := &repositories.RoomRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
 			WarehouseRepo: warehouseRepo,
 		},
+		RoomController: &controllers.RoomController{
+			RoomRepo: roomRepo,
+		},
 	}
 
-	publicRoutes.Handle(http.MethodGet, "/warehouses", handlers.GetWarehouses(controller.WarehouseController))
-	publicRoutes.Handle(http.MethodGet, "/warehousesWithRooms", handlers.GetWarehousesWithRooms(controller.WarehouseController))
-	publicRoutes.Handle(http.MethodGet, "/warehousesWithRooms/:id", handlers.GetWarehouseByIdWithRooms(controller.WarehouseController))
-	publicRoutes.Handle(http.MethodGet, "/warehouses/:id", handlers.GetWarehouseById(controller.WarehouseController))
-	publicRoutes.Handle(http.MethodPost, "/warehouses", handlers.CreateWarehouse(controller.WarehouseController))
-	publicRoutes.Handle(http.MethodPut, "/warehouses", handlers.UpdateWarehouse(controller.WarehouseController))
+	// Warehouse routes
+	publicRoutes.Handle(http.MethodGet, "/warehouses", handlers.GetWarehousesHandler(controller.WarehouseController))
+	publicRoutes.Handle(http.MethodGet, "/warehousesWithRooms", handlers.GetWarehousesWithRoomsHandler(controller.WarehouseController))
+	publicRoutes.Handle(http.MethodGet, "/warehousesWithRooms/:id", handlers.GetWarehouseByIdWithRoomsHandler(controller.WarehouseController))
+	publicRoutes.Handle(http.MethodGet, "/warehouses/:id", handlers.GetWarehouseByIdHandler(controller.WarehouseController))
+	publicRoutes.Handle(http.MethodPost, "/warehouses", handlers.CreateWarehouseHandler(controller.WarehouseController))
+	publicRoutes.Handle(http.MethodPut, "/warehouses", handlers.UpdateWarehouseHandler(controller.WarehouseController))
+
+	// Room routes
+	publicRoutes.Handle(http.MethodGet, "/rooms", handlers.GetRoomsHandler(controller.RoomController))
+	publicRoutes.Handle(http.MethodGet, "/roomswithshelves", handlers.GetRoomsWithShelvesHandle(controller.RoomController))
+	publicRoutes.Handle(http.MethodGet, "/roomswithshelves/:id", handlers.GetRoomsByIdWithShelvesHandle(controller.RoomController))
+	publicRoutes.Handle(http.MethodGet, "/rooms/:id", handlers.GetRoomsByIdHandle(controller.RoomController))
+	publicRoutes.Handle(http.MethodPost, "/rooms", handlers.CreateRoomHandle(controller.RoomController))
+	publicRoutes.Handle(http.MethodPut, "/rooms", handlers.UpdateRoomHandle(controller.RoomController))
+
 
 	return router
 }
