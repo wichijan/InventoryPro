@@ -14,6 +14,8 @@ import (
 type WarehouseRepositoryI interface {
 	GetWarehouses() (*[]model.Warehouses, *models.INVError)
 	GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError)
+	GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError)
+	GetWarehouseByIdWithRooms(id *uuid.UUID) (*model.Warehouses, *models.INVError)
 	CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
 	UpdateWarehouse(Warehouse *model.Warehouses) *models.INVError
 	DeleteWarehouse(warehouseId *uuid.UUID) *models.INVError
@@ -45,7 +47,6 @@ func (wr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INV
 
 	return &warehouses, nil
 }
-
 
 func (wr *WarehouseRepository) GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError) {
 	var warehouse model.Warehouses
@@ -136,4 +137,55 @@ func (wr *WarehouseRepository) UpdateWarehouse(warehouse *model.Warehouses) *mod
 func (wr *WarehouseRepository) DeleteWarehouse(warehouseId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
+}
+
+func (wr *WarehouseRepository) GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError) {
+	var warehouse []models.WarehouseWithRooms
+
+	// Create the query
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Warehouses.AllColumns,
+		table.Rooms.AllColumns,
+	).FROM(
+		table.Warehouses.
+			LEFT_JOIN(table.Rooms, table.Rooms.WarehouseID.EQ(table.Warehouses.ID)),
+	)
+
+	// Execute the query
+	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &warehouse)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_NOT_FOUND
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &warehouse, nil
+}
+
+func (wr *WarehouseRepository) GetWarehouseByIdWithRooms(id *uuid.UUID) (*model.Warehouses, *models.INVError) {
+	var warehouse model.Warehouses
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Warehouses.AllColumns,
+		table.Rooms.AllColumns,
+	).FROM(
+		table.Warehouses.
+			LEFT_JOIN(table.Rooms, table.Rooms.WarehouseID.EQ(table.Warehouses.ID)),
+	).WHERE(
+		table.Warehouses.ID.EQ(utils.MySqlString(id.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &warehouse)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_NOT_FOUND
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &warehouse, nil
 }

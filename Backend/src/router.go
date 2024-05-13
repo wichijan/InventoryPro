@@ -44,6 +44,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	publicRoutes.Handle(http.MethodGet, "/warehouses", handlers.GetWarehouses(controller.WarehouseController))
+	publicRoutes.Handle(http.MethodGet, "/warehousesWithRooms", handlers.GetWarehousesWithRooms(controller.WarehouseController))
 	publicRoutes.Handle(http.MethodGet, "/warehouses/:id", handlers.GetWarehouseById(controller.WarehouseController))
 	publicRoutes.Handle(http.MethodPost, "/warehouses", handlers.CreateWarehouse(controller.WarehouseController))
 	publicRoutes.Handle(http.MethodPut, "/warehouses", handlers.UpdateWarehouse(controller.WarehouseController))
