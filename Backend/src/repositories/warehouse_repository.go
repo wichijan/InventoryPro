@@ -13,7 +13,7 @@ import (
 
 type WarehouseRepositoryI interface {
 	GetWarehouses() (*[]model.Warehouses, *models.INVError)
-	GetWarehouseByName(name *string) (*model.Warehouses, *models.INVError)
+	GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError)
 	CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
 	UpdateWarehouse(Warehouse *model.Warehouses) *models.INVError
 	DeleteWarehouse(warehouseId *uuid.UUID) *models.INVError
@@ -46,7 +46,8 @@ func (wr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INV
 	return &warehouses, nil
 }
 
-func (wr *WarehouseRepository) GetWarehouseByName(name *string) (*model.Warehouses, *models.INVError) {
+
+func (wr *WarehouseRepository) GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError) {
 	var warehouse model.Warehouses
 
 	// Create the query
@@ -55,7 +56,7 @@ func (wr *WarehouseRepository) GetWarehouseByName(name *string) (*model.Warehous
 	).FROM(
 		table.Warehouses,
 	).WHERE(
-		table.Warehouses.Name.EQ(utils.MySqlString(*name)),
+		table.Warehouses.ID.EQ(utils.MySqlString(id.String())),
 	)
 
 	// Execute the query

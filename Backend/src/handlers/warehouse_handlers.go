@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -29,26 +30,27 @@ func GetWarehouses(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFu
 	}
 }
 
-// @Summary Get warehouse by name
-// @Description Get warehouse by name
+
+// @Summary Get warehouse by id
+// @Description Get warehouse by id
 // @Tags Warehouses
 // @Accept  json
 // @Produce  json
-// @Param name path string true "Warehouse name"
+// @Param id path string true "Warehouse id"
 // @Success 200 {object} model.Warehouses
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /warehouses/{name} [get]
-func GetWarehouseByName(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+// @Router /warehouses/{id} [get]
+func GetWarehouseById(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		name := c.Param("name")
-		if utils.ContainsEmptyString(name) {
+		id, err := uuid.Parse(c.Param("id"))
+		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		warehouse, inv_err := warehouseCtrl.GetWarehouseByName(&name)
+		warehouse, inv_err := warehouseCtrl.GetWarehouseById(&id)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
