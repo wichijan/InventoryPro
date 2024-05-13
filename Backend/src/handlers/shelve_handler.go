@@ -7,41 +7,40 @@ import (
 	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
-	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/utils"
 )
 
-// @Summary Get rooms
-// @Description Get rooms
-// @Tags Rooms
+// @Summary Get shelves
+// @Description Get shelves
+// @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} model.Rooms
+// @Success 200 {array} model.Shelves
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms [get]
-func GetRoomsHandler(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
+// @Router /shelves [get]
+func GetShelvesHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		rooms, inv_err := roomCtrl.GetRooms()
+		shelves, inv_err := shelveCtrl.GetShelves()
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, rooms)
+		c.JSON(http.StatusOK, shelves)
 	}
 }
 
-// @Summary Get room by id
-// @Description Get room by id
-// @Tags Rooms
+// @Summary Get shelve by id
+// @Description Get shelve by id
+// @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Param id path string true "Room id"
-// @Success 200 {object} model.Rooms
+// @Param id path string true "Shelve id"
+// @Success 200 {object} model.Shelves
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms/{id} [get]
-func GetRoomsByIdHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
+// @Router /shelves/{id} [get]
+func GetShelveByIdHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -49,49 +48,48 @@ func GetRoomsByIdHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 			return
 		}
 
-		room, inv_err := roomCtrl.GetRoomsById(&id)
+		shelve, inv_err := shelveCtrl.GetShelveById(&id)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, room)
+		c.JSON(http.StatusOK, shelve)
 	}
 }
 
-// @Summary Get rooms with shelves
-// @Description Get rooms with shelves
-// @Tags Rooms
+// @Summary Get shelves with items
+// @Description Get shelves with items
+// @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Param id path string true "room id"
-// @Success 200 {object} model.Rooms
+// @Success 200 {object} model.Shelves
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms/{id} [get]
-func GetRoomsWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
+// @Router /shelveswithitems [get]
+func GetShelvesWithItemsHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		rooms, inv_err := roomCtrl.GetRoomsWithShelves()
+		shelvesWithItems, inv_err := shelveCtrl.GetShelvesWithItems()
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, rooms)
+		c.JSON(http.StatusOK, shelvesWithItems)
 	}
 }
 
-// @Summary Get room by id with shelves
-// @Description Get room by id with shelves
-// @Tags Rooms
+// @Summary Get shelve by id with items
+// @Description Get shelve by id with items
+// @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Param id path string true "Room id"
-// @Success 200 {object} model.Rooms
+// @Param id path string true "shelve id"
+// @Success 200 {object} model.Shelves
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms/{id} [get]
-func GetRoomsByIdWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
+// @Router /shelveswithitems/{id} [get]
+func GetShelveByIdWithItemsHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -99,71 +97,75 @@ func GetRoomsByIdWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.Han
 			return
 		}
 
-		room, inv_err := roomCtrl.GetRoomsByIdWithShelves(&id)
+		shelveWithItems, inv_err := shelveCtrl.GetShelveByIdWithItems(&id)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, room)
+		c.JSON(http.StatusOK, shelveWithItems)
 	}
 }
 
-// @Summary Create Room
-// @Description Create Room
-// @Tags Rooms
+/*
+// @Summary Create Shelve
+// @Description Create Shelve
+// @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Param room body model.Rooms true "Room model"
-// @Success 201 {object} model.Rooms
+// @Param room body model.Rooms true "Shelve model"
+// @Success 201 {object} model.Shelves
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms [post]
-func CreateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
+// @Router /shelves [post]
+func CreateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var room model.Rooms
-		err := c.ShouldBindJSON(&room)
-		if err != nil || utils.ContainsEmptyString(*room.Name) {
+		var shelve models.OwnShelve
+		err := c.ShouldBindJSON(&shelve)
+		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		roomId, inv_err := roomCtrl.CreateRoom(&room)
+		shelveId, inv_err := shelveCtrl.CreateShelve(&shelve)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
 
-		c.JSON(http.StatusCreated, roomId)
+		c.JSON(http.StatusCreated, shelveId)
 	}
 }
+*/
 
-// @Summary Update room
-// @Description Update room
-// @Tags Rooms
+/*
+// @Summary Update shelve
+// @Description Update shelve
+// @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Param room body model.Rooms true "Room model"
-// @Success 200 {object} model.Rooms
+// @Param shelve body model.Rooms true "Shelve model"
+// @Success 200 {object} model.Shelves
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms [put]
-func UpdateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
+// @Router /shelves [put]
+func UpdateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var room model.Rooms
-		err := c.ShouldBindJSON(&room)
-		if err != nil || utils.ContainsEmptyString(*room.Name) {
+		var shelve models.OwnShelve
+		err := c.ShouldBindJSON(&shelve)
+		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		inv_err := roomCtrl.UpdateRoom(&room)
+		inv_err := shelveCtrl.UpdateShelve(&shelve)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, room)
+		c.JSON(http.StatusOK, shelve)
 	}
 }
+*/
 
 /*
 // @Summary Delete room
@@ -176,7 +178,7 @@ func UpdateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /rooms/{id} [delete]
-func DeleteGenre(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
+func DeleteGenre(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		genreId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -184,7 +186,7 @@ func DeleteGenre(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 			return
 		}
 
-		inv_err := roomCtrl.DeleteGenre(&genreId)
+		inv_err := shelveCtrl.DeleteGenre(&genreId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

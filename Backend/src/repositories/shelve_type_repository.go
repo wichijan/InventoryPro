@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -12,6 +14,7 @@ import (
 
 type ShelveTypeRepositoryI interface {
 	GetShelveTypes() (*[]model.ShelveTypes, *models.INVError)
+	GetShelveTypeByName(name *string) (*model.ShelveTypes, *models.INVError)
 	CreateShelveType(shelveTypeName *string) (*uuid.UUID, *models.INVError)
 	UpdateShelveType(shelveType *model.ShelveTypes) *models.INVError
 	DeleteShelveType(shelveTypeId *uuid.UUID) *models.INVError
@@ -42,6 +45,30 @@ func (str *ShelveTypeRepository) GetShelveTypes() (*[]model.ShelveTypes, *models
 	}
 
 	return &shelveTypes, nil
+}
+
+func (str *ShelveTypeRepository) GetShelveTypeByName(name *string) (*model.ShelveTypes, *models.INVError) {
+	var shelveType model.ShelveTypes
+
+	log.Print("Type name is ")
+	log.Print("Type name is %v ", name)
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.ShelveTypes.AllColumns,
+	).FROM(
+		table.ShelveTypes,
+	).WHERE(table.ShelveTypes.TypeName.EQ(mysql.String(*name)))
+
+	log.Print(stmt.DebugSql())
+
+	// Execute the query
+	err := stmt.Query(str.DatabaseManager.GetDatabaseConnection(), &shelveType)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &shelveType, nil
 }
 
 func (str *ShelveTypeRepository) CreateShelveType(shelveTypeName *string) (*uuid.UUID, *models.INVError) {

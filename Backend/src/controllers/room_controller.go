@@ -22,57 +22,57 @@ type RoomController struct {
 	RoomRepo repositories.RoomRepositoryI
 }
 
-func (mc *RoomController) GetRooms() (*[]model.Rooms, *models.INVError) {
-	rooms, inv_errors := mc.RoomRepo.GetRooms()
+func (rc *RoomController) GetRooms() (*[]model.Rooms, *models.INVError) {
+	rooms, inv_errors := rc.RoomRepo.GetRooms()
 	if inv_errors != nil {
 		return nil, inv_errors
 	}
 	return rooms, nil
 }
 
-func (mc *RoomController) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError) {
+func (rc *RoomController) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError) {
 	if room == nil {
 		return nil, inv_errors.INV_BAD_REQUEST
 	}
 
-	roomId, inv_errors := mc.RoomRepo.CreateRoom(room)
+	roomId, inv_errors := rc.RoomRepo.CreateRoom(room)
 	if inv_errors != nil {
 		return nil, inv_errors
 	}
 	return roomId, nil
 }
 
-func (mc *RoomController) UpdateRoom(room *model.Rooms) *models.INVError {
-	inv_errors := mc.RoomRepo.UpdateRoom(room)
+func (rc *RoomController) UpdateRoom(room *model.Rooms) *models.INVError {
+	inv_errors := rc.RoomRepo.UpdateRoom(room)
 	if inv_errors != nil {
 		return inv_errors
 	}
 	return nil
 }
 
-func (mc *RoomController) DeleteRoom(roomId *uuid.UUID) *models.INVError {
+func (rc *RoomController) DeleteRoom(roomId *uuid.UUID) *models.INVError {
 	// TODO Needs to be implemented
 	return nil
 }
 
-func (mc *RoomController) GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INVError) {
-	room, inv_errors := mc.RoomRepo.GetRoomsById(id)
+func (rc *RoomController) GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INVError) {
+	room, inv_errors := rc.RoomRepo.GetRoomsById(id)
 	if inv_errors != nil {
 		return nil, inv_errors
 	}
 	return room, nil
 }
 
-func (mc *RoomController) GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError) {
-	rooms, inv_errors := mc.RoomRepo.GetRoomsWithShelves()
+func (rc *RoomController) GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError) {
+	rooms, inv_errors := rc.RoomRepo.GetRoomsWithShelves()
 	if inv_errors != nil {
 		return nil, inv_errors
 	}
 	return rooms, nil
 }
 
-func (mc *RoomController) GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWithShelves, *models.INVError) {
-	room, inv_errors := mc.RoomRepo.GetRoomsByIdWithShelves(id)
+func (rc *RoomController) GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWithShelves, *models.INVError) {
+	room, inv_errors := rc.RoomRepo.GetRoomsByIdWithShelves(id)
 	if inv_errors != nil {
 		return nil, inv_errors
 	}
