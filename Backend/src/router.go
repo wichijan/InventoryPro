@@ -13,7 +13,8 @@ import (
 
 type Controllers struct {
 	WarehouseController controllers.WarehouseControllerI
-	RoomController controllers.RoomControllerI
+	RoomController      controllers.RoomControllerI
+	ShelveController    controllers.ShelveControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -41,6 +42,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	shelveRepo := &repositories.ShelveRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -48,6 +53,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		RoomController: &controllers.RoomController{
 			RoomRepo: roomRepo,
+		},
+		ShelveController: &controllers.ShelveController{
+			ShelveRepo: shelveRepo,
 		},
 	}
 
@@ -66,6 +74,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/rooms/:id", handlers.GetRoomsByIdHandle(controller.RoomController))
 	publicRoutes.Handle(http.MethodPost, "/rooms", handlers.CreateRoomHandle(controller.RoomController))
 	publicRoutes.Handle(http.MethodPut, "/rooms", handlers.UpdateRoomHandle(controller.RoomController))
+
+	// Shelve routes
+	publicRoutes.Handle(http.MethodGet, "/shelves", handlers.GetShelvesHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodGet, "/shelveswithitems", handlers.GetShelvesWithItemsHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodGet, "/shelveswithitems/:id", handlers.GetShelveByIdWithItemsHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodGet, "/shelves/:id", handlers.GetShelveByIdHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
 
 
 	return router

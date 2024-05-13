@@ -11,7 +11,10 @@ import (
 )
 
 type ShelveRepositoryI interface {
-	GetShelves() (*[]model.Shelves, *models.INVError)
+	GetShelves() (*[]models.OwnShelve, *models.INVError)
+	GetShelveById(id *uuid.UUID) (*models.OwnShelve, *models.INVError)
+	GetShelvesWithItems() (*[]models.ShelveWithItems, *models.INVError)
+	GetShelveByIdWithItems(id *uuid.UUID) (*models.ShelveWithItems, *models.INVError)
 	CreateShelve(shelve *model.Shelves) (*uuid.UUID, *models.INVError)
 	UpdateShelve(shelve *model.Shelves) *models.INVError
 	DeleteShelve(shelveId *uuid.UUID) *models.INVError
@@ -21,14 +24,16 @@ type ShelveRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (sr *ShelveRepository) GetShelves() (*[]model.Shelves, *models.INVError) {
-	var shelves []model.Shelves
+func (sr *ShelveRepository) GetShelves() (*[]models.OwnShelve, *models.INVError) {
+	var shelves []models.OwnShelve
 
 	// Create the query
 	stmt := mysql.SELECT(
-		table.Shelves.AllColumns,
+		table.Shelves.ID,
+		table.ShelveTypes.TypeName,
+		table.Shelves.RoomID,
 	).FROM(
-		table.Shelves,
+		table.Shelves.INNER_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)),
 	)
 
 	// Execute the query
@@ -42,6 +47,29 @@ func (sr *ShelveRepository) GetShelves() (*[]model.Shelves, *models.INVError) {
 	}
 
 	return &shelves, nil
+}
+
+func (sr *ShelveRepository) GetShelveById(id *uuid.UUID) (*models.OwnShelve, *models.INVError) {
+	var shelve models.OwnShelve
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Shelves.ID,
+		table.ShelveTypes.TypeName,
+		table.Shelves.RoomID,
+	).FROM(
+		table.Shelves.INNER_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)),
+	).WHERE(
+		table.Shelves.ID.EQ(mysql.String(id.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &shelve)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &shelve, nil
 }
 
 func (sr *ShelveRepository) CreateShelve(shelve *model.Shelves) (*uuid.UUID, *models.INVError) {
@@ -107,4 +135,56 @@ func (sr *ShelveRepository) UpdateShelve(shelve *model.Shelves) *models.INVError
 func (sr *ShelveRepository) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
+}
+
+func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *models.INVError) {
+	var shelvesWithItems []models.ShelveWithItems
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Shelves.ID,
+		table.ShelveTypes.TypeName,
+		table.Shelves.RoomID,
+		table.Items.AllColumns,
+	).FROM(
+		table.Shelves.
+			INNER_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)).
+			LEFT_JOIN(table.ItemsInShelve, table.ItemsInShelve.ShelveID.EQ(table.Shelves.ID)).
+			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemsInShelve.ItemID)),
+	)
+
+	// Execute the query
+	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &shelvesWithItems)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &shelvesWithItems, nil
+}
+
+func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.ShelveWithItems, *models.INVError) {
+	var shelveWithItems models.ShelveWithItems
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Shelves.ID,
+		table.ShelveTypes.TypeName,
+		table.Shelves.RoomID,
+		table.Items.AllColumns,
+	).FROM(
+		table.Shelves.
+			INNER_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)).
+			LEFT_JOIN(table.ItemsInShelve, table.ItemsInShelve.ShelveID.EQ(table.Shelves.ID)).
+			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemsInShelve.ItemID)),
+	).WHERE(
+		table.Shelves.ID.EQ(mysql.String(id.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &shelveWithItems)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &shelveWithItems, nil
 }
