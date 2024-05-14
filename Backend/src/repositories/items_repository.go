@@ -10,25 +10,36 @@ import (
 	"github.com/wichijan/InventoryPro/src/models"
 )
 
-type IteitrepositoryI interface {
-	GetItems() (*[]model.Items, *models.INVError)
+type ItemRepositoryI interface {
+	GetItems() (*[]models.ItemWithStatus, *models.INVError)
+	GetItemById() (*models.ItemWithStatus, *models.INVError)
 	CreateItem(item *model.Items) (*uuid.UUID, *models.INVError)
 	UpdateItem(item *model.Items) *models.INVError
 	DeleteItem(itemId *uuid.UUID) *models.INVError
 }
 
-type Iteitrepository struct {
+type ItemRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (itr *Iteitrepository) GetItems() (*[]model.Items, *models.INVError) {
-	var items []model.Items
+func (itr *ItemRepository) GetItems() (*[]models.ItemWithStatus, *models.INVError) {
+	var items []models.ItemWithStatus
 
 	// Create the query
 	stmt := mysql.SELECT(
-		table.Items.AllColumns,
+		table.Items.ID,
+		table.Items.Name,
+		table.Items.Description,
+		table.Items.ClassOne,
+		table.Items.ClassTwo,
+		table.Items.ClassThree,
+		table.Items.ClassFour,
+		table.Items.Damaged,
+		table.Items.DamagedDescription,
+		table.Items.Quantity,
+		table.ItemStatus.StatusName,
 	).FROM(
-		table.Items,
+		table.Items.LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)),
 	)
 
 	// Execute the query
@@ -44,7 +55,38 @@ func (itr *Iteitrepository) GetItems() (*[]model.Items, *models.INVError) {
 	return &items, nil
 }
 
-func (itr *Iteitrepository) CreateItem(item *model.Items) (*uuid.UUID, *models.INVError) {
+func (itr *ItemRepository) GetItemById() (*models.ItemWithStatus, *models.INVError) {
+	var item models.ItemWithStatus
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Items.ID,
+		table.Items.Name,
+		table.Items.Description,
+		table.Items.ClassOne,
+		table.Items.ClassTwo,
+		table.Items.ClassThree,
+		table.Items.ClassFour,
+		table.Items.Damaged,
+		table.Items.DamagedDescription,
+		table.Items.Quantity,
+		table.ItemStatus.StatusName,
+	).FROM(
+		table.Items.LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)),
+	).WHERE(
+		table.Items.ID.EQ(mysql.String(item.ID)),
+	)
+
+	// Execute the query
+	err := stmt.Query(itr.DatabaseManager.GetDatabaseConnection(), &item)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &item, nil
+}
+
+func (itr *ItemRepository) CreateItem(item *model.Items) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -92,7 +134,7 @@ func (itr *Iteitrepository) CreateItem(item *model.Items) (*uuid.UUID, *models.I
 	return &uuid, nil
 }
 
-func (itr *Iteitrepository) UpdateItem(item *model.Items) *models.INVError {
+func (itr *ItemRepository) UpdateItem(item *model.Items) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Items.UPDATE(
 		table.Items.Name,
@@ -136,7 +178,7 @@ func (itr *Iteitrepository) UpdateItem(item *model.Items) *models.INVError {
 	return nil
 }
 
-func (itr *Iteitrepository) DeleteItem(itemId *uuid.UUID) *models.INVError {
+func (itr *ItemRepository) DeleteItem(itemId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }

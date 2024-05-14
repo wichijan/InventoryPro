@@ -33,7 +33,7 @@ func (sr *ShelveRepository) GetShelves() (*[]models.OwnShelve, *models.INVError)
 		table.ShelveTypes.TypeName,
 		table.Shelves.RoomID,
 	).FROM(
-		table.Shelves.INNER_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)),
+		table.Shelves.LEFT_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)),
 	)
 
 	// Execute the query
@@ -58,7 +58,7 @@ func (sr *ShelveRepository) GetShelveById(id *uuid.UUID) (*models.OwnShelve, *mo
 		table.ShelveTypes.TypeName,
 		table.Shelves.RoomID,
 	).FROM(
-		table.Shelves.INNER_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)),
+		table.Shelves.LEFT_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)),
 	).WHERE(
 		table.Shelves.ID.EQ(mysql.String(id.String())),
 	)
@@ -148,7 +148,7 @@ func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *m
 		table.Items.AllColumns,
 	).FROM(
 		table.Shelves.
-			INNER_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)).
+			LEFT_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)).
 			LEFT_JOIN(table.ItemsInShelve, table.ItemsInShelve.ShelveID.EQ(table.Shelves.ID)).
 			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemsInShelve.ItemID)),
 	)
@@ -173,7 +173,7 @@ func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.Shelv
 		table.Items.AllColumns,
 	).FROM(
 		table.Shelves.
-			INNER_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)).
+			LEFT_JOIN(table.ShelveTypes, table.ShelveTypes.ID.EQ(table.Shelves.ShelveTypeID)).
 			LEFT_JOIN(table.ItemsInShelve, table.ItemsInShelve.ShelveID.EQ(table.Shelves.ID)).
 			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemsInShelve.ItemID)),
 	).WHERE(

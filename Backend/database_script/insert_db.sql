@@ -16,7 +16,10 @@ values
 Insert into
     item_status(id, status_name)
 values
-    (UUID(), 'Available'),
+    (
+        "740d9d99-7ac9-4f44-a67f-cdc2b7dad0a1",
+        'Available'
+    ),
     (UUID(), 'Reserved'),
     (UUID(), 'Borrowed'),
     (UUID(), 'Lost');
@@ -131,7 +134,8 @@ Insert into
         class_four,
         damaged,
         damaged_description,
-        quantity
+        quantity,
+        status_id
     )
 values
     (
@@ -145,7 +149,8 @@ values
         0,
         /* false */
         Null,
-        1
+        1,
+        "740d9d99-7ac9-4f44-a67f-cdc2b7dad0a1"
     ),
     (
         "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
@@ -157,7 +162,8 @@ values
         0,
         0,
         NULL,
-        20
+        20,
+        NULL
     ),
     (
         "7791a294-94de-4cbf-9243-3f7210664f92",
@@ -169,7 +175,8 @@ values
         0,
         0,
         NULL,
-        30
+        30,
+        NULL
     ),
     (
         "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
@@ -181,7 +188,8 @@ values
         1,
         0,
         NULL,
-        40
+        40,
+        NULL
     );
 
 Insert into
