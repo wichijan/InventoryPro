@@ -1,31 +1,4 @@
 definitions:
-  model.ItemPictures:
-    properties:
-      id:
-        type: string
-      itemID:
-        type: string
-      picture:
-        type: string
-    type: object
-  model.ItemSubjects:
-    properties:
-      id:
-        type: string
-      itemID:
-        type: string
-      subjectID:
-        type: string
-    type: object
-  model.KeywordsForItems:
-    properties:
-      id:
-        type: string
-      itemID:
-        type: string
-      keyword:
-        type: string
-    type: object
   model.Rooms:
     properties:
       id:
@@ -52,13 +25,13 @@ definitions:
   models.ItemWithEverything:
     properties:
       classFour:
-        type: string
+        type: boolean
       classOne:
-        type: string
+        type: boolean
       classThree:
-        type: string
+        type: boolean
       classTwo:
-        type: string
+        type: boolean
       damaged:
         type: boolean
       damagedDesc:
@@ -69,13 +42,27 @@ definitions:
         type: string
       keywords:
         items:
-          $ref: '#/definitions/model.KeywordsForItems'
+          properties:
+            id:
+              type: string
+            itemID:
+              type: string
+            keyword:
+              type: string
+          type: object
         type: array
       name:
         type: string
       pictures:
         items:
-          $ref: '#/definitions/model.ItemPictures'
+          properties:
+            id:
+              type: string
+            itemID:
+              type: string
+            picture:
+              type: string
+          type: object
         type: array
       quantity:
         type: integer
@@ -83,7 +70,14 @@ definitions:
         type: string
       subject:
         items:
-          $ref: '#/definitions/model.ItemSubjects'
+          properties:
+            id:
+              type: string
+            itemID:
+              type: string
+            subjectID:
+              type: string
+          type: object
         type: array
     type: object
   models.OwnShelve:
@@ -193,6 +187,33 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get items
+      tags:
+      - Items
+  /items/:id:
+    get:
+      consumes:
+      - application/json
+      description: Get item by id
+      parameters:
+      - description: item id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ItemWithEverything'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get item by id
       tags:
       - Items
   /rooms:

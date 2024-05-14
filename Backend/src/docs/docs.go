@@ -47,6 +47,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/items/:id": {
+            "get": {
+                "description": "Get item by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get item by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ItemWithEverything"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/rooms": {
             "get": {
                 "description": "Get rooms",
@@ -560,48 +601,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.ItemPictures": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "itemID": {
-                    "type": "string"
-                },
-                "picture": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.ItemSubjects": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "itemID": {
-                    "type": "string"
-                },
-                "subjectID": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.KeywordsForItems": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "itemID": {
-                    "type": "string"
-                },
-                "keyword": {
-                    "type": "string"
-                }
-            }
-        },
         "model.Rooms": {
             "type": "object",
             "properties": {
@@ -642,16 +641,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "classFour": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "classOne": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "classThree": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "classTwo": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "damaged": {
                     "type": "boolean"
@@ -668,7 +667,18 @@ const docTemplate = `{
                 "keywords": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.KeywordsForItems"
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "itemID": {
+                                "type": "string"
+                            },
+                            "keyword": {
+                                "type": "string"
+                            }
+                        }
                     }
                 },
                 "name": {
@@ -677,7 +687,18 @@ const docTemplate = `{
                 "pictures": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.ItemPictures"
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "itemID": {
+                                "type": "string"
+                            },
+                            "picture": {
+                                "type": "string"
+                            }
+                        }
                     }
                 },
                 "quantity": {
@@ -689,7 +710,18 @@ const docTemplate = `{
                 "subject": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.ItemSubjects"
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "itemID": {
+                                "type": "string"
+                            },
+                            "subjectID": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
