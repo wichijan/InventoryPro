@@ -8,10 +8,12 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type ItemStatusRepositoryI interface {
 	GetItemStatus() (*[]model.ItemStatus, *models.INVError)
+	GetStatusIdByName(statusName *string) (*uuid.UUID, *models.INVError)
 	CreateItemStatus(itemStatusName *string) (*uuid.UUID, *models.INVError)
 	UpdateItemStatus(itemStatus *model.ItemStatus) *models.INVError
 	DeleteItemStatus(itemStatusId *uuid.UUID) *models.INVError
@@ -39,6 +41,27 @@ func (isr *ItemStatusRepository) GetItemStatus() (*[]model.ItemStatus, *models.I
 
 	if len(itemStatus) == 0 {
 		return nil, inv_errors.INV_NOT_FOUND
+	}
+
+	return &itemStatus, nil
+}
+
+func (isr *ItemStatusRepository) GetStatusIdByName(statusName *string) (*uuid.UUID, *models.INVError) {
+	var itemStatus uuid.UUID
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.ItemStatus.ID,
+	).FROM(
+		table.ItemStatus,
+	).WHERE(
+		table.ItemStatus.StatusName.EQ(utils.MySqlString(*statusName)),
+	)
+
+	// Execute the query
+	err := stmt.Query(isr.DatabaseManager.GetDatabaseConnection(), &itemStatus)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return &itemStatus, nil

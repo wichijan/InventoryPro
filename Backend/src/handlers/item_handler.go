@@ -54,3 +54,34 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusOK, item)
 	}
 }
+
+/*
+// @Summary Create Item
+// @Description Create Item
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param room body model.Rooms true "ItemWithStatus model"
+// @Success 201 {object} models.ItemWithStatus
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items [post]
+func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var item models.ItemWithStatus
+		err := c.ShouldBindJSON(&item)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		itemId, inv_err := itemCtrl.CreateItem(&item)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusCreated, itemId)
+	}
+}
+*/
