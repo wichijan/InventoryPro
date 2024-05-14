@@ -64,7 +64,7 @@ func GetRoomsByIdHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 // @Accept  json
 // @Produce  json
 // @Param id path string true "room id"
-// @Success 200 {object} model.Rooms
+// @Success 200 {object} models.RoomWithShelves
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
@@ -86,7 +86,7 @@ func GetRoomsWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.Handler
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Room id"
-// @Success 200 {object} model.Rooms
+// @Success 200 {object} models.RoomWithShelves
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage

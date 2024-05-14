@@ -1,4 +1,31 @@
 definitions:
+  model.ItemPictures:
+    properties:
+      id:
+        type: string
+      itemID:
+        type: string
+      picture:
+        type: string
+    type: object
+  model.ItemSubjects:
+    properties:
+      id:
+        type: string
+      itemID:
+        type: string
+      subjectID:
+        type: string
+    type: object
+  model.KeywordsForItems:
+    properties:
+      id:
+        type: string
+      itemID:
+        type: string
+      keyword:
+        type: string
+    type: object
   model.Rooms:
     properties:
       id:
@@ -6,15 +33,6 @@ definitions:
       name:
         type: string
       warehouseID:
-        type: string
-    type: object
-  model.Shelves:
-    properties:
-      id:
-        type: string
-      roomID:
-        type: string
-      shelveTypeID:
         type: string
     type: object
   model.Warehouses:
@@ -31,9 +49,152 @@ definitions:
       errorMessage:
         type: string
     type: object
+  models.ItemWithEverything:
+    properties:
+      classFour:
+        type: string
+      classOne:
+        type: string
+      classThree:
+        type: string
+      classTwo:
+        type: string
+      damaged:
+        type: boolean
+      damagedDesc:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      keywords:
+        items:
+          $ref: '#/definitions/model.KeywordsForItems'
+        type: array
+      name:
+        type: string
+      pictures:
+        items:
+          $ref: '#/definitions/model.ItemPictures'
+        type: array
+      quantity:
+        type: integer
+      status:
+        type: string
+      subject:
+        items:
+          $ref: '#/definitions/model.ItemSubjects'
+        type: array
+    type: object
+  models.OwnShelve:
+    properties:
+      id:
+        type: string
+      roomID:
+        type: string
+      shelveTypeName:
+        type: string
+    type: object
+  models.RoomWithShelves:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      shelves:
+        items:
+          properties:
+            id:
+              type: string
+            roomID:
+              type: string
+            shelveTypeID:
+              type: string
+          type: object
+        type: array
+      warehouseID:
+        type: string
+    type: object
+  models.ShelveWithItems:
+    properties:
+      id:
+        type: string
+      items:
+        items:
+          properties:
+            classFour:
+              type: boolean
+            classOne:
+              type: boolean
+            classThree:
+              type: boolean
+            classTwo:
+              type: boolean
+            damaged:
+              type: boolean
+            damagedDescription:
+              type: string
+            description:
+              type: string
+            id:
+              type: string
+            name:
+              type: string
+            quantity:
+              type: integer
+            statusID:
+              type: string
+          type: object
+        type: array
+      roomID:
+        type: string
+      shelveTypeName:
+        type: string
+    type: object
+  models.WarehouseWithRooms:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      rooms:
+        items:
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            warehouseID:
+              type: string
+          type: object
+        type: array
+    type: object
 info:
   contact: {}
 paths:
+  /items:
+    get:
+      consumes:
+      - application/json
+      description: Get items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ItemWithEverything'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get items
+      tags:
+      - Items
   /rooms:
     get:
       consumes:
@@ -130,7 +291,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Rooms'
+            $ref: '#/definitions/models.RoomWithShelves'
         "400":
           description: Bad Request
           schema:
@@ -158,7 +319,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Shelves'
+              $ref: '#/definitions/models.OwnShelve'
             type: array
         "500":
           description: Internal Server Error
@@ -184,7 +345,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Shelves'
+            $ref: '#/definitions/models.OwnShelve'
         "400":
           description: Bad Request
           schema:
@@ -211,7 +372,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Shelves'
+            $ref: '#/definitions/models.ShelveWithItems'
         "400":
           description: Bad Request
           schema:
@@ -244,7 +405,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Shelves'
+            $ref: '#/definitions/models.ShelveWithItems'
         "400":
           description: Bad Request
           schema:
@@ -355,7 +516,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Warehouses'
+            $ref: '#/definitions/models.WarehouseWithRooms'
         "400":
           description: Bad Request
           schema:

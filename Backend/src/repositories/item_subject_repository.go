@@ -12,6 +12,7 @@ import (
 
 type ItemSubjectRepositoryI interface {
 	GetItemsForSubject(subjectId *string) (*[]model.ItemSubjects, *models.INVError)
+	GetSubjectsForItem(itemId *string) (*[]model.ItemSubjects, *models.INVError)
 	CreateItemForSubject(itemForSubject *model.ItemSubjects) (*uuid.UUID, *models.INVError)
 	UpdateItemForSubject(itemForSubject *model.ItemSubjects) *models.INVError
 	DeleteItemForSubject(itemIdForSubject *uuid.UUID) *models.INVError
@@ -29,7 +30,7 @@ func (isjr *ItemSubjectRepository) GetItemsForSubject(subjectId *string) (*[]mod
 		table.ItemSubjects.AllColumns,
 	).FROM(
 		table.ItemSubjects,
-	).WHERE(table.ItemSubjects.ID.EQ(mysql.String(*subjectId)))
+	).WHERE(table.ItemSubjects.SubjectID.EQ(mysql.String(*subjectId)))
 
 	// Execute the query
 	err := stmt.Query(isjr.DatabaseManager.GetDatabaseConnection(), &itemsForSubject)
@@ -42,6 +43,29 @@ func (isjr *ItemSubjectRepository) GetItemsForSubject(subjectId *string) (*[]mod
 	}
 
 	return &itemsForSubject, nil
+}
+
+func (isjr *ItemSubjectRepository) GetSubjectsForItem(itemId *string) (*[]model.ItemSubjects, *models.INVError) {
+	var itemWithSubject []model.ItemSubjects
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.ItemSubjects.AllColumns,
+	).FROM(
+		table.ItemSubjects,
+	).WHERE(table.ItemSubjects.ItemID.EQ(mysql.String(*itemId)))
+
+	// Execute the query
+	err := stmt.Query(isjr.DatabaseManager.GetDatabaseConnection(), &itemWithSubject)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if len(itemWithSubject) == 0 {
+		return nil, inv_errors.INV_NOT_FOUND
+	}
+
+	return &itemWithSubject, nil
 }
 
 func (isjr *ItemSubjectRepository) CreateItemForSubject(itemForSubject *model.ItemSubjects) (*uuid.UUID, *models.INVError) {

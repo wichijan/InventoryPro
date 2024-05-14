@@ -29,7 +29,7 @@ func (ipr *ItemPictureRepository) GetItemPictures(itemId *string) (*[]model.Item
 		table.ItemPictures.AllColumns,
 	).FROM(
 		table.ItemPictures,
-	).WHERE(table.ItemPictures.ID.EQ(mysql.String(*itemId)))
+	).WHERE(table.ItemPictures.ItemID.EQ(mysql.String(*itemId)))
 
 	// Execute the query
 	err := stmt.Query(ipr.DatabaseManager.GetDatabaseConnection(), &itemPictures)
