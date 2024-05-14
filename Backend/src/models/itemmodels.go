@@ -29,9 +29,15 @@ type ItemWithEverything struct {
 	Quantity    int    `alias:"items.quantity"`
 	Status      string `alias:"item_status.status_name"`
 
-	Keywords *[]model.KeywordsForItems
+	Keywords []struct {
+		model.KeywordsForItems
+	}
 
-	Subject *[]model.ItemSubjects
+	Subject []struct {
+		model.ItemSubjects
+	}
 
-	Pictures *[]model.ItemPictures
+	Pictures []struct {
+		model.ItemPictures
+	}
 }

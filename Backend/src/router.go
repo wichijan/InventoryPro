@@ -99,7 +99,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	//publicRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
 
 	// Items routes
-	//publicRoutes.Handle(http.MethodGet, "/items", handlers.GetItemsHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodGet, "/items", handlers.GetItemsHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"

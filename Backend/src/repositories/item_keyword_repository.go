@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -47,6 +49,8 @@ func (kfir *ItemKeywordRepository) GetKeywordsForItems() (*[]model.KeywordsForIt
 
 func (kfir *ItemKeywordRepository) GetKeywordsForItem(itemId *string) (*[]model.KeywordsForItems, *models.INVError) {
 	var keywords []model.KeywordsForItems
+
+	log.Print("GetKeywords Repo")
 
 	// Create the query
 	stmt := mysql.SELECT(

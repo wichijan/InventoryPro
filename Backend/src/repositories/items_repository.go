@@ -11,8 +11,8 @@ import (
 )
 
 type ItemRepositoryI interface {
-	GetItems() (*[]models.ItemWithStatus, *models.INVError)
-	GetItemById() (*models.ItemWithStatus, *models.INVError)
+	GetItems() (*[]models.ItemWithEverything, *models.INVError)
+	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
 	CreateItem(item *model.Items) (*uuid.UUID, *models.INVError)
 	UpdateItem(item *model.Items) *models.INVError
 	DeleteItem(itemId *uuid.UUID) *models.INVError
@@ -22,8 +22,8 @@ type ItemRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (itr *ItemRepository) GetItems() (*[]models.ItemWithStatus, *models.INVError) {
-	var items []models.ItemWithStatus
+func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INVError) {
+	var items []models.ItemWithEverything
 
 	// Create the query
 	stmt := mysql.SELECT(
@@ -38,8 +38,15 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithStatus, *models.INVErro
 		table.Items.DamagedDescription,
 		table.Items.Quantity,
 		table.ItemStatus.StatusName,
+		table.ItemPictures.AllColumns,
+		table.ItemSubjects.AllColumns,
+		table.KeywordsForItems.AllColumns,
 	).FROM(
-		table.Items.LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)),
+		table.Items.
+			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)).
+			LEFT_JOIN(table.ItemPictures, table.ItemPictures.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)),
 	)
 
 	// Execute the query
@@ -55,8 +62,8 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithStatus, *models.INVErro
 	return &items, nil
 }
 
-func (itr *ItemRepository) GetItemById() (*models.ItemWithStatus, *models.INVError) {
-	var item models.ItemWithStatus
+func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError) {
+	var items models.ItemWithEverything
 
 	// Create the query
 	stmt := mysql.SELECT(
@@ -71,19 +78,26 @@ func (itr *ItemRepository) GetItemById() (*models.ItemWithStatus, *models.INVErr
 		table.Items.DamagedDescription,
 		table.Items.Quantity,
 		table.ItemStatus.StatusName,
+		table.ItemPictures.AllColumns,
+		table.ItemSubjects.AllColumns,
+		table.KeywordsForItems.AllColumns,
 	).FROM(
-		table.Items.LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)),
+		table.Items.
+			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)).
+			LEFT_JOIN(table.ItemPictures, table.ItemPictures.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)),
 	).WHERE(
-		table.Items.ID.EQ(mysql.String(item.ID)),
+		table.Items.ID.EQ(mysql.String(itemId.String())),
 	)
 
 	// Execute the query
-	err := stmt.Query(itr.DatabaseManager.GetDatabaseConnection(), &item)
+	err := stmt.Query(itr.DatabaseManager.GetDatabaseConnection(), &items)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
-	return &item, nil
+	return &items, nil
 }
 
 func (itr *ItemRepository) CreateItem(item *model.Items) (*uuid.UUID, *models.INVError) {
