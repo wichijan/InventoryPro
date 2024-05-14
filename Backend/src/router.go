@@ -8,6 +8,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/controllers"
 	"github.com/wichijan/InventoryPro/src/handlers"
 	"github.com/wichijan/InventoryPro/src/managers"
+	"github.com/wichijan/InventoryPro/src/middlewares"
 	"github.com/wichijan/InventoryPro/src/repositories"
 )
 
@@ -22,6 +23,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Attach Middleware
 	router.Use(middlewares.CorsMiddleware())
+	//securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
+	//adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware())
 
 	// Create api groups, with special middleware
 	publicRoutes := router.Group("/")
@@ -82,7 +85,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/shelves/:id", handlers.GetShelveByIdHandler(controller.ShelveController))
 	//publicRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
 	//publicRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
-
 
 	return router
 }
