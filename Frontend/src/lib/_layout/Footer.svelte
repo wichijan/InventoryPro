@@ -1,4 +1,4 @@
-<div class="w-full px-3 lg:py-8 sm:px-12 bg-gray-700">
+<div class="w-full px-3 lg:py-8 sm:px-12 bg-gray-900">
   <div class="w-full max-w-6xl mx-auto">
     <div class="md:flex md:justify-between">
       <div class="mt-4 mb-6 md:mb-0">

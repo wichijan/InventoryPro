@@ -55,10 +55,9 @@
             placeholder="Password"
             required
           />
-          <p class="text-red-600 text-sm mt-2">{passwordError}</p>
+          <p class="text-red-500 text-sm mt-2">{passwordError}</p>
         </div>
       </div>
-      <!-- Need to be registerd and remember me-->
       <div class="flex justify-between">
         <div class="flex flex-row w-max gap-1">
           <input type="checkbox" class="mx-auto my-auto rounded" />
