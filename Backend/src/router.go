@@ -6,10 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/wichijan/InventoryPro/src/controllers"
+	"github.com/wichijan/InventoryPro/src/docs"
 	"github.com/wichijan/InventoryPro/src/handlers"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/middlewares"
 	"github.com/wichijan/InventoryPro/src/repositories"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Controllers struct {
@@ -85,6 +89,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/shelves/:id", handlers.GetShelveByIdHandler(controller.ShelveController))
 	//publicRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
 	//publicRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
+
+	// swagger
+	docs.SwaggerInfo.Title = "InventoryPro API"
+	docs.SwaggerInfo.Description = "This is the API for the InventoryPro project"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Schemes = []string{"http"}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }
