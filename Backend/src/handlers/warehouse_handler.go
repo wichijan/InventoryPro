@@ -64,7 +64,7 @@ func GetWarehouseByIdHandler(warehouseCtrl controllers.WarehouseControllerI) gin
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Warehouse id"
-// @Success 200 {object} model.WarehouseWithRooms
+// @Success 200 {object} models.WarehouseWithRooms
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
@@ -86,7 +86,7 @@ func GetWarehousesWithRoomsHandler(warehouseCtrl controllers.WarehouseController
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Warehouse id"
-// @Success 200 {object} model.WarehouseWithRooms
+// @Success 200 {object} models.WarehouseWithRooms
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage

@@ -15,6 +15,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/items": {
+            "get": {
+                "description": "Get items",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get items",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ItemWithEverything"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/rooms": {
             "get": {
                 "description": "Get rooms",
@@ -161,7 +193,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Rooms"
+                            "$ref": "#/definitions/models.RoomWithShelves"
                         }
                     },
                     "400": {
@@ -204,7 +236,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Shelves"
+                                "$ref": "#/definitions/models.OwnShelve"
                             }
                         }
                     },
@@ -243,7 +275,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Shelves"
+                            "$ref": "#/definitions/models.OwnShelve"
                         }
                     },
                     "400": {
@@ -284,7 +316,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Shelves"
+                            "$ref": "#/definitions/models.ShelveWithItems"
                         }
                     },
                     "400": {
@@ -334,7 +366,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Shelves"
+                            "$ref": "#/definitions/models.ShelveWithItems"
                         }
                     },
                     "400": {
@@ -502,7 +534,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Warehouses"
+                            "$ref": "#/definitions/models.WarehouseWithRooms"
                         }
                     },
                     "400": {
@@ -528,6 +560,48 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.ItemPictures": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "itemID": {
+                    "type": "string"
+                },
+                "picture": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ItemSubjects": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "itemID": {
+                    "type": "string"
+                },
+                "subjectID": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.KeywordsForItems": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "itemID": {
+                    "type": "string"
+                },
+                "keyword": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Rooms": {
             "type": "object",
             "properties": {
@@ -538,20 +612,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "warehouseID": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Shelves": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "roomID": {
-                    "type": "string"
-                },
-                "shelveTypeID": {
                     "type": "string"
                 }
             }
@@ -575,6 +635,193 @@ const docTemplate = `{
             "properties": {
                 "errorMessage": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ItemWithEverything": {
+            "type": "object",
+            "properties": {
+                "classFour": {
+                    "type": "string"
+                },
+                "classOne": {
+                    "type": "string"
+                },
+                "classThree": {
+                    "type": "string"
+                },
+                "classTwo": {
+                    "type": "string"
+                },
+                "damaged": {
+                    "type": "boolean"
+                },
+                "damagedDesc": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.KeywordsForItems"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "pictures": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ItemPictures"
+                    }
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ItemSubjects"
+                    }
+                }
+            }
+        },
+        "models.OwnShelve": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "roomID": {
+                    "type": "string"
+                },
+                "shelveTypeName": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RoomWithShelves": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "shelves": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "roomID": {
+                                "type": "string"
+                            },
+                            "shelveTypeID": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "warehouseID": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ShelveWithItems": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "classFour": {
+                                "type": "boolean"
+                            },
+                            "classOne": {
+                                "type": "boolean"
+                            },
+                            "classThree": {
+                                "type": "boolean"
+                            },
+                            "classTwo": {
+                                "type": "boolean"
+                            },
+                            "damaged": {
+                                "type": "boolean"
+                            },
+                            "damagedDescription": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "quantity": {
+                                "type": "integer"
+                            },
+                            "statusID": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "roomID": {
+                    "type": "string"
+                },
+                "shelveTypeName": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.WarehouseWithRooms": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "rooms": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "warehouseID": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             }
         }
