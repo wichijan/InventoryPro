@@ -13,7 +13,7 @@ import (
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} model.ItemWithStatus
+// @Success 200 {array} model.ItemWithEverything
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items [get]
 func GetItemsHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
