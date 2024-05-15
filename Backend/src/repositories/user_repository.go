@@ -8,47 +8,78 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type UserRepositoryI interface {
-	GetUsers() (*[]model.Users, *models.INVError)
-	CreateUser(user *model.Users) (*uuid.UUID, *models.INVError)
-	UpdateUser(user *model.Users) *models.INVError
-	DeleteUser(userId *uuid.UUID) *models.INVError
+	GetUserById(id *uuid.UUID) (*model.Users, *models.INVError)
+	GetUserByUsername(username string) (*model.Users, *models.INVError)
+	CreateUser(user model.Users) *models.INVError
+	CheckIfUsernameExists(username string) *models.INVError
+	CheckIfEmailExists(email string) *models.INVError
 }
 
 type UserRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (ur *UserRepository) GetUsers() (*[]model.Users, *models.INVError) {
-	var users []model.Users
-
-	// Create the query
+func (ur *UserRepository) GetUserById(id *uuid.UUID) (*model.Users, *models.INVError) {
+	var user model.Users
 	stmt := mysql.SELECT(
-		table.Users.AllColumns,
+		table.Users.ID,
+		table.Users.Username,
+		table.Users.Email,
+		table.Users.Password,
+		table.Users.FirstName,
+		table.Users.LastName,
+		table.Users.JobTitle,
+		table.Users.PhoneNumber,
+		table.Users.UserTypeID,
 	).FROM(
 		table.Users,
+	).WHERE(
+		table.Users.ID.EQ(utils.MySqlString(id.String())),
 	)
-
-	// Execute the query
-	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &users)
+	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &user)
 	if err != nil {
+		if err.Error() == "jet: sql: no rows in result set" {
+			return nil, inv_errors.INV_USER_NOT_FOUND
+		}
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
-	if len(users) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
-	}
-
-	return &users, nil
+	return &user, nil
 }
 
-func (ur *UserRepository) CreateUser(user *model.Users) (*uuid.UUID, *models.INVError) {
-	uuid := uuid.New()
+func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *models.INVError) {
+	var user model.Users
+	stmt := mysql.SELECT(
+		table.Users.Username,
+		table.Users.Email,
+		table.Users.Password,
+		table.Users.FirstName,
+		table.Users.LastName,
+		table.Users.JobTitle,
+		table.Users.PhoneNumber,
+		table.Users.UserTypeID,
+	).FROM(
+		table.Users,
+	).WHERE(
+		table.Users.Username.EQ(mysql.String(username)),
+	)
+	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &user)
+	if err != nil {
+		if err.Error() == "jet: sql: no rows in result set" {
+			return nil, inv_errors.INV_USER_NOT_FOUND
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
 
-	// Create the insert statement
-	insertQuery := table.Users.INSERT(
+	return &user, nil
+}
+
+func (ur *UserRepository) CreateUser(user model.Users) *models.INVError {
+	stmt := table.Users.INSERT(
 		table.Users.ID,
 		table.Users.FirstName,
 		table.Users.LastName,
@@ -59,7 +90,7 @@ func (ur *UserRepository) CreateUser(user *model.Users) (*uuid.UUID, *models.INV
 		table.Users.PhoneNumber,
 		table.Users.UserTypeID,
 	).VALUES(
-		uuid.String(),
+		user.ID,
 		user.FirstName,
 		user.LastName,
 		user.Username,
@@ -67,68 +98,35 @@ func (ur *UserRepository) CreateUser(user *model.Users) (*uuid.UUID, *models.INV
 		user.Password,
 		user.JobTitle,
 		user.PhoneNumber,
-		user.UserTypeID,		
+		user.UserTypeID,
 	)
 
-	// Execute the query
-	rows, err := insertQuery.Exec(ur.DatabaseManager.GetDatabaseConnection())
-	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
+	_, err := stmt.Exec(ur.DatabaseManager.GetDatabaseConnection())
 
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
-	}
-
-	return &uuid, nil
-}
-
-func (ur *UserRepository) UpdateUser(user *model.Users) *models.INVError {
-	// Create the update statement
-	updateQuery := table.Users.UPDATE(
-		table.Users.FirstName,
-		table.Users.LastName,
-		table.Users.Username,
-		table.Users.Email,
-		table.Users.Password,
-		table.Users.JobTitle,
-		table.Users.PhoneNumber,
-		table.Users.UserTypeID,
-	).SET(
-		user.FirstName,
-		user.LastName,
-		user.Username,
-		user.Email,
-		user.Password,
-		user.JobTitle,
-		user.PhoneNumber,
-		user.UserTypeID,		
-	).WHERE(table.Users.ID.EQ(mysql.String(user.ID)))
-
-	// Execute the query
-	rows, err := updateQuery.Exec(ur.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
-	}
-
 	return nil
 }
 
-func (ur *UserRepository) DeleteUser(userId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
+func (ur *UserRepository) CheckIfUsernameExists(username string) *models.INVError {
+	count, err := utils.CountStatement(table.Users, table.Users.Username.EQ(mysql.String(username)), ur.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	if count > 0 {
+		return inv_errors.INV_USERNAME_EXISTS
+	}
+	return nil
+}
+
+func (ur *UserRepository) CheckIfEmailExists(email string) *models.INVError {
+	count, err := utils.CountStatement(table.Users, table.Users.Email.EQ(mysql.String(email)), ur.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	if count > 0 {
+		return inv_errors.INV_EMAIL_EXISTS
+	}
 	return nil
 }
