@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Go Debug Main",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/Backend/src",
+            "cwd": "${workspaceFolder}/Backend",
+            "env": {
+                "DB_HOST": "localhost",
+                "DB_PORT": "3306",
+                "DB_USER": "inventur",
+                "DB_PASSWORD": "1234",
+                "DB_NAME": "InventoryProDB",
+                "JWT_SECRET": "187_420_69",
+            },
+        },
+    ]
+}

@@ -13,14 +13,12 @@ type ItemControllerI interface {
 	GetItems() (*[]models.ItemWithEverything, *models.INVError)
 	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
 	CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *models.INVError)
+	UpdateItem(item *models.ItemWithStatus) *models.INVError
 }
 
 type ItemController struct {
-	ItemRepo        repositories.ItemRepositoryI
-	ItemKeywordRepo repositories.ItemKeywordRepositoryI
-	ItemSubjectRepo repositories.ItemSubjectRepositoryI
-	ItemPictureRepo repositories.ItemPictureRepositoryI
-	ItemStatus      repositories.ItemStatusRepositoryI
+	ItemRepo       repositories.ItemRepositoryI
+	ItemStatusRepo repositories.ItemStatusRepositoryI
 }
 
 func (ic *ItemController) GetItems() (*[]models.ItemWithEverything, *models.INVError) {
@@ -42,8 +40,6 @@ func (ic *ItemController) GetItemById(itemId *uuid.UUID) (*models.ItemWithEveryt
 }
 
 func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *models.INVError) {
-	log.Print(item)
-
 	var pureItem model.Items
 	pureItem.ID = item.ID
 	pureItem.Name = &item.Name
@@ -56,15 +52,18 @@ func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *
 	pureItem.DamagedDescription = &item.DamagedDesc
 	pureItem.Quantity = &item.Quantity
 
-	log.Print(item.Status)
+	if item.Status != "" {
+		statusId, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&item.Status)
+		if inv_error != nil {
+			return nil, inv_error
+		}
 
-	statusId, inv_error := ic.ItemStatus.GetStatusIdByName(&item.Status)
-	if inv_error != nil {
-		return nil, inv_error
+		log.Print(statusId.String())
+		statusString := statusId.String()
+		pureItem.StatusID = &statusString
+	} else {
+		pureItem.StatusID = nil
 	}
-
-	statusString := statusId.String()
-	pureItem.StatusID = &statusString
 
 	id, inv_error := ic.ItemRepo.CreateItem(&pureItem)
 	if inv_error != nil {
@@ -72,4 +71,38 @@ func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *
 	}
 
 	return id, nil
+}
+
+func (ic *ItemController) UpdateItem(item *models.ItemWithStatus) *models.INVError {
+	var pureItem model.Items
+	pureItem.ID = item.ID
+	pureItem.Name = &item.Name
+	pureItem.Description = &item.Description
+	pureItem.ClassOne = &item.ClassOne
+	pureItem.ClassTwo = &item.ClassTwo
+	pureItem.ClassThree = &item.ClassThree
+	pureItem.ClassFour = &item.ClassFour
+	pureItem.Damaged = &item.Damaged
+	pureItem.DamagedDescription = &item.DamagedDesc
+	pureItem.Quantity = &item.Quantity
+
+	if item.Status != "" {
+		statusId, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&item.Status)
+		if inv_error != nil {
+			return inv_error
+		}
+
+		log.Print(statusId.String())
+		statusString := statusId.String()
+		pureItem.StatusID = &statusString
+	} else {
+		pureItem.StatusID = nil
+	}
+
+	inv_error := ic.ItemRepo.UpdateItem(&pureItem)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
 }

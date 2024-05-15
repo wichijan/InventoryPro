@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
+	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/utils"
 )
 
@@ -55,7 +56,6 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
-/*
 // @Summary Create Item
 // @Description Create Item
 // @Tags Items
@@ -84,4 +84,32 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusCreated, itemId)
 	}
 }
-*/
+
+// @Summary Update Item
+// @Description Update Item
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param room body model.Rooms true "ItemWithStatus model"
+// @Success 201 {object} models.ItemWithStatus
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items [put]
+func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var item models.ItemWithStatus
+		err := c.ShouldBindJSON(&item)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		inv_err := itemCtrl.UpdateItem(&item)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
