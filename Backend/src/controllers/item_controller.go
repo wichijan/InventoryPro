@@ -13,6 +13,7 @@ type ItemControllerI interface {
 	GetItems() (*[]models.ItemWithEverything, *models.INVError)
 	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
 	CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *models.INVError)
+	UpdateItem(item *models.ItemWithStatus) *models.INVError
 }
 
 type ItemController struct {
@@ -52,7 +53,6 @@ func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *
 	pureItem.Quantity = &item.Quantity
 
 	if item.Status != "" {
-		log.Print("Status: " + item.Status)
 		statusId, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&item.Status)
 		if inv_error != nil {
 			return nil, inv_error
@@ -71,4 +71,38 @@ func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *
 	}
 
 	return id, nil
+}
+
+func (ic *ItemController) UpdateItem(item *models.ItemWithStatus) *models.INVError {
+	var pureItem model.Items
+	pureItem.ID = item.ID
+	pureItem.Name = &item.Name
+	pureItem.Description = &item.Description
+	pureItem.ClassOne = &item.ClassOne
+	pureItem.ClassTwo = &item.ClassTwo
+	pureItem.ClassThree = &item.ClassThree
+	pureItem.ClassFour = &item.ClassFour
+	pureItem.Damaged = &item.Damaged
+	pureItem.DamagedDescription = &item.DamagedDesc
+	pureItem.Quantity = &item.Quantity
+
+	if item.Status != "" {
+		statusId, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&item.Status)
+		if inv_error != nil {
+			return inv_error
+		}
+
+		log.Print(statusId.String())
+		statusString := statusId.String()
+		pureItem.StatusID = &statusString
+	} else {
+		pureItem.StatusID = nil
+	}
+
+	inv_error := ic.ItemRepo.UpdateItem(&pureItem)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
 }
