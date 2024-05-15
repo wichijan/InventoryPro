@@ -80,6 +80,31 @@ definitions:
           type: object
         type: array
     type: object
+  models.ItemWithStatus:
+    properties:
+      classFour:
+        type: boolean
+      classOne:
+        type: boolean
+      classThree:
+        type: boolean
+      classTwo:
+        type: boolean
+      damaged:
+        type: boolean
+      damagedDesc:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      quantity:
+        type: integer
+      status:
+        type: string
+    type: object
   models.OwnShelve:
     properties:
       id:
@@ -187,6 +212,64 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get items
+      tags:
+      - Items
+    post:
+      consumes:
+      - application/json
+      description: Create Item
+      parameters:
+      - description: ItemWithStatus model
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/model.Rooms'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ItemWithStatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Item
+      tags:
+      - Items
+    put:
+      consumes:
+      - application/json
+      description: Update Item
+      parameters:
+      - description: ItemWithStatus model
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/model.Rooms'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ItemWithStatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update Item
       tags:
       - Items
   /items/:id:
