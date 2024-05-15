@@ -54,6 +54,7 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*model.Users, *models.INVE
 func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *models.INVError) {
 	var user model.Users
 	stmt := mysql.SELECT(
+		table.Users.ID,
 		table.Users.Username,
 		table.Users.Email,
 		table.Users.Password,
