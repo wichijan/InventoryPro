@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
+	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/utils"
 )
 
@@ -55,7 +56,6 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
-/*
 // @Summary Create Item
 // @Description Create Item
 // @Tags Items
@@ -84,4 +84,3 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusCreated, itemId)
 	}
 }
-*/

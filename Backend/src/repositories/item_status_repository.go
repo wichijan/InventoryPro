@@ -47,11 +47,11 @@ func (isr *ItemStatusRepository) GetItemStatus() (*[]model.ItemStatus, *models.I
 }
 
 func (isr *ItemStatusRepository) GetStatusIdByName(statusName *string) (*uuid.UUID, *models.INVError) {
-	var itemStatus uuid.UUID
+	var itemStatusModel model.ItemStatus
 
 	// Create the query
 	stmt := mysql.SELECT(
-		table.ItemStatus.ID,
+		table.ItemStatus.AllColumns,
 	).FROM(
 		table.ItemStatus,
 	).WHERE(
@@ -59,12 +59,21 @@ func (isr *ItemStatusRepository) GetStatusIdByName(statusName *string) (*uuid.UU
 	)
 
 	// Execute the query
-	err := stmt.Query(isr.DatabaseManager.GetDatabaseConnection(), &itemStatus)
+	err := stmt.Query(isr.DatabaseManager.GetDatabaseConnection(), &itemStatusModel)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
-	return &itemStatus, nil
+	if itemStatusModel.ID == "" {
+		return nil, inv_errors.INV_NOT_FOUND
+	}
+
+	itemStatusId, err := uuid.Parse(itemStatusModel.ID)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &itemStatusId, nil
 }
 
 func (isr *ItemStatusRepository) CreateItemStatus(itemStatusName *string) (*uuid.UUID, *models.INVError) {
