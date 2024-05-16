@@ -10,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type ItemKeywordRepositoryI interface {
@@ -17,6 +18,7 @@ type ItemKeywordRepositoryI interface {
 	GetKeywordsForItem(itemId *string) (*[]model.KeywordsForItems, *models.INVError)
 	CreateKeywordForItem(keyword *models.ItemWithKeyword) (*uuid.UUID, *models.INVError)
 	DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError
+	CheckIfKeywordAndItemExists(keywordAndItem models.ItemWithKeyword) *models.INVError
 }
 
 type ItemKeywordRepository struct {
@@ -108,7 +110,7 @@ func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWith
 func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError {
 	deleteQuery := table.KeywordsForItems.DELETE().WHERE(
 		table.KeywordsForItems.ID.EQ(mysql.String(keyword.KeywordID)).
-		AND(table.KeywordsForItems.ItemID.EQ(mysql.String(keyword.ItemID))),
+			AND(table.KeywordsForItems.ItemID.EQ(mysql.String(keyword.ItemID))),
 	)
 
 	// Execute the query
@@ -126,5 +128,16 @@ func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keyword *models.ItemWith
 		return inv_errors.INV_NOT_FOUND
 	}
 
+	return nil
+}
+
+func (kfir *ItemKeywordRepository) CheckIfKeywordAndItemExists(keywordAndItem models.ItemWithKeyword) *models.INVError {
+	count, err := utils.CountStatement(table.KeywordsForItems, table.KeywordsForItems.KeywordID.EQ(mysql.String(*&keywordAndItem.KeywordID)).AND(table.KeywordsForItems.ItemID.EQ(mysql.String(*&keywordAndItem.ItemID))), kfir.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	if count > 0 {
+		return inv_errors.INV_KEYWORDS_ITEM_COMBI_EXISTS
+	}
 	return nil
 }

@@ -122,6 +122,12 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 		KeywordID: keyword.ID,
 	}
 
+	// TODO Move to handler
+	inv_err := ic.ItemKeywordRepo.CheckIfKeywordAndItemExists(itemKeywordWithID)
+	if inv_err != nil {
+		return inv_err
+	}
+
 	_, inv_error = ic.ItemKeywordRepo.CreateKeywordForItem(&itemKeywordWithID)
 	if inv_error != nil {
 		return inv_error

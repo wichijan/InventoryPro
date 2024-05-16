@@ -21,6 +21,8 @@ var (
 	INV_EMAIL_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "EMAIL_EXISTS"}, Status: 409}
 	// INV_USERNAME_EXISTS is used to indicate that the username already exists
 	INV_USERNAME_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "USERNAME_EXISTS"}, Status: 409}
+	// INV_KEYWORDS_ITEM_COMBI_EXISTS is used to indicate that the username already exists
+	INV_KEYWORDS_ITEM_COMBI_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "KEYWORDS_ITEM_COMBI_EXISTS"}, Status: 409}
 	// INV_KEYWORD_EXISTS is used to indicate that the keyword already exists
 	INV_KEYWORD_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "KEYWORD_EXISTS"}, Status: 409}
 	// INV_CONFLICT is used to indicate that the request could not be processed due to a conflict
