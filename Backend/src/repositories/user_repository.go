@@ -12,8 +12,8 @@ import (
 )
 
 type UserRepositoryI interface {
-	GetUserById(id *uuid.UUID) (*model.Users, *models.INVError)
-	GetUserByUsername(username string) (*model.Users, *models.INVError)
+	GetUserById(id *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
+	GetUserByUsername(username string) (*models.UserWithTypeName, *models.INVError)
 	CreateUser(user model.Users) *models.INVError
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
@@ -23,8 +23,8 @@ type UserRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (ur *UserRepository) GetUserById(id *uuid.UUID) (*model.Users, *models.INVError) {
-	var user model.Users
+func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, *models.INVError) {
+	var user models.UserWithTypeName
 	stmt := mysql.SELECT(
 		table.Users.ID,
 		table.Users.Username,
@@ -34,9 +34,10 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*model.Users, *models.INVE
 		table.Users.LastName,
 		table.Users.JobTitle,
 		table.Users.PhoneNumber,
-		table.Users.UserTypeID,
+		table.UserTypes.TypeName,
 	).FROM(
-		table.Users,
+		table.Users.
+			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
 	).WHERE(
 		table.Users.ID.EQ(utils.MySqlString(id.String())),
 	)
@@ -51,8 +52,8 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*model.Users, *models.INVE
 	return &user, nil
 }
 
-func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *models.INVError) {
-	var user model.Users
+func (ur *UserRepository) GetUserByUsername(username string) (*models.UserWithTypeName, *models.INVError) {
+	var user models.UserWithTypeName
 	stmt := mysql.SELECT(
 		table.Users.ID,
 		table.Users.Username,
@@ -62,9 +63,10 @@ func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *mod
 		table.Users.LastName,
 		table.Users.JobTitle,
 		table.Users.PhoneNumber,
-		table.Users.UserTypeID,
+		table.UserTypes.TypeName,
 	).FROM(
-		table.Users,
+		table.Users.
+			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
 	).WHERE(
 		table.Users.Username.EQ(mysql.String(username)),
 	)

@@ -14,11 +14,12 @@ type UserControllerI interface {
 	LoginUser(loginData models.LoginRequest) (*models.LoginResponse, *models.INVError)
 	CheckEmail(email string) *models.INVError
 	CheckUsername(username string) *models.INVError
-	GetUserById(userId *uuid.UUID) (*model.Users, *models.INVError)
+	GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
 }
 
 type UserController struct {
-	UserRepo repositories.UserRepositoryI
+	UserRepo     repositories.UserRepositoryI
+	UserTypeRepo repositories.UserTypeRepositoryI
 }
 
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) (*models.LoginResponse, *models.INVError) {
@@ -34,6 +35,27 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		return nil, inv_err
 	}
 
+	var userTypeId *string
+	userTypeId = nil
+	if registrationData.UserTypeName != "" {
+		userTypeId, inv_err = uc.UserTypeRepo.GetUserTypeByName(&registrationData.UserTypeName)
+		if inv_err != nil {
+			return nil, inv_err
+		}
+	}
+
+	userForResponse := models.UserWithTypeName{
+		ID:           userId.String(),
+		Username:     &registrationData.Username,
+		Email:        &registrationData.Email,
+		Password:     &hash,
+		FirstName:    &registrationData.FirstName,
+		LastName:     &registrationData.LastName,
+		JobTitle:     &registrationData.JobTitle,
+		PhoneNumber:  &registrationData.PhoneNumber,
+		UserTypeName: &registrationData.UserTypeName,
+	}
+
 	user := model.Users{
 		ID:          userId.String(),
 		Username:    &registrationData.Username,
@@ -43,7 +65,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		LastName:    &registrationData.LastName,
 		JobTitle:    &registrationData.JobTitle,
 		PhoneNumber: &registrationData.PhoneNumber,
-		UserTypeID:  registrationData.UserTypeID,
+		UserTypeID:  userTypeId,
 	}
 
 	inv_err = uc.UserRepo.CreateUser(user)
@@ -62,7 +84,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 	}
 
 	return &models.LoginResponse{
-		User:         user,
+		User:         userForResponse,
 		Token:        token,
 		RefreshToken: refreshToken,
 	}, nil
@@ -108,6 +130,6 @@ func (uc *UserController) CheckUsername(username string) *models.INVError {
 	return uc.UserRepo.CheckIfUsernameExists(username)
 }
 
-func (uc *UserController) GetUserById(userId *uuid.UUID) (*model.Users, *models.INVError) {
+func (uc *UserController) GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError) {
 	return uc.UserRepo.GetUserById(userId)
 }

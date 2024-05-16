@@ -29,12 +29,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Attach Middleware
 	router.Use(middlewares.CorsMiddleware())
-	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
-	//adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware())
 
 	// Create api groups, with special middleware
 	publicRoutes := router.Group("/")
-	//securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
+	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
 	//adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware())
 
 	// Create managers and repositories
@@ -67,6 +65,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	userTypeRepo := &repositories.UserTypeRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -83,7 +85,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			ItemStatusRepo: itemStatusRepo,
 		},
 		UserController: &controllers.UserController{
-			UserRepo: userRepo,
+			UserRepo:     userRepo,
+			UserTypeRepo: userTypeRepo,
 		},
 	}
 

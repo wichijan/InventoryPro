@@ -2,18 +2,29 @@ package models
 
 import (
 	"github.com/google/uuid"
-	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 )
 
 type RegistrationRequest struct {
-	Username    string  `json:"username"`
-	Email       string  `json:"email"`
-	Password    string  `json:"password"`
-	FirstName   string  `json:"firstname"`
-	LastName    string  `json:"lastname"`
-	JobTitle    string  `json:"jobtitle"`
-	PhoneNumber string  `json:"phonenumber"`
-	UserTypeID  *string `json:"usertypeid"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	FirstName    string `json:"firstname"`
+	LastName     string `json:"lastname"`
+	JobTitle     string `json:"jobtitle"`
+	PhoneNumber  string `json:"phonenumber"`
+	UserTypeName string `json:"usertypename"`
+}
+
+type UserWithTypeName struct {
+	ID           string  `alias:"users.id"`
+	FirstName    *string `alias:"users.first_name"`
+	LastName     *string `alias:"users.last_name"`
+	Username     *string `alias:"users.username"`
+	Email        *string `alias:"users.email"`
+	Password     *string `alias:"users.password"`
+	JobTitle     *string `alias:"users.job_title"`
+	PhoneNumber  *string `alias:"users.phone_number"`
+	UserTypeName *string `alias:"user_types.type_name"`
 }
 
 type LoginRequest struct {
@@ -22,7 +33,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	User         model.Users
+	User         UserWithTypeName
 	Token        string
 	RefreshToken string
 }

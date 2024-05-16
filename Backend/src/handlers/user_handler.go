@@ -17,7 +17,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param user body models.RegistrationRequest true "User data"
-// @Success 201 {object} model.Users
+// @Success 201 {object} models.LoginResponse
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /auth/register [post]
 func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
@@ -44,6 +44,14 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get User Data
+// @Description Get User Data when logged in
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 201 {object} models.UserWithTypeName
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /users/get-me [GET]
 func GetUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -73,7 +81,7 @@ func LogoutUserHandler(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param user body models.LoginRequest true "User data"
-// @Success 200 {object} model.Users
+// @Success 200 {object} models.LoginResponse
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /auth/login [post]
 func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
