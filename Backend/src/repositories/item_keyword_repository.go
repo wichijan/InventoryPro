@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -15,7 +13,6 @@ import (
 
 type ItemKeywordRepositoryI interface {
 	GetKeywordsForItems() (*[]model.KeywordsForItems, *models.INVError)
-	GetKeywordsForItem(itemId *string) (*[]model.KeywordsForItems, *models.INVError)
 	CreateKeywordForItem(keyword *models.ItemWithKeyword) (*uuid.UUID, *models.INVError)
 	DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError
 	CheckIfKeywordAndItemExists(keywordAndItem models.ItemWithKeyword) *models.INVError
@@ -33,33 +30,6 @@ func (kfir *ItemKeywordRepository) GetKeywordsForItems() (*[]model.KeywordsForIt
 		table.KeywordsForItems.AllColumns,
 	).FROM(
 		table.KeywordsForItems,
-	)
-
-	// Execute the query
-	err := stmt.Query(kfir.DatabaseManager.GetDatabaseConnection(), &keywords)
-	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(keywords) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
-	}
-
-	return &keywords, nil
-}
-
-func (kfir *ItemKeywordRepository) GetKeywordsForItem(itemId *string) (*[]model.KeywordsForItems, *models.INVError) {
-	var keywords []model.KeywordsForItems
-
-	log.Print("GetKeywords Repo")
-
-	// Create the query
-	stmt := mysql.SELECT(
-		table.KeywordsForItems.AllColumns,
-	).FROM(
-		table.KeywordsForItems,
-	).WHERE(
-		table.KeywordsForItems.ItemID.EQ(mysql.String(*itemId)),
 	)
 
 	// Execute the query
@@ -132,7 +102,7 @@ func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keyword *models.ItemWith
 }
 
 func (kfir *ItemKeywordRepository) CheckIfKeywordAndItemExists(keywordAndItem models.ItemWithKeyword) *models.INVError {
-	count, err := utils.CountStatement(table.KeywordsForItems, table.KeywordsForItems.KeywordID.EQ(mysql.String(*&keywordAndItem.KeywordID)).AND(table.KeywordsForItems.ItemID.EQ(mysql.String(*&keywordAndItem.ItemID))), kfir.DatabaseManager.GetDatabaseConnection())
+	count, err := utils.CountStatement(table.KeywordsForItems, table.KeywordsForItems.KeywordID.EQ(mysql.String(keywordAndItem.KeywordID)).AND(table.KeywordsForItems.ItemID.EQ(mysql.String(keywordAndItem.ItemID))), kfir.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}

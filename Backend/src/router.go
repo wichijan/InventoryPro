@@ -78,6 +78,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	subjectRepo := &repositories.SubjectRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	itemSubjectRepo := &repositories.ItemSubjectRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -91,9 +99,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ItemController: &controllers.ItemController{
 			ItemRepo:        itemRepo,
+			KeywordRepo:     keywordRepo,
+			SubjectRepo:     subjectRepo,
 			ItemStatusRepo:  itemStatusRepo,
 			ItemKeywordRepo: itemKeywordRepo,
-			KeywordRepo:     keywordRepo,
+			ItemSubjectRepo: itemSubjectRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:     userRepo,
@@ -143,6 +153,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/addkeyword", handlers.AddKeywordToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removekeyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodPost, "/items/addsubject", handlers.AddSubjectToItemHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"

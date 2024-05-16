@@ -16,13 +16,17 @@ type ItemControllerI interface {
 	UpdateItem(item *models.ItemWithStatus) *models.INVError
 	AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError
 	RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError
+	AddSubjectToItem(itemSubject models.ItemWithSubjectName) *models.INVError
+	RemoveSubjectFromItem(itemSubject models.ItemWithSubjectName) *models.INVError
 }
 
 type ItemController struct {
 	ItemRepo        repositories.ItemRepositoryI
-	ItemStatusRepo  repositories.ItemStatusRepositoryI
 	KeywordRepo     repositories.KeywordRepositoryI
+	SubjectRepo     repositories.SubjectRepositoryI
+	ItemStatusRepo  repositories.ItemStatusRepositoryI
 	ItemKeywordRepo repositories.ItemKeywordRepositoryI
+	ItemSubjectRepo repositories.ItemSubjectRepositoryI
 }
 
 func (ic *ItemController) GetItems() (*[]models.ItemWithEverything, *models.INVError) {
@@ -122,7 +126,6 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 		KeywordID: keyword.ID,
 	}
 
-	// TODO Move to handler
 	inv_err := ic.ItemKeywordRepo.CheckIfKeywordAndItemExists(itemKeywordWithID)
 	if inv_err != nil {
 		return inv_err
@@ -148,6 +151,49 @@ func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywo
 	}
 
 	inv_error = ic.ItemKeywordRepo.DeleteKeywordForItem(&itemKeywordWithID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectName) *models.INVError {
+	subject, inv_error := ic.SubjectRepo.GetSubjectByName(&itemSubject.SubjectName)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	itemSubjectWithID := models.ItemWithSubject{
+		ItemID:    itemSubject.ItemID,
+		SubjectID: subject.ID,
+	}
+
+	inv_err := ic.ItemSubjectRepo.CheckIfSubjectAndItemExists(itemSubjectWithID)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	_, inv_error = ic.ItemSubjectRepo.CreateSubjectForItem(&itemSubjectWithID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubjectName) *models.INVError {
+	subject, inv_error := ic.SubjectRepo.GetSubjectByName(&itemSubject.SubjectName)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	itemSubjectWithID := models.ItemWithSubject{
+		ItemID:    itemSubject.ItemID,
+		SubjectID: subject.ID,
+	}
+
+	inv_error = ic.ItemSubjectRepo.DeleteSubjectForItem(&itemSubjectWithID)
 	if inv_error != nil {
 		return inv_error
 	}

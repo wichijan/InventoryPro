@@ -8,14 +8,14 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type ItemSubjectRepositoryI interface {
 	GetItemsForSubject(subjectId *string) (*[]model.ItemSubjects, *models.INVError)
-	GetSubjectsForItem(itemId *string) (*[]model.ItemSubjects, *models.INVError)
-	CreateItemForSubject(itemForSubject *model.ItemSubjects) (*uuid.UUID, *models.INVError)
-	UpdateItemForSubject(itemForSubject *model.ItemSubjects) *models.INVError
-	DeleteItemForSubject(itemIdForSubject *uuid.UUID) *models.INVError
+	CreateSubjectForItem(keyword *models.ItemWithSubject) (*uuid.UUID, *models.INVError)
+	DeleteSubjectForItem(keyword *models.ItemWithSubject) *models.INVError
+	CheckIfSubjectAndItemExists(subjectAndItem models.ItemWithSubject) *models.INVError
 }
 
 type ItemSubjectRepository struct {
@@ -45,41 +45,18 @@ func (isjr *ItemSubjectRepository) GetItemsForSubject(subjectId *string) (*[]mod
 	return &itemsForSubject, nil
 }
 
-func (isjr *ItemSubjectRepository) GetSubjectsForItem(itemId *string) (*[]model.ItemSubjects, *models.INVError) {
-	var itemWithSubject []model.ItemSubjects
-
-	// Create the query
-	stmt := mysql.SELECT(
-		table.ItemSubjects.AllColumns,
-	).FROM(
-		table.ItemSubjects,
-	).WHERE(table.ItemSubjects.ItemID.EQ(mysql.String(*itemId)))
-
-	// Execute the query
-	err := stmt.Query(isjr.DatabaseManager.GetDatabaseConnection(), &itemWithSubject)
-	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(itemWithSubject) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
-	}
-
-	return &itemWithSubject, nil
-}
-
-func (isjr *ItemSubjectRepository) CreateItemForSubject(itemForSubject *model.ItemSubjects) (*uuid.UUID, *models.INVError) {
+func (isjr *ItemSubjectRepository) CreateSubjectForItem(keyword *models.ItemWithSubject) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
 	insertQuery := table.ItemSubjects.INSERT(
 		table.ItemSubjects.ID,
-		table.ItemSubjects.ItemID,
 		table.ItemSubjects.SubjectID,
+		table.ItemSubjects.ItemID,
 	).VALUES(
 		uuid.String(),
-		itemForSubject.ItemID,
-		itemForSubject.SubjectID,
+		keyword.SubjectID,
+		keyword.ItemID,
 	)
 
 	// Execute the query
@@ -100,18 +77,14 @@ func (isjr *ItemSubjectRepository) CreateItemForSubject(itemForSubject *model.It
 	return &uuid, nil
 }
 
-func (isjr *ItemSubjectRepository) UpdateItemForSubject(itemForSubject *model.ItemSubjects) *models.INVError {
-	// Create the update statement
-	updateQuery := table.ItemSubjects.UPDATE(
-		table.ItemSubjects.ItemID,
-		table.ItemSubjects.SubjectID,
-	).SET(
-		itemForSubject.ItemID,
-		itemForSubject.SubjectID,
-	).WHERE(table.ItemSubjects.ID.EQ(mysql.String(itemForSubject.ID)))
+func (isjr *ItemSubjectRepository) DeleteSubjectForItem(keyword *models.ItemWithSubject) *models.INVError {
+	deleteQuery := table.ItemSubjects.DELETE().WHERE(
+		table.ItemSubjects.SubjectID.EQ(mysql.String(keyword.SubjectID)).
+			AND(table.ItemSubjects.ItemID.EQ(mysql.String(keyword.ItemID))),
+	)
 
 	// Execute the query
-	rows, err := updateQuery.Exec(isjr.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(isjr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -128,7 +101,13 @@ func (isjr *ItemSubjectRepository) UpdateItemForSubject(itemForSubject *model.It
 	return nil
 }
 
-func (isjr *ItemSubjectRepository) DeleteItemForSubject(itemIdForSubject *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
+func (isjr *ItemSubjectRepository) CheckIfSubjectAndItemExists(subjectAndItem models.ItemWithSubject) *models.INVError {
+	count, err := utils.CountStatement(table.ItemSubjects, table.ItemSubjects.SubjectID.EQ(mysql.String(subjectAndItem.SubjectID)).AND(table.ItemSubjects.ItemID.EQ(mysql.String(subjectAndItem.ItemID))), isjr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	if count > 0 {
+		return inv_errors.INV_SUBJECT_ITEM_COMBI_EXISTS
+	}
 	return nil
 }
