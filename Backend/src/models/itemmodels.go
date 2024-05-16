@@ -13,6 +13,7 @@ type ItemWithStatus struct {
 	Damaged     bool   `alias:"items.damaged"`
 	DamagedDesc string `alias:"items.damaged_description"`
 	Quantity    int32  `alias:"items.quantity"`
+	Picture     string `alias:"items.picture"`
 	Status      string `alias:"item_status.status_name"`
 }
 
@@ -27,6 +28,7 @@ type ItemWithEverything struct {
 	Damaged     bool   `alias:"items.damaged"`
 	DamagedDesc string `alias:"items.damaged_description"`
 	Quantity    int32  `alias:"items.quantity"`
+	Picture     string `alias:"items.picture"`
 	Status      string `alias:"item_status.status_name"`
 
 	Keywords []struct {
@@ -35,9 +37,5 @@ type ItemWithEverything struct {
 
 	Subject []struct {
 		model.ItemSubjects
-	}
-
-	Pictures []struct {
-		model.ItemPictures
 	}
 }

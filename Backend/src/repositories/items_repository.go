@@ -37,14 +37,13 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.Items.Damaged,
 		table.Items.DamagedDescription,
 		table.Items.Quantity,
+		table.Items.Picture,
 		table.ItemStatus.StatusName,
-		table.ItemPictures.AllColumns,
 		table.ItemSubjects.AllColumns,
 		table.KeywordsForItems.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)).
-			LEFT_JOIN(table.ItemPictures, table.ItemPictures.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)),
 	)
@@ -77,14 +76,13 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 		table.Items.Damaged,
 		table.Items.DamagedDescription,
 		table.Items.Quantity,
+		table.Items.Picture,
 		table.ItemStatus.StatusName,
-		table.ItemPictures.AllColumns,
 		table.ItemSubjects.AllColumns,
 		table.KeywordsForItems.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)).
-			LEFT_JOIN(table.ItemPictures, table.ItemPictures.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)),
 	).WHERE(
