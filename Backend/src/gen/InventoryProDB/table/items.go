@@ -27,6 +27,7 @@ type itemsTable struct {
 	Damaged            mysql.ColumnBool
 	DamagedDescription mysql.ColumnString
 	Quantity           mysql.ColumnInteger
+	Picture            mysql.ColumnString
 	StatusID           mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
@@ -78,9 +79,10 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 		DamagedColumn            = mysql.BoolColumn("damaged")
 		DamagedDescriptionColumn = mysql.StringColumn("damaged_description")
 		QuantityColumn           = mysql.IntegerColumn("quantity")
+		PictureColumn            = mysql.StringColumn("picture")
 		StatusIDColumn           = mysql.StringColumn("status_id")
-		allColumns               = mysql.ColumnList{IDColumn, NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, QuantityColumn, StatusIDColumn}
-		mutableColumns           = mysql.ColumnList{NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, QuantityColumn, StatusIDColumn}
+		allColumns               = mysql.ColumnList{IDColumn, NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, QuantityColumn, PictureColumn, StatusIDColumn}
+		mutableColumns           = mysql.ColumnList{NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, QuantityColumn, PictureColumn, StatusIDColumn}
 	)
 
 	return itemsTable{
@@ -97,6 +99,7 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 		Damaged:            DamagedColumn,
 		DamagedDescription: DamagedDescriptionColumn,
 		Quantity:           QuantityColumn,
+		Picture:            PictureColumn,
 		StatusID:           StatusIDColumn,
 
 		AllColumns:     allColumns,

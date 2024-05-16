@@ -22,6 +22,7 @@ type Controllers struct {
 	ShelveController    controllers.ShelveControllerI
 	ItemController      controllers.ItemControllerI
 	UserController      controllers.UserControllerI
+	KeywordController   controllers.KeywordControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -69,6 +70,22 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	itemKeywordRepo := &repositories.ItemKeywordRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	keywordRepo := &repositories.KeywordRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	subjectRepo := &repositories.SubjectRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	itemSubjectRepo := &repositories.ItemSubjectRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -81,8 +98,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			ShelveRepo: shelveRepo,
 		},
 		ItemController: &controllers.ItemController{
-			ItemRepo:       itemRepo,
-			ItemStatusRepo: itemStatusRepo,
+			ItemRepo:        itemRepo,
+			KeywordRepo:     keywordRepo,
+			SubjectRepo:     subjectRepo,
+			ItemStatusRepo:  itemStatusRepo,
+			ItemKeywordRepo: itemKeywordRepo,
+			ItemSubjectRepo: itemSubjectRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:     userRepo,
@@ -130,6 +151,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodPost, "/items/addkeyword", handlers.AddKeywordToItemHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodPost, "/items/removekeyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodPost, "/items/addsubject", handlers.AddSubjectToItemHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"

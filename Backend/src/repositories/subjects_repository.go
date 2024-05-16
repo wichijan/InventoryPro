@@ -12,6 +12,7 @@ import (
 
 type SubjectRepositoryI interface {
 	GetSubjects() (*[]model.Subjects, *models.INVError)
+	GetSubjectByName(subjectName *string) (*model.Subjects, *models.INVError)
 	CreateSubject(subject *model.Subjects) (*uuid.UUID, *models.INVError)
 	UpdateSubject(subject *model.Subjects) *models.INVError
 	DeleteSubject(subjectId *uuid.UUID) *models.INVError
@@ -42,6 +43,31 @@ func (sr *SubjectRepository) GetSubjects() (*[]model.Subjects, *models.INVError)
 	}
 
 	return &subjects, nil
+}
+
+func (sr *SubjectRepository) GetSubjectByName(subjectName *string) (*model.Subjects, *models.INVError) {
+	var subject model.Subjects
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Subjects.AllColumns,
+	).FROM(
+		table.Subjects,
+	).WHERE(
+		table.Subjects.Name.EQ(mysql.String(*subjectName)),
+	)
+
+	// Execute the query
+	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &subject)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if subject.ID == "" {
+		return nil, inv_errors.INV_NOT_FOUND
+	}
+
+	return &subject, nil
 }
 
 func (sr *SubjectRepository) CreateSubject(subject *model.Subjects) (*uuid.UUID, *models.INVError) {

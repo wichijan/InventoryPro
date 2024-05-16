@@ -7,12 +7,7 @@
 
 package model
 
-import (
-	"github.com/google/uuid"
-)
-
-type ItemPictures struct {
+type Keywords struct {
 	ID      string `sql:"primary_key"`
-	Picture *uuid.UUID
-	ItemID  *string
+	Keyword *string
 }

@@ -12,9 +12,9 @@ package table
 func UseSchema(schema string) {
 	Items = Items.FromSchema(schema)
 	ItemsInShelve = ItemsInShelve.FromSchema(schema)
-	ItemPictures = ItemPictures.FromSchema(schema)
 	ItemStatus = ItemStatus.FromSchema(schema)
 	ItemSubjects = ItemSubjects.FromSchema(schema)
+	Keywords = Keywords.FromSchema(schema)
 	KeywordsForItems = KeywordsForItems.FromSchema(schema)
 	Roles = Roles.FromSchema(schema)
 	Rooms = Rooms.FromSchema(schema)

@@ -46,6 +46,7 @@ CREATE TABLE items(
     damaged BOOLEAN,
     damaged_description TEXT,
     quantity INT,
+    picture TEXT,
     status_id VARCHAR(36),
     FOREIGN KEY (status_id) REFERENCES item_status(id)
 );
@@ -72,18 +73,17 @@ create table item_subjects(
     FOREIGN KEY (subject_id) REFERENCES subjects(id)
 );
 
-CREATE TABLE item_pictures(
+CREATE TABLE keywords(
     id VARCHAR(36) PRIMARY KEY,
-    picture BLOB,
-    item_id VARCHAR(36),
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    keyword VARCHAR(100)
 );
 
 CREATE TABLE keywords_for_items(
     id VARCHAR(36) PRIMARY KEY,
-    keyword VARCHAR(100),
+    keyword_id VARCHAR(36),
     item_id VARCHAR(36),
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (keyword_id) REFERENCES keywords(id)
 );
 
 create table user_types (
