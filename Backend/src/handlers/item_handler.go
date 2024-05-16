@@ -70,7 +70,7 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var item models.ItemWithStatus
 		err := c.ShouldBindJSON(&item)
-		if err != nil {
+		if err != nil || item.Name == "" {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
@@ -114,7 +114,6 @@ func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
-
 // @Summary Add keyword to item
 // @Description Add keyword to item
 // @Tags Items
@@ -135,6 +134,35 @@ func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 		}
 
 		inv_err := itemCtrl.AddKeywordToItem(itemAndKeyword)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Remove keyword to item
+// @Description Remove keyword to item
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param item_keyword body models.ItemWithKeywordName true "ItemWithStatus model"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/removekeyword [post]
+func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var itemAndKeyword models.ItemWithKeywordName
+		err := c.ShouldBindJSON(&itemAndKeyword)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		inv_err := itemCtrl.RemoveKeywordFromItem(itemAndKeyword)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

@@ -238,15 +238,20 @@ values
     );
 
 Insert into
+    keywords
+values
+    ("75a570b7-ca2a-4e36-82c3-bab80b65bceb", "light");
+
+Insert into
     keywords_for_items (
         id,
-        keyword,
+        keyword_id,
         item_id
     )
 values
     (
         UUID(),
-        "light",
+        "75a570b7-ca2a-4e36-82c3-bab80b65bceb",
         "d2b6b0f5-a9b9-4ab5-9644-75407c9e9dfb"
     );
 

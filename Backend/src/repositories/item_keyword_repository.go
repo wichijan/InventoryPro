@@ -109,7 +109,7 @@ func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWith
 
 func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError {
 	deleteQuery := table.KeywordsForItems.DELETE().WHERE(
-		table.KeywordsForItems.ID.EQ(mysql.String(keyword.KeywordID)).
+		table.KeywordsForItems.KeywordID.EQ(mysql.String(keyword.KeywordID)).
 			AND(table.KeywordsForItems.ItemID.EQ(mysql.String(keyword.ItemID))),
 	)
 

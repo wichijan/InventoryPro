@@ -15,7 +15,7 @@ type ItemControllerI interface {
 	CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *models.INVError)
 	UpdateItem(item *models.ItemWithStatus) *models.INVError
 	AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError
-	RemoveKeywordFromItem(itemKeyword models.ItemWithKeyword) *models.INVError
+	RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError
 }
 
 type ItemController struct {
@@ -136,19 +136,18 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 	return nil
 }
 
-func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeyword) *models.INVError {
-	keyword, inv_error := ic.KeywordRepo.GetKeywordByName(&itemKeyword.KeywordID)
+func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError {
+	keyword, inv_error := ic.KeywordRepo.GetKeywordByName(&itemKeyword.KeywordName)
 	if inv_error != nil {
 		return inv_error
 	}
 
-	// TODO Move to handler
-	inv_err := ic.KeywordRepo.CheckIfKeywordExists(&keyword.ID)
-	if inv_err != nil {
-		return inv_err
+	itemKeywordWithID := models.ItemWithKeyword{
+		ItemID:    itemKeyword.ItemID,
+		KeywordID: keyword.ID,
 	}
 
-	inv_error = ic.ItemKeywordRepo.DeleteKeywordForItem(&itemKeyword)
+	inv_error = ic.ItemKeywordRepo.DeleteKeywordForItem(&itemKeywordWithID)
 	if inv_error != nil {
 		return inv_error
 	}
