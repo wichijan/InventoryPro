@@ -61,23 +61,14 @@ definitions:
               type: string
             itemID:
               type: string
-            keyword:
+            keywordID:
               type: string
           type: object
         type: array
       name:
         type: string
-      pictures:
-        items:
-          properties:
-            id:
-              type: string
-            itemID:
-              type: string
-            picture:
-              type: string
-          type: object
-        type: array
+      picture:
+        type: string
       quantity:
         type: integer
       status:
@@ -93,6 +84,13 @@ definitions:
               type: string
           type: object
         type: array
+    type: object
+  models.ItemWithKeywordName:
+    properties:
+      itemId:
+        type: string
+      keywordName:
+        type: string
     type: object
   models.ItemWithStatus:
     properties:
@@ -114,9 +112,18 @@ definitions:
         type: string
       name:
         type: string
+      picture:
+        type: string
       quantity:
         type: integer
       status:
+        type: string
+    type: object
+  models.ItemWithSubjectName:
+    properties:
+      itemId:
+        type: string
+      keywordName:
         type: string
     type: object
   models.LoggedInResponse:
@@ -214,6 +221,8 @@ definitions:
             id:
               type: string
             name:
+              type: string
+            picture:
               type: string
             quantity:
               type: integer
@@ -446,10 +455,10 @@ paths:
       parameters:
       - description: ItemWithStatus model
         in: body
-        name: room
+        name: item
         required: true
         schema:
-          $ref: '#/definitions/model.Rooms'
+          $ref: '#/definitions/models.ItemWithStatus'
       produces:
       - application/json
       responses:
@@ -493,6 +502,118 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get item by id
+      tags:
+      - Items
+  /items/addkeyword:
+    post:
+      consumes:
+      - application/json
+      description: Add keyword to item
+      parameters:
+      - description: ItemWithKeywordName model
+        in: body
+        name: item_keyword
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemWithKeywordName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Add keyword to item
+      tags:
+      - Items
+  /items/addsubject:
+    post:
+      consumes:
+      - application/json
+      description: Add Subject to item
+      parameters:
+      - description: ItemWithSubjectName model
+        in: body
+        name: item_keyword
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemWithSubjectName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Add Subject to item
+      tags:
+      - Items
+  /items/removekeyword:
+    post:
+      consumes:
+      - application/json
+      description: Remove keyword to item
+      parameters:
+      - description: ItemWithKeywordName model
+        in: body
+        name: item_keyword
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemWithKeywordName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Remove keyword to item
+      tags:
+      - Items
+  /items/removesubject:
+    post:
+      consumes:
+      - application/json
+      description: Remove Subject to item
+      parameters:
+      - description: ItemWithSubjectName model
+        in: body
+        name: item_subject
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemWithSubjectName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Remove Subject to item
       tags:
       - Items
   /rooms:

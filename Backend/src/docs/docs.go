@@ -244,11 +244,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "ItemWithStatus model",
-                        "name": "room",
+                        "name": "item",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Rooms"
+                            "$ref": "#/definitions/models.ItemWithStatus"
                         }
                     }
                 ],
@@ -348,6 +348,178 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.ItemWithEverything"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/addkeyword": {
+            "post": {
+                "description": "Add keyword to item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Add keyword to item",
+                "parameters": [
+                    {
+                        "description": "ItemWithKeywordName model",
+                        "name": "item_keyword",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemWithKeywordName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/addsubject": {
+            "post": {
+                "description": "Add Subject to item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Add Subject to item",
+                "parameters": [
+                    {
+                        "description": "ItemWithSubjectName model",
+                        "name": "item_keyword",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemWithSubjectName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/removekeyword": {
+            "post": {
+                "description": "Remove keyword to item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Remove keyword to item",
+                "parameters": [
+                    {
+                        "description": "ItemWithKeywordName model",
+                        "name": "item_keyword",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemWithKeywordName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/removesubject": {
+            "post": {
+                "description": "Remove Subject to item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Remove Subject to item",
+                "parameters": [
+                    {
+                        "description": "ItemWithSubjectName model",
+                        "name": "item_subject",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemWithSubjectName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
                         }
                     },
                     "500": {
@@ -997,7 +1169,7 @@ const docTemplate = `{
                             "itemID": {
                                 "type": "string"
                             },
-                            "keyword": {
+                            "keywordID": {
                                 "type": "string"
                             }
                         }
@@ -1006,22 +1178,8 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "pictures": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string"
-                            },
-                            "itemID": {
-                                "type": "string"
-                            },
-                            "picture": {
-                                "type": "string"
-                            }
-                        }
-                    }
+                "picture": {
+                    "type": "string"
                 },
                 "quantity": {
                     "type": "integer"
@@ -1045,6 +1203,17 @@ const docTemplate = `{
                             }
                         }
                     }
+                }
+            }
+        },
+        "models.ItemWithKeywordName": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "keywordName": {
+                    "type": "string"
                 }
             }
         },
@@ -1078,10 +1247,24 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "picture": {
+                    "type": "string"
+                },
                 "quantity": {
                     "type": "integer"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemWithSubjectName": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "keywordName": {
                     "type": "string"
                 }
             }
@@ -1232,6 +1415,9 @@ const docTemplate = `{
                                 "type": "string"
                             },
                             "name": {
+                                "type": "string"
+                            },
+                            "picture": {
                                 "type": "string"
                             },
                             "quantity": {
