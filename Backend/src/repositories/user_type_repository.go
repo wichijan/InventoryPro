@@ -12,6 +12,8 @@ import (
 
 type UserTypeRepositoryI interface {
 	GetUserTypes() (*[]model.UserTypes, *models.INVError)
+	GetUserTypeById(id *string) (*string, *models.INVError)
+	GetUserTypeByName(name *string) (*string, *models.INVError)
 	CreateUserType(type_name *string) (*uuid.UUID, *models.INVError)
 	UpdateUserType(userType *model.UserTypes) *models.INVError
 	DeleteUserType(userTypeId *uuid.UUID) *models.INVError
@@ -42,6 +44,57 @@ func (utr *UserTypeRepository) GetUserTypes() (*[]model.UserTypes, *models.INVEr
 	}
 
 	return &userTypes, nil
+}
+
+func (utr *UserTypeRepository) GetUserTypeById(id *string) (*string, *models.INVError) {
+	var userTypes model.UserTypes
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.UserTypes.AllColumns,
+	).FROM(
+		table.UserTypes,
+	).WHERE(
+		table.UserTypes.ID.EQ(mysql.String(*id)),
+	)
+
+	// Execute the query
+	err := stmt.Query(utr.DatabaseManager.GetDatabaseConnection(), &userTypes)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if userTypes.TypeName == nil {
+		return nil, inv_errors.INV_NOT_FOUND
+	}
+
+	return userTypes.TypeName, nil
+}
+
+
+func (utr *UserTypeRepository) GetUserTypeByName(name *string) (*string, *models.INVError) {
+	var userTypes model.UserTypes
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.UserTypes.AllColumns,
+	).FROM(
+		table.UserTypes,
+	).WHERE(
+		table.UserTypes.TypeName.EQ(mysql.String(*name)),
+	)
+
+	// Execute the query
+	err := stmt.Query(utr.DatabaseManager.GetDatabaseConnection(), &userTypes)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if userTypes.TypeName == nil {
+		return nil, inv_errors.INV_NOT_FOUND
+	}
+
+	return &userTypes.ID, nil
 }
 
 func (utr *UserTypeRepository) CreateUserType(type_name *string) (*uuid.UUID, *models.INVError) {

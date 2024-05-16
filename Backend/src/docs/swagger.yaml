@@ -17,6 +17,20 @@ definitions:
       name:
         type: string
     type: object
+  models.CheckEmailRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  models.CheckUsernameRequest:
+    properties:
+      username:
+        type: string
+    required:
+    - username
+    type: object
   models.INVErrorMessage:
     properties:
       errorMessage:
@@ -105,6 +119,29 @@ definitions:
       status:
         type: string
     type: object
+  models.LoggedInResponse:
+    properties:
+      id:
+        type: string
+      loggedIn:
+        type: boolean
+    type: object
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.LoginResponse:
+    properties:
+      refreshToken:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/models.UserWithTypeName'
+    type: object
   models.OwnShelve:
     properties:
       id:
@@ -112,6 +149,25 @@ definitions:
       roomID:
         type: string
       shelveTypeName:
+        type: string
+    type: object
+  models.RegistrationRequest:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      jobtitle:
+        type: string
+      lastname:
+        type: string
+      password:
+        type: string
+      phonenumber:
+        type: string
+      username:
+        type: string
+      usertypename:
         type: string
     type: object
   models.RoomWithShelves:
@@ -170,6 +226,27 @@ definitions:
       shelveTypeName:
         type: string
     type: object
+  models.UserWithTypeName:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: string
+      jobTitle:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+      phoneNumber:
+        type: string
+      userTypeName:
+        type: string
+      username:
+        type: string
+    type: object
   models.WarehouseWithRooms:
     properties:
       description:
@@ -193,6 +270,125 @@ definitions:
 info:
   contact: {}
 paths:
+  /auth/check-email:
+    post:
+      consumes:
+      - application/json
+      description: Check email
+      parameters:
+      - description: Email data
+        in: body
+        name: checkEmailRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Check email
+      tags:
+      - Users
+  /auth/check-username:
+    post:
+      consumes:
+      - application/json
+      description: Check username
+      parameters:
+      - description: Username data
+        in: body
+        name: checkUsernameRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckUsernameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Check username
+      tags:
+      - Users
+  /auth/logged-in:
+    get:
+      consumes:
+      - application/json
+      description: Check if user is logged in
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoggedInResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Logged in
+      tags:
+      - Users
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Login user
+      tags:
+      - Users
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Register user
+      tags:
+      - Users
   /items:
     get:
       consumes:
@@ -525,6 +721,25 @@ paths:
       summary: Get shelve by id with items
       tags:
       - Shelves
+  /users/get-me:
+    get:
+      consumes:
+      - application/json
+      description: Get User Data when logged in
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserWithTypeName'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get User Data
+      tags:
+      - Users
   /warehouses:
     get:
       consumes:

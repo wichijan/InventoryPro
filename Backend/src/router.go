@@ -21,6 +21,7 @@ type Controllers struct {
 	RoomController      controllers.RoomControllerI
 	ShelveController    controllers.ShelveControllerI
 	ItemController      controllers.ItemControllerI
+	UserController      controllers.UserControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -28,12 +29,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Attach Middleware
 	router.Use(middlewares.CorsMiddleware())
-	//securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
-	//adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware())
 
 	// Create api groups, with special middleware
 	publicRoutes := router.Group("/")
-	//securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
+	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
 	//adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware())
 
 	// Create managers and repositories
@@ -62,6 +61,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	userRepo := &repositories.UserRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	userTypeRepo := &repositories.UserTypeRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -77,7 +84,22 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			ItemRepo:       itemRepo,
 			ItemStatusRepo: itemStatusRepo,
 		},
+		UserController: &controllers.UserController{
+			UserRepo:     userRepo,
+			UserTypeRepo: userTypeRepo,
+		},
 	}
+
+	// user routes
+	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/logout", handlers.LogoutUserHandler)
+	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
+	securedRoutes.Handle(http.MethodGet, "/auth/is-admin", handlers.IsAdminHandler)
+
+	securedRoutes.Handle(http.MethodGet, "/users/get-me", handlers.GetUserHandler(controller.UserController))
 
 	// Warehouse routes
 	publicRoutes.Handle(http.MethodGet, "/warehouses", handlers.GetWarehousesHandler(controller.WarehouseController))
