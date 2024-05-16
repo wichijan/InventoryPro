@@ -7,8 +7,7 @@
 
 package model
 
-type KeywordsForItems struct {
-	ID        string `sql:"primary_key"`
-	KeywordID *string
-	ItemID    *string
+type Keywords struct {
+	ID      string `sql:"primary_key"`
+	Keyword *string
 }

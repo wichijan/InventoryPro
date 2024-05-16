@@ -17,9 +17,9 @@ type keywordsForItemsTable struct {
 	mysql.Table
 
 	// Columns
-	ID      mysql.ColumnString
-	Keyword mysql.ColumnString
-	ItemID  mysql.ColumnString
+	ID        mysql.ColumnString
+	KeywordID mysql.ColumnString
+	ItemID    mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -60,20 +60,20 @@ func newKeywordsForItemsTable(schemaName, tableName, alias string) *KeywordsForI
 
 func newKeywordsForItemsTableImpl(schemaName, tableName, alias string) keywordsForItemsTable {
 	var (
-		IDColumn       = mysql.StringColumn("id")
-		KeywordColumn  = mysql.StringColumn("keyword")
-		ItemIDColumn   = mysql.StringColumn("item_id")
-		allColumns     = mysql.ColumnList{IDColumn, KeywordColumn, ItemIDColumn}
-		mutableColumns = mysql.ColumnList{KeywordColumn, ItemIDColumn}
+		IDColumn        = mysql.StringColumn("id")
+		KeywordIDColumn = mysql.StringColumn("keyword_id")
+		ItemIDColumn    = mysql.StringColumn("item_id")
+		allColumns      = mysql.ColumnList{IDColumn, KeywordIDColumn, ItemIDColumn}
+		mutableColumns  = mysql.ColumnList{KeywordIDColumn, ItemIDColumn}
 	)
 
 	return keywordsForItemsTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:      IDColumn,
-		Keyword: KeywordColumn,
-		ItemID:  ItemIDColumn,
+		ID:        IDColumn,
+		KeywordID: KeywordIDColumn,
+		ItemID:    ItemIDColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

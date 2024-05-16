@@ -15,9 +15,8 @@ import (
 type ItemKeywordRepositoryI interface {
 	GetKeywordsForItems() (*[]model.KeywordsForItems, *models.INVError)
 	GetKeywordsForItem(itemId *string) (*[]model.KeywordsForItems, *models.INVError)
-	CreateKeywordForItem(keyword *model.KeywordsForItems) (*uuid.UUID, *models.INVError)
-	UpdateKeywordForItem(keyword *model.KeywordsForItems) *models.INVError
-	DeleteKeywordForItem(keywordId *uuid.UUID) *models.INVError
+	CreateKeywordForItem(keyword *models.ItemWithKeyword) (*uuid.UUID, *models.INVError)
+	DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError
 }
 
 type ItemKeywordRepository struct {
@@ -74,17 +73,17 @@ func (kfir *ItemKeywordRepository) GetKeywordsForItem(itemId *string) (*[]model.
 	return &keywords, nil
 }
 
-func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *model.KeywordsForItems) (*uuid.UUID, *models.INVError) {
+func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWithKeyword) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
 	insertQuery := table.KeywordsForItems.INSERT(
 		table.KeywordsForItems.ID,
-		table.KeywordsForItems.Keyword,
+		table.KeywordsForItems.KeywordID,
 		table.KeywordsForItems.ItemID,
 	).VALUES(
 		uuid.String(),
-		keyword.Keyword,
+		keyword.KeywordID,
 		keyword.ItemID,
 	)
 
@@ -106,18 +105,14 @@ func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *model.KeywordsF
 	return &uuid, nil
 }
 
-func (kfir *ItemKeywordRepository) UpdateKeywordForItem(keyword *model.KeywordsForItems) *models.INVError {
-	// Create the update statement
-	updateQuery := table.KeywordsForItems.UPDATE(
-		table.KeywordsForItems.Keyword,
-		table.KeywordsForItems.ItemID,
-	).SET(
-		keyword.Keyword,
-		keyword.ItemID,
-	).WHERE(table.KeywordsForItems.ID.EQ(mysql.String(keyword.ID)))
+func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError {
+	deleteQuery := table.KeywordsForItems.DELETE().WHERE(
+		table.KeywordsForItems.ID.EQ(mysql.String(keyword.KeywordID)).
+		AND(table.KeywordsForItems.ItemID.EQ(mysql.String(keyword.ItemID))),
+	)
 
 	// Execute the query
-	rows, err := updateQuery.Exec(kfir.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(kfir.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -131,10 +126,5 @@ func (kfir *ItemKeywordRepository) UpdateKeywordForItem(keyword *model.KeywordsF
 		return inv_errors.INV_NOT_FOUND
 	}
 
-	return nil
-}
-
-func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keywordId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
 	return nil
 }

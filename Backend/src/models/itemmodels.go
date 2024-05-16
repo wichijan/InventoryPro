@@ -39,3 +39,13 @@ type ItemWithEverything struct {
 		model.ItemSubjects
 	}
 }
+
+type ItemWithKeyword struct {
+	ItemID    string `json:"itemId"`
+	KeywordID string `json:"keywordId"`
+}
+
+type ItemWithKeywordName struct {
+	ItemID      string `json:"itemId"`
+	KeywordName string `json:"keywordName"`
+}

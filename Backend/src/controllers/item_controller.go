@@ -14,11 +14,15 @@ type ItemControllerI interface {
 	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
 	CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *models.INVError)
 	UpdateItem(item *models.ItemWithStatus) *models.INVError
+	AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError
+	RemoveKeywordFromItem(itemKeyword models.ItemWithKeyword) *models.INVError
 }
 
 type ItemController struct {
-	ItemRepo       repositories.ItemRepositoryI
-	ItemStatusRepo repositories.ItemStatusRepositoryI
+	ItemRepo        repositories.ItemRepositoryI
+	ItemStatusRepo  repositories.ItemStatusRepositoryI
+	KeywordRepo     repositories.KeywordRepositoryI
+	ItemKeywordRepo repositories.ItemKeywordRepositoryI
 }
 
 func (ic *ItemController) GetItems() (*[]models.ItemWithEverything, *models.INVError) {
@@ -100,6 +104,45 @@ func (ic *ItemController) UpdateItem(item *models.ItemWithStatus) *models.INVErr
 	}
 
 	inv_error := ic.ItemRepo.UpdateItem(&pureItem)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError {
+	keyword, inv_error := ic.KeywordRepo.GetKeywordByName(&itemKeyword.KeywordName)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	itemKeywordWithID := models.ItemWithKeyword{
+		ItemID:    itemKeyword.ItemID,
+		KeywordID: keyword.ID,
+	}
+
+	_, inv_error = ic.ItemKeywordRepo.CreateKeywordForItem(&itemKeywordWithID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeyword) *models.INVError {
+	keyword, inv_error := ic.KeywordRepo.GetKeywordByName(&itemKeyword.KeywordID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// TODO Move to handler
+	inv_err := ic.KeywordRepo.CheckIfKeywordExists(&keyword.ID)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	inv_error = ic.ItemKeywordRepo.DeleteKeywordForItem(&itemKeyword)
 	if inv_error != nil {
 		return inv_error
 	}

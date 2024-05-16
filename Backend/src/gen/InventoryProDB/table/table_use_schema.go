@@ -14,6 +14,7 @@ func UseSchema(schema string) {
 	ItemsInShelve = ItemsInShelve.FromSchema(schema)
 	ItemStatus = ItemStatus.FromSchema(schema)
 	ItemSubjects = ItemSubjects.FromSchema(schema)
+	Keywords = Keywords.FromSchema(schema)
 	KeywordsForItems = KeywordsForItems.FromSchema(schema)
 	Roles = Roles.FromSchema(schema)
 	Rooms = Rooms.FromSchema(schema)

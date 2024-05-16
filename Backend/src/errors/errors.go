@@ -21,6 +21,8 @@ var (
 	INV_EMAIL_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "EMAIL_EXISTS"}, Status: 409}
 	// INV_USERNAME_EXISTS is used to indicate that the username already exists
 	INV_USERNAME_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "USERNAME_EXISTS"}, Status: 409}
+	// INV_KEYWORD_EXISTS is used to indicate that the keyword already exists
+	INV_KEYWORD_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "KEYWORD_EXISTS"}, Status: 409}
 	// INV_CONFLICT is used to indicate that the request could not be processed due to a conflict
 	INV_CONFLICT = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "CONFLICT"}, Status: 409}
 	// INV_UPSTREAM_ERROR is used to indicate an error in 3rd party services

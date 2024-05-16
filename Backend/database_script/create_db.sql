@@ -73,11 +73,17 @@ create table item_subjects(
     FOREIGN KEY (subject_id) REFERENCES subjects(id)
 );
 
+CREATE TABLE keywords(
+    id VARCHAR(36) PRIMARY KEY,
+    keyword VARCHAR(100)
+);
+
 CREATE TABLE keywords_for_items(
     id VARCHAR(36) PRIMARY KEY,
-    keyword VARCHAR(100),
+    keyword_id VARCHAR(36),
     item_id VARCHAR(36),
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (keyword_id) REFERENCES keywords(id)
 );
 
 create table user_types (

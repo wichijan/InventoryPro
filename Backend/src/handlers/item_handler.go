@@ -90,7 +90,7 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param room body model.Rooms true "ItemWithStatus model"
+// @Param item body models.ItemWithStatus true "ItemWithStatus model"
 // @Success 201 {object} models.ItemWithStatus
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
@@ -105,6 +105,36 @@ func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 		}
 
 		inv_err := itemCtrl.UpdateItem(&item)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+
+// @Summary Add keyword to item
+// @Description Add keyword to item
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param item_keyword body models.ItemWithKeywordName true "ItemWithStatus model"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/addkeyword [post]
+func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var itemAndKeyword models.ItemWithKeywordName
+		err := c.ShouldBindJSON(&itemAndKeyword)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		inv_err := itemCtrl.AddKeywordToItem(itemAndKeyword)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
