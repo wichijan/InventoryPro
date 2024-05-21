@@ -17,7 +17,6 @@ type userRolesTable struct {
 	mysql.Table
 
 	// Columns
-	ID     mysql.ColumnString
 	UserID mysql.ColumnString
 	RoleID mysql.ColumnString
 
@@ -60,18 +59,16 @@ func newUserRolesTable(schemaName, tableName, alias string) *UserRolesTable {
 
 func newUserRolesTableImpl(schemaName, tableName, alias string) userRolesTable {
 	var (
-		IDColumn       = mysql.StringColumn("id")
 		UserIDColumn   = mysql.StringColumn("user_id")
 		RoleIDColumn   = mysql.StringColumn("role_id")
-		allColumns     = mysql.ColumnList{IDColumn, UserIDColumn, RoleIDColumn}
-		mutableColumns = mysql.ColumnList{UserIDColumn, RoleIDColumn}
+		allColumns     = mysql.ColumnList{UserIDColumn, RoleIDColumn}
+		mutableColumns = mysql.ColumnList{}
 	)
 
 	return userRolesTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:     IDColumn,
 		UserID: UserIDColumn,
 		RoleID: RoleIDColumn,
 

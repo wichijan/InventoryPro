@@ -8,7 +8,6 @@
 package model
 
 type UserRoles struct {
-	ID     string `sql:"primary_key"`
-	UserID *string
-	RoleID *string
+	UserID string `sql:"primary_key"`
+	RoleID string `sql:"primary_key"`
 }

@@ -8,7 +8,6 @@
 package model
 
 type ItemSubjects struct {
-	ID        string `sql:"primary_key"`
-	ItemID    *string
-	SubjectID *string
+	ItemID    string `sql:"primary_key"`
+	SubjectID string `sql:"primary_key"`
 }

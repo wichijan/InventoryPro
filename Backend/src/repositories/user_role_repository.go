@@ -12,7 +12,7 @@ import (
 
 type UserRoleRepositoryI interface {
 	GetUserRoles() (*[]model.UserRoles, *models.INVError)
-	CreateUserRole(user_role *model.UserRoles) (*uuid.UUID, *models.INVError)
+	CreateUserRole(user_role *model.UserRoles) *models.INVError
 	UpdateUserRole(userRole *model.UserRoles) *models.INVError
 	DeleteUserRole(userRoleId *uuid.UUID) *models.INVError
 }
@@ -44,16 +44,13 @@ func (urr *UserRoleRepository) GetUserRoles() (*[]model.UserRoles, *models.INVEr
 	return &userRoles, nil
 }
 
-func (urr *UserRoleRepository) CreateUserRole(user_role *model.UserRoles) (*uuid.UUID, *models.INVError) {
-	uuid := uuid.New()
+func (urr *UserRoleRepository) CreateUserRole(user_role *model.UserRoles) *models.INVError {
 
 	// Create the insert statement
 	insertQuery := table.UserRoles.INSERT(
-		table.UserRoles.ID,
 		table.UserRoles.RoleID,
 		table.UserRoles.UserID,
 	).VALUES(
-		uuid.String(),
 		user_role.RoleID,
 		user_role.UserID,
 	)
@@ -61,19 +58,19 @@ func (urr *UserRoleRepository) CreateUserRole(user_role *model.UserRoles) (*uuid
 	// Execute the query
 	rows, err := insertQuery.Exec(urr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND
 	}
 
-	return &uuid, nil
+	return nil
 }
 
 func (urr *UserRoleRepository) UpdateUserRole(userRole *model.UserRoles) *models.INVError {
@@ -84,7 +81,7 @@ func (urr *UserRoleRepository) UpdateUserRole(userRole *model.UserRoles) *models
 	).SET(
 		userRole.RoleID,
 		userRole.UserID,
-	).WHERE(table.UserRoles.ID.EQ(mysql.String(userRole.ID)))
+	).WHERE(table.UserRoles.UserID.EQ(mysql.String(userRole.UserID)).AND(table.UserRoles.RoleID.EQ(mysql.String(userRole.RoleID))))
 
 	// Execute the query
 	rows, err := updateQuery.Exec(urr.DatabaseManager.GetDatabaseConnection())
