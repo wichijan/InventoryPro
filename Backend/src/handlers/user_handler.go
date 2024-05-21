@@ -207,24 +207,3 @@ func IsAdminHandler(c *gin.Context) {
 	adminId := uuid.MustParse("dddddddd-dddd-dddd-dddd-dddddddddddd")
 	c.JSON(http.StatusOK, *userId == adminId)
 }
-
-
-
-// @Summary Get Users and their items
-// @Description Get Users and their items for list view
-// @Tags Users
-// @Accept  json
-// @Produce  json
-// @Success 200 {array} models.ItemWithUser
-// @Failure 500 {object} models.INVErrorMessage
-// @Router /users-items [get]
-func GetUsersItemshandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		usersItems, inv_err := userCtrl.GetUsersItems()
-		if inv_err != nil {
-			utils.HandleErrorAndAbort(c, inv_err)
-			return
-		}
-		c.JSON(http.StatusOK, usersItems)
-	}
-}

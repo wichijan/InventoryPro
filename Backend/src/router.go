@@ -121,7 +121,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodGet, "/auth/is-admin", handlers.IsAdminHandler)
 
 	securedRoutes.Handle(http.MethodGet, "/users/get-me", handlers.GetUserHandler(controller.UserController))
-	publicRoutes.Handle(http.MethodGet, "/users-items", handlers.GetUsersItemshandler(controller.UserController))
 
 	// Warehouse routes
 	publicRoutes.Handle(http.MethodGet, "/warehouses", handlers.GetWarehousesHandler(controller.WarehouseController))

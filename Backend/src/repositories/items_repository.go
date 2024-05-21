@@ -41,11 +41,15 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.ItemStatus.StatusName,
 		table.ItemSubjects.AllColumns,
 		table.KeywordsForItems.AllColumns,
+		table.Users.ID,
+		table.Users.Username,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)),
+			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
 	)
 
 	// Execute the query
@@ -80,11 +84,15 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 		table.ItemStatus.StatusName,
 		table.ItemSubjects.AllColumns,
 		table.KeywordsForItems.AllColumns,
+		table.Users.ID,
+		table.Users.Username,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)),
+			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
 	).WHERE(
 		table.Items.ID.EQ(mysql.String(itemId.String())),
 	)

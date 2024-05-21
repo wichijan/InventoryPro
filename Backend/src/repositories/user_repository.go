@@ -17,7 +17,6 @@ type UserRepositoryI interface {
 	CreateUser(user model.Users) *models.INVError
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
-	GetUsersItems() (*[]models.ItemWithUser, *models.INVError)
 }
 
 type UserRepository struct {
@@ -133,29 +132,4 @@ func (ur *UserRepository) CheckIfEmailExists(email string) *models.INVError {
 		return inv_errors.INV_EMAIL_EXISTS
 	}
 	return nil
-}
-
-func (ur *UserRepository) GetUsersItems() (*[]models.ItemWithUser, *models.INVError) {
-	var items []models.ItemWithUser
-	stmt := mysql.SELECT(
-		table.Items.ID,
-		table.Items.Name,
-		table.Items.Description,
-		table.Users.ID,
-		table.Users.Username,
-	).FROM(
-		table.Items.
-			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Users.UserTypeID)).
-			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.UserItems.ItemID)),
-	)
-
-	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &items)
-	if err != nil {
-		if err.Error() == "jet: sql: no rows in result set" {
-			return nil, inv_errors.INV_USER_NOT_FOUND
-		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	return &items, nil
 }
