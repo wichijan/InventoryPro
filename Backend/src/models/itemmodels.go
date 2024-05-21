@@ -3,7 +3,7 @@ package models
 import "github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 
 type ItemWithStatus struct {
-	ID          string `alias:"items.id"`
+	ID          string `alias:"items.id" sql:"primary_key"`
 	Name        string `alias:"items.name"`
 	Description string `alias:"items.description"`
 	ClassOne    bool   `alias:"items.class_one"`
@@ -18,7 +18,7 @@ type ItemWithStatus struct {
 }
 
 type ItemWithEverything struct {
-	ID          string `alias:"items.id"`
+	ID          string `alias:"items.id" sql:"primary_key"`
 	Name        string `alias:"items.name"`
 	Description string `alias:"items.description"`
 	ClassOne    bool   `alias:"items.class_one"`
