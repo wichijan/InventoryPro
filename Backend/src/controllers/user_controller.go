@@ -15,6 +15,7 @@ type UserControllerI interface {
 	CheckEmail(email string) *models.INVError
 	CheckUsername(username string) *models.INVError
 	GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
+	GetUsersItems() (*[]models.ItemWithUser, *models.INVError)
 }
 
 type UserController struct {
@@ -132,4 +133,8 @@ func (uc *UserController) CheckUsername(username string) *models.INVError {
 
 func (uc *UserController) GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError) {
 	return uc.UserRepo.GetUserById(userId)
+}
+
+func (uc *UserController) GetUsersItems() (*[]models.ItemWithUser, *models.INVError) {
+	return uc.UserRepo.GetUsersItems()
 }

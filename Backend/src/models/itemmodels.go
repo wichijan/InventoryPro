@@ -50,7 +50,6 @@ type ItemWithKeywordName struct {
 	KeywordName string `json:"keywordName"`
 }
 
-
 type ItemWithSubject struct {
 	ItemID    string `json:"itemId"`
 	SubjectID string `json:"keywordId"`
@@ -59,4 +58,12 @@ type ItemWithSubject struct {
 type ItemWithSubjectName struct {
 	ItemID      string `json:"itemId"`
 	SubjectName string `json:"keywordName"`
+}
+
+type ItemWithUser struct {
+	item_id          string `alias:"items.id"`
+	item_Name        string `alias:"items.name"`
+	item_Description string `alias:"items.description"`
+	user_id          string `alias:"users.id"`
+	user_Username    string `alias:"users.username"`
 }
