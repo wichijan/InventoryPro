@@ -22,6 +22,7 @@ func UseSchema(schema string) {
 	ShelveTypes = ShelveTypes.FromSchema(schema)
 	Subjects = Subjects.FromSchema(schema)
 	Users = Users.FromSchema(schema)
+	UserItems = UserItems.FromSchema(schema)
 	UserRoles = UserRoles.FromSchema(schema)
 	UserTypes = UserTypes.FromSchema(schema)
 	Warehouses = Warehouses.FromSchema(schema)

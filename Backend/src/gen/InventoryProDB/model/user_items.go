@@ -7,7 +7,7 @@
 
 package model
 
-type ItemsInShelve struct {
-	ItemID   string `sql:"primary_key"`
-	ShelveID string `sql:"primary_key"`
+type UserItems struct {
+	UserID string `sql:"primary_key"`
+	ItemID string `sql:"primary_key"`
 }

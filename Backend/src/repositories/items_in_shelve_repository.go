@@ -12,7 +12,7 @@ import (
 
 type ItemInShelveRepositoryI interface {
 	GetItemsInShelve(shelveId *string) (*[]model.ItemsInShelve, *models.INVError)
-	CreateItemInShelve(itemInShelve *model.ItemsInShelve) (*uuid.UUID, *models.INVError)
+	CreateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError
 	UpdateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError
 	DeleteItemInShelve(itemIdInShelve *uuid.UUID) *models.INVError
 }
@@ -29,7 +29,7 @@ func (iisr *ItemInShelveRepository) GetItemsInShelve(shelveId *string) (*[]model
 		table.ItemsInShelve.AllColumns,
 	).FROM(
 		table.ItemsInShelve,
-	).WHERE(table.ItemsInShelve.ID.EQ(mysql.String(*shelveId)))
+	).WHERE(table.ItemsInShelve.ShelveID.EQ(mysql.String(*shelveId)))
 
 	// Execute the query
 	err := stmt.Query(iisr.DatabaseManager.GetDatabaseConnection(), &itemsInShelve)
@@ -44,16 +44,13 @@ func (iisr *ItemInShelveRepository) GetItemsInShelve(shelveId *string) (*[]model
 	return &itemsInShelve, nil
 }
 
-func (iisr *ItemInShelveRepository) CreateItemInShelve(itemInShelve *model.ItemsInShelve) (*uuid.UUID, *models.INVError) {
-	uuid := uuid.New()
+func (iisr *ItemInShelveRepository) CreateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError {
 
 	// Create the insert statement
 	insertQuery := table.ItemsInShelve.INSERT(
-		table.ItemsInShelve.ID,
 		table.ItemsInShelve.ItemID,
 		table.ItemsInShelve.ShelveID,
 	).VALUES(
-		uuid.String(),
 		itemInShelve.ItemID,
 		itemInShelve.ShelveID,
 	)
@@ -61,19 +58,19 @@ func (iisr *ItemInShelveRepository) CreateItemInShelve(itemInShelve *model.Items
 	// Execute the query
 	rows, err := insertQuery.Exec(iisr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND
 	}
 
-	return &uuid, nil
+	return nil
 }
 
 func (iisr *ItemInShelveRepository) UpdateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError {
@@ -84,7 +81,8 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(itemInShelve *model.Items
 	).SET(
 		itemInShelve.ItemID,
 		itemInShelve.ShelveID,
-	).WHERE(table.ItemsInShelve.ID.EQ(mysql.String(itemInShelve.ID)))
+	).WHERE(table.ItemsInShelve.ItemID.EQ(mysql.String(itemInShelve.ItemID)).
+		AND(table.ItemsInShelve.ShelveID.EQ(mysql.String(itemInShelve.ShelveID))))
 
 	// Execute the query
 	rows, err := updateQuery.Exec(iisr.DatabaseManager.GetDatabaseConnection())

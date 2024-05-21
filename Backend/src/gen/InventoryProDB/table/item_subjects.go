@@ -17,7 +17,6 @@ type itemSubjectsTable struct {
 	mysql.Table
 
 	// Columns
-	ID        mysql.ColumnString
 	ItemID    mysql.ColumnString
 	SubjectID mysql.ColumnString
 
@@ -60,18 +59,16 @@ func newItemSubjectsTable(schemaName, tableName, alias string) *ItemSubjectsTabl
 
 func newItemSubjectsTableImpl(schemaName, tableName, alias string) itemSubjectsTable {
 	var (
-		IDColumn        = mysql.StringColumn("id")
 		ItemIDColumn    = mysql.StringColumn("item_id")
 		SubjectIDColumn = mysql.StringColumn("subject_id")
-		allColumns      = mysql.ColumnList{IDColumn, ItemIDColumn, SubjectIDColumn}
-		mutableColumns  = mysql.ColumnList{ItemIDColumn, SubjectIDColumn}
+		allColumns      = mysql.ColumnList{ItemIDColumn, SubjectIDColumn}
+		mutableColumns  = mysql.ColumnList{}
 	)
 
 	return itemSubjectsTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:        IDColumn,
 		ItemID:    ItemIDColumn,
 		SubjectID: SubjectIDColumn,
 

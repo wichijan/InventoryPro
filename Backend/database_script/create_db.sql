@@ -52,9 +52,9 @@ CREATE TABLE items(
 );
 
 Create table items_in_shelve(
-    id VARCHAR(36) PRIMARY KEY,
     item_id VARCHAR(36) UNIQUE,
     shelve_id VARCHAR(36),
+    PRIMARY KEY (shelve_id, item_id),
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (shelve_id) REFERENCES shelves(id)
 );
@@ -66,9 +66,9 @@ create table subjects(
 );
 
 create table item_subjects(
-    id VARCHAR(36) PRIMARY KEY,
     item_id VARCHAR(36),
     subject_id VARCHAR(36),
+    PRIMARY KEY (subject_id, item_id),
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (subject_id) REFERENCES subjects(id)
 );
@@ -79,9 +79,9 @@ CREATE TABLE keywords(
 );
 
 CREATE TABLE keywords_for_items(
-    id VARCHAR(36) PRIMARY KEY,
     keyword_id VARCHAR(36),
     item_id VARCHAR(36),
+    PRIMARY KEY (keyword_id, item_id),
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (keyword_id) REFERENCES keywords(id)
 );
@@ -111,9 +111,17 @@ CREATE TABLE users(
 );
 
 create table user_roles(
-    id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36),
     role_id VARCHAR(36),
+    PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+create table user_items(
+    user_id VARCHAR(36) NOT NULL,
+    item_id VARCHAR(36) NOT NULL,
+    PRIMARY KEY (user_id, item_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (item_id) REFERENCES items(id)
 );

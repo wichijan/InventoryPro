@@ -193,46 +193,33 @@ values
     );
 
 Insert into
-    items_in_shelve(
-        id,
-        item_id,
-        shelve_id
-    )
+    items_in_shelve(item_id, shelve_id)
 values
     (
-        UUID(),
         "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
         "0a75123a-9736-4c60-a10c-16e76aced3d2"
         /* Small Shelve */
     ),
     (
-        UUID(),
         "7791a294-94de-4cbf-9243-3f7210664f92",
         "0a75123a-9736-4c60-a10c-16e76aced3d2"
         /* Small Shelve */
     ),
     (
-        UUID(),
         "d2b6b0f5-a9b9-4ab5-9644-75407c9e9dfb",
         "0a75123a-9736-4c60-a10c-16e76aced3d2"
         /* Small Shelve */
     ),
     (
-        UUID(),
         "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
         "0a75123a-9736-4c60-a10c-16e76aced3d2"
         /* Small Shelve */
     );
 
 Insert into
-    item_subjects(
-        id,
-        item_id,
-        subject_id
-    )
+    item_subjects(item_id, subject_id)
 values
     (
-        UUID(),
         "d2b6b0f5-a9b9-4ab5-9644-75407c9e9dfb",
         "e1234a08-cd29-4f8a-9d8e-2716d6d2b546"
     );
@@ -243,14 +230,9 @@ values
     ("75a570b7-ca2a-4e36-82c3-bab80b65bceb", "light");
 
 Insert into
-    keywords_for_items (
-        id,
-        keyword_id,
-        item_id
-    )
+    keywords_for_items (keyword_id, item_id)
 values
     (
-        UUID(),
         "75a570b7-ca2a-4e36-82c3-bab80b65bceb",
         "d2b6b0f5-a9b9-4ab5-9644-75407c9e9dfb"
     );
@@ -286,14 +268,9 @@ values
     );
 
 Insert into
-    user_roles(
-        id,
-        user_id,
-        role_id
-    )
+    user_roles(user_id, role_id)
 values
     (
-        UUID(),
         "d1592a60-1538-4d6a-b3fd-60193622a854",
         "b01ccc07-693f-42de-b7f5-f2b5307bbcc1"
     );

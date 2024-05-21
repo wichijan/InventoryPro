@@ -131,7 +131,7 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 		return inv_err
 	}
 
-	_, inv_error = ic.ItemKeywordRepo.CreateKeywordForItem(&itemKeywordWithID)
+	inv_error = ic.ItemKeywordRepo.CreateKeywordForItem(&itemKeywordWithID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -174,7 +174,7 @@ func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectNam
 		return inv_err
 	}
 
-	_, inv_error = ic.ItemSubjectRepo.CreateSubjectForItem(&itemSubjectWithID)
+	inv_error = ic.ItemSubjectRepo.CreateSubjectForItem(&itemSubjectWithID)
 	if inv_error != nil {
 		return inv_error
 	}

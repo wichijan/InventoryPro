@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
@@ -13,7 +12,7 @@ import (
 
 type ItemKeywordRepositoryI interface {
 	GetKeywordsForItems() (*[]model.KeywordsForItems, *models.INVError)
-	CreateKeywordForItem(keyword *models.ItemWithKeyword) (*uuid.UUID, *models.INVError)
+	CreateKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError
 	DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError
 	CheckIfKeywordAndItemExists(keywordAndItem models.ItemWithKeyword) *models.INVError
 }
@@ -45,16 +44,13 @@ func (kfir *ItemKeywordRepository) GetKeywordsForItems() (*[]model.KeywordsForIt
 	return &keywords, nil
 }
 
-func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWithKeyword) (*uuid.UUID, *models.INVError) {
-	uuid := uuid.New()
+func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError {
 
 	// Create the insert statement
 	insertQuery := table.KeywordsForItems.INSERT(
-		table.KeywordsForItems.ID,
 		table.KeywordsForItems.KeywordID,
 		table.KeywordsForItems.ItemID,
 	).VALUES(
-		uuid.String(),
 		keyword.KeywordID,
 		keyword.ItemID,
 	)
@@ -62,19 +58,19 @@ func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWith
 	// Execute the query
 	rows, err := insertQuery.Exec(kfir.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND
 	}
 
-	return &uuid, nil
+	return nil
 }
 
 func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError {
