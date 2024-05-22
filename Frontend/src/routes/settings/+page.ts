@@ -2,34 +2,23 @@ import { API_URL } from '$lib/_services/ShelfService.js';
 
 export const load = async ({ fetch, params }) => {
 
-    type Item = {
-        ID: string;
-        Name: string;
+    type Warehouse = {
         Description: string;
-        ClassOne: boolean;
-        ClassTwo: boolean;
-        ClassThree: boolean;
-        ClassFour: boolean;
-        Damaged: boolean;
-        DamagedDesc: string;
-        Quantity: number;
-        Status: string;
-        Keywords: string[];
-        Subject: string;
-        Pictures: string[];
+        Id: string;
+        Name: string;
       };
 
-    async function getItem(): Promise<Item> {
+    async  function getAllWarehouses(): Promise<Warehouse[]> {
         return new Promise((resolve, reject) => {
-            const id = params.id;
-            fetch(API_URL + 'items/' + id, {
+            fetch(API_URL + 'warehouses', {
                 method: 'GET',
                 credentials: 'include',
                 mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(async (response) => {
+            })
+            .then(async (response) => {
                 if (response.ok) {
                     await response.json().then((data) => {
                         resolve(data);
@@ -41,6 +30,5 @@ export const load = async ({ fetch, params }) => {
         });
     }
 
-
-    return { item: await getItem()};
+    return {warehouses: await getAllWarehouses()};
 }

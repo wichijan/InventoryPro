@@ -8,7 +8,7 @@
 </script>
 
 <button
-  class="sidebar-icon group {active ? 'bg-green-500 text-black' : ''}"
+  class="sidebar-icon group {active ? 'bg-[#a3b18a] text-black' : ''}"
   on:click={() => {
     goto(href);
   }}

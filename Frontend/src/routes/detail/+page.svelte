@@ -71,9 +71,9 @@
 
 <div class="flex min-h-screen items-center flex-col">
   <div class="mt-10 mb-4">
-    <h1 class="text-3xl font-bold text-white">Items</h1>
+    <h1 class="text-3xl font-bold text-black">Items</h1>
   </div>
-  <div class="grid grid-cols-3 bg-slate-600 rounded">
+  <div class="grid grid-cols-3 bg-tertiary rounded">
     {#each latestThreeItems as item (item.ID)}
       <button
         class="max-w-sm rounded overflow-hidden shadow-lg m-3 bg-white px-5 py-5 hover:shadow-2xl duration-300 ease-in-out transform hover:scale-[1.02]"
@@ -143,7 +143,7 @@
           <tbody class="bg-white">
             {#each allItems as item (item.ID)}
               <tr
-                class="text-gray-700 hover:bg-gray-300 duration-300 cursor-pointer"
+                class="text-gray-700 hover:bg-tertiary duration-300 cursor-pointer"
                 on:click={() => {
                   goto(`/detail/${item.ID}`);
                 }}

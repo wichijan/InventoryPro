@@ -8,6 +8,7 @@
     CardList,
     InfoCircle,
     PersonCircle,
+    Gear,
   } from "svelte-bootstrap-icons";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/stores";
@@ -18,6 +19,7 @@
     { icon: HouseDoor, text: "InventoryPro", href: "/", active: false },
     { icon: CardList, text: "Overview", href: "/overview", active: false },
     { icon: InfoCircle, text: "Detail", href: "/detail", active: false },
+    { icon: Gear, text: "Settings", href: "/settings", active: false },
   ];
 
   $: sidebarItems = sidebarItems;
@@ -56,7 +58,7 @@
   function addRecentPage(page: any) {
     //check double if double move it to the top
     recentPages = recentPages.filter((item) => item.href !== page.url.pathname);
-    
+
     if (recentPages.length > 5) {
       recentPages.pop();
     }
@@ -77,7 +79,6 @@
       text: routeName,
       href: page.url.pathname,
     };
-    console.log(recentPages);
     recentPages = [recentPage, ...recentPages];
   }
 
@@ -91,7 +92,7 @@
 </script>
 
 <div
-  class="fixed top-0 left-0 h-screen w-16 m-0 flex flex-col bg-gray-900 text-white shadow-lg"
+  class="fixed top-0 left-0 h-screen w-16 m-0 flex flex-col bg-white text-white shadow-lg"
 >
   {#each sidebarItems as item}
     <SideBarIcon
@@ -101,7 +102,7 @@
       active={item.active}
     />
   {/each}
-  <hr />
+  <!-- <hr />
   <p class="text-sm mx-auto mt-3">Recent:</p>
   {#each recentPages as item}
     <SideBarIcon
@@ -110,5 +111,5 @@
       href={item.href}
       active={false}
     />
-  {/each}
+  {/each} -->
 </div>

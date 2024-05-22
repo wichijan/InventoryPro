@@ -30,7 +30,7 @@
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-screen min-h-screen bg-gray-800"
+  class="relative flex flex-col justify-between min-w-screen min-h-screen bg-primary"
 >
   <div>
     {#if url !== "/"}

@@ -30,12 +30,12 @@
 </script>
 
 <div
-  class="min-h-screen bg-gray-800 flex items-center justify-between px-8 py-6"
+  class="min-h-screen bg-primary flex items-center justify-between px-8 py-6"
 >
   <div class="space-x-4">
     <a
       href="/"
-      class="text-2xl font-extrabold text-white tracking-widest transition transform duration-500 ease-in-out hover:scale-105 hover:text-blue-300"
+      class="text-2xl font-extrabold hover:text-black tracking-widest transition transform duration-500 ease-in-out hover:scale-105 text-blue-500"
     >
       InventoryPro
     </a>
@@ -45,7 +45,7 @@
     {#each navbarItems as item}
       <a
         href={item.href}
-        class="text-lg font-bold text-white px-3 py-2 rounded-lg transform transition duration-500 ease-in-out hover:scale-105 hover:{item.color} hover:text-black"
+        class="text-lg font-bold px-5 py-3 rounded-lg transform transition duration-500 ease-in-out hover:scale-105 text-black hover:text-white hover:bg-blue-500"
       >
         {item.text}
       </a>
