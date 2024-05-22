@@ -1,4 +1,4 @@
-import { API_URL } from '$lib/_services/ShelfService.js';
+import { API_URL } from '$lib/_services/ShelfService';
 
 export const load = async ({ fetch, params }) => {
 

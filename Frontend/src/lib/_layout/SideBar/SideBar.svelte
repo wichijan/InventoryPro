@@ -9,9 +9,12 @@
     InfoCircle,
     PersonCircle,
     Gear,
+    GraphUp,
+    Safe,
   } from "svelte-bootstrap-icons";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/stores";
+  import { API_URL } from "$lib/_services/ShelfService";
 
   let isAdmin = false;
 
@@ -29,22 +32,43 @@
   $: recentPages = recentPages;
 
   onMount(() => {
-    if (isAdmin) {
-      sidebarItems.push({
-        icon: PersonCircle,
-        text: "Admin",
-        href: "/admin",
-        active: false,
-      });
-    } else {
-      sidebarItems.push({
-        icon: PersonCircle,
-        text: "Login",
-        href: "/auth/login",
-        active: false,
-      });
-    }
-    sidebarItems = sidebarItems;
+    fetch(API_URL + "users/get-me", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      if (response.ok) {
+        response.json().then((data) => {
+          isAdmin = data.UserType === "Admin";
+          if (isAdmin) {
+            sidebarItems.push({
+              icon: Safe,
+              text: "Admin",
+              href: "/admin",
+              active: false,
+            });
+          } else {
+            sidebarItems.push({
+              icon: GraphUp,
+              text: "Dashboard",
+              href: "/dashboard",
+              active: false,
+            });
+          }
+          sidebarItems = sidebarItems;
+        });
+      } else {
+        sidebarItems.push({
+          icon: PersonCircle,
+          text: "Login oder Register",
+          href: "/auth/login",
+          active: false,
+        });
+        sidebarItems = sidebarItems;
+      }
+    });
   });
 
   afterNavigate(() => {

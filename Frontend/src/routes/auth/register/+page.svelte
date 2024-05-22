@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { API_URL } from "$lib/_services/ShelfService.js";
+  import { API_URL } from "$lib/_services/ShelfService";
   import { ArrowRight } from "svelte-bootstrap-icons";
   import Swal from "sweetalert2";
   import { fly } from "svelte/transition";
@@ -131,7 +131,7 @@
 <div class="min-h-screen flex justify-center items-center">
   <div class="flex space-x-5 justify-between w-full" class:mr-5={step === 1}>
     <div
-      class="max-w-xs w-full m-auto bg-tertiary rounded-xl shadow-md overflow-hidden md:max-w-2xl px-4 py-6"
+      class="max-w-xs w-full m-auto bg-tertiary rounded-xl shadow-md overflow-hidden md:max-w-2xl px-4 py-6 hover:shadow-lg duration-300"
     >
       <h2
         class="text-center text-4xl font-extrabold text-white tracking-widest hover:text-blue-300 mb-4 duration-300"
@@ -178,7 +178,7 @@
           </div>
           <a
             href="/auth/login"
-            class="text-white text-sm font-bold hover:text-blue-300 duration-300"
+            class="text-white text-sm font-bold hover:text-blue-400 duration-300"
             >Bereits ein Account?</a
           >
         </div>
@@ -187,14 +187,17 @@
           disabled={passwordError}
           type="submit"
           class="bg-[#d5bdaf] hover:bg-d6ccc2 hover:text-black hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 mt-5 w-full"
+          hidden={step === 1}
         >
-          Next Step <ArrowRight class="inline-block w-5 h-5" />
+          Next Step <ArrowRight
+            class="inline-block w-5 h-5 animate-pulse my-auto"
+          />
         </button>
       </form>
     </div>
     {#key step}
       <div
-        class="max-w-xs w-full m-auto bg-tertiary rounded-xl shadow-md overflow-hidden md:max-w-2xl px-4 py-6 my-5"
+        class="max-w-xs w-full m-auto bg-tertiary rounded-xl shadow-md overflow-hidden md:max-w-2xl px-4 py-6 my-5 hover:shadow-lg duration-300"
         class:hidden={step !== 1}
         in:fly={{ x: 100, duration: 200, delay: 201 }}
         out:fly={{ x: -100, duration: 200 }}
@@ -248,20 +251,6 @@
             </div>
           </div>
           <div>
-            <label for="jobtitle" class="text-white text-lg font-bold">
-              Jobtitel
-            </label>
-            <div class="mt-1 rounded-md shadow-sm">
-              <input
-                bind:value={jobtitle}
-                type="text"
-                class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
-                placeholder="Jobtitel"
-                required
-              />
-            </div>
-          </div>
-          <div>
             <label for="phonenumber" class="text-white text-lg font-bold">
               Telefonnummer
             </label>
@@ -271,6 +260,20 @@
                 type="text"
                 class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
                 placeholder="Telefonnummer"
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label for="jobtitle" class="text-white text-lg font-bold">
+              Jobtitel
+            </label>
+            <div class="mt-1 rounded-md shadow-sm">
+              <input
+                bind:value={jobtitle}
+                type="text"
+                class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
+                placeholder="Jobtitel"
                 required
               />
             </div>

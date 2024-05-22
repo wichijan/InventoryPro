@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { API_URL } from "$lib/_services/ShelfService.js";
+  import { API_URL } from "$lib/_services/ShelfService";
   import EditModal from "$lib/templates/EditModal.svelte";
 
   export let data;

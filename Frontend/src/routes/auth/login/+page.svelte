@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { API_URL } from "$lib/_services/ShelfService.js";
+  import { API_URL } from "$lib/_services/ShelfService";
   import Swal from "sweetalert2";
 
   let username: string = "";
@@ -98,7 +98,7 @@
         </div>
         <a
           href="/auth/register"
-          class="text-white text-sm font-bold hover:text-blue-300 duration-300"
+          class="text-white text-sm font-bold hover:text-blue-400 duration-300"
           >Noch keinen Account?</a
         >
       </div>
