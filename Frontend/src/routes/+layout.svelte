@@ -65,7 +65,7 @@
         <SideBar />
       </div>
       <div
-        class=" mt-3 bg-tertiary px-5 py-1 rounded-md ml-[5.25rem] mr-3"
+        class=" mt-3 bg-tertiary px-5 py-1 rounded-md ml-[5.25rem] mr-5"
         id="breadcrumbs"
       >
         {#key breadcrumbs}
