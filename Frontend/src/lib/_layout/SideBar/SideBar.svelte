@@ -13,7 +13,7 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/stores";
 
-  let isAdmin = Math.random() > 0.5;
+  let isAdmin = false;
 
   let sidebarItems = [
     { icon: HouseDoor, text: "InventoryPro", href: "/", active: false },
