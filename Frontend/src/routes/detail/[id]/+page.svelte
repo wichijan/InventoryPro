@@ -85,7 +85,7 @@
       class="flex flex-col bg-tertiary px-5 py-5 mt-5 ml-10 mr-5 w-full rounded-md"
       id="damaged"
     >
-      <div class="mx-auto font-semibold text-xl" id="header">Status</div>
+      <div class="mx-auto font-semibold text-xl" id="header">Beschädigt</div>
       <div class="w-full">
         <div class="flex space-x-3">
           {#if item.Damaged}

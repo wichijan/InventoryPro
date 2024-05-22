@@ -31,10 +31,15 @@
           </h2>
           <ul class="text-black text-sm sm:text-md">
             <li class="">
-              <a href="/" class="hover:underline">API</a>
+              <a
+                href="http://localhost:8080/swagger/index.html"
+                class="hover:underline">API</a
+              >
             </li>
             <li>
-              <a href="/" class="hover:underline">Tailwind CSS</a>
+              <a href="https://tailwindcss.com/" class="hover:underline"
+                >Tailwind CSS</a
+              >
             </li>
           </ul>
         </div>
@@ -44,10 +49,13 @@
           </h2>
           <ul class="text-black text-sm sm:text-md">
             <li class="">
-              <a href="/" class="hover:underline">Github</a>
+              <a
+                href="https://github.com/wichijan/InventoryPro"
+                class="hover:underline">Github</a
+              >
             </li>
             <li>
-              <a href="/" class="hover:underline">Discord</a>
+              <a href="#" class="hover:underline">TBA</a>
             </li>
           </ul>
         </div>
