@@ -23,7 +23,6 @@ type Controllers struct {
 	ItemController      controllers.ItemControllerI
 	UserController      controllers.UserControllerI
 	KeywordController   controllers.KeywordControllerI
-	
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -83,6 +82,18 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	itemInShelveRepo := &repositories.ItemInShelveRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	itemStatusRepo := &repositories.ItemStatusRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	userItemRepo := &repositories.UserItemRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -95,11 +106,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			ShelveRepo: shelveRepo,
 		},
 		ItemController: &controllers.ItemController{
-			ItemRepo:        itemRepo,
-			KeywordRepo:     keywordRepo,
-			SubjectRepo:     subjectRepo,
-			ItemKeywordRepo: itemKeywordRepo,
-			ItemSubjectRepo: itemSubjectRepo,
+			ItemRepo:         itemRepo,
+			ItemInShelveRepo: itemInShelveRepo,
+			ItemStatusRepo:   itemStatusRepo,
+			UserItemRepo:     userItemRepo,
+			KeywordRepo:      keywordRepo,
+			SubjectRepo:      subjectRepo,
+			ItemKeywordRepo:  itemKeywordRepo,
+			ItemSubjectRepo:  itemSubjectRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:     userRepo,
@@ -153,12 +167,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
 
 	// Item reserve
-	publicRoutes.Handle(http.MethodPost, "/items/reserve", nil)
-	publicRoutes.Handle(http.MethodPost, "/items/reserve-cancel", nil)
+	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ItemController))
+	securedRoutes.Handle(http.MethodPost, "/items/reserve-cancel", nil)
 
 	// Item move
-	publicRoutes.Handle(http.MethodPost, "/items/borrow", nil)
-	publicRoutes.Handle(http.MethodPost, "/items/return", nil)
+	securedRoutes.Handle(http.MethodPost, "/items/borrow", nil)
+	securedRoutes.Handle(http.MethodPost, "/items/return", nil)
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"

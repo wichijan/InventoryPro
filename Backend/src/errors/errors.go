@@ -31,6 +31,8 @@ var (
 	INV_USER_TYPE_NOT_FOUND = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "USER_TYPE_NOT_FOUND"}, Status: 409}
 	// INV_CONFLICT is used to indicate that the request could not be processed due to a conflict
 	INV_CONFLICT = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "CONFLICT"}, Status: 409}
+	// INV_NOT_ENOUGH_QUANTITY is used to indicate that the requested quantity is not available
+	INV_NOT_ENOUGH_QUANTITY = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "NOT_ENOUGH_QUANTITY"}, Status: 409}
 	// INV_UPSTREAM_ERROR is used to indicate an error in 3rd party services
 	INV_UPSTREAM_ERROR = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "UPSTREAM_ERROR"}, Status: 500}
 	// INV_INTERNAL_ERROR is used to indicate an internal, unclassified error

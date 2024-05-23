@@ -20,6 +20,7 @@ type userItemsTable struct {
 	UserID       mysql.ColumnString
 	ItemID       mysql.ColumnString
 	Quantity     mysql.ColumnInteger
+	ReservedDate mysql.ColumnDate
 	BorrowedDate mysql.ColumnDate
 	ReturnDate   mysql.ColumnDate
 	StatusID     mysql.ColumnString
@@ -66,11 +67,12 @@ func newUserItemsTableImpl(schemaName, tableName, alias string) userItemsTable {
 		UserIDColumn       = mysql.StringColumn("user_id")
 		ItemIDColumn       = mysql.StringColumn("item_id")
 		QuantityColumn     = mysql.IntegerColumn("quantity")
+		ReservedDateColumn = mysql.DateColumn("reserved_date")
 		BorrowedDateColumn = mysql.DateColumn("borrowed_date")
 		ReturnDateColumn   = mysql.DateColumn("return_date")
 		StatusIDColumn     = mysql.StringColumn("status_id")
-		allColumns         = mysql.ColumnList{UserIDColumn, ItemIDColumn, QuantityColumn, BorrowedDateColumn, ReturnDateColumn, StatusIDColumn}
-		mutableColumns     = mysql.ColumnList{QuantityColumn, BorrowedDateColumn, ReturnDateColumn, StatusIDColumn}
+		allColumns         = mysql.ColumnList{UserIDColumn, ItemIDColumn, QuantityColumn, ReservedDateColumn, BorrowedDateColumn, ReturnDateColumn, StatusIDColumn}
+		mutableColumns     = mysql.ColumnList{QuantityColumn, ReservedDateColumn, BorrowedDateColumn, ReturnDateColumn, StatusIDColumn}
 	)
 
 	return userItemsTable{
@@ -80,6 +82,7 @@ func newUserItemsTableImpl(schemaName, tableName, alias string) userItemsTable {
 		UserID:       UserIDColumn,
 		ItemID:       ItemIDColumn,
 		Quantity:     QuantityColumn,
+		ReservedDate: ReservedDateColumn,
 		BorrowedDate: BorrowedDateColumn,
 		ReturnDate:   ReturnDateColumn,
 		StatusID:     StatusIDColumn,

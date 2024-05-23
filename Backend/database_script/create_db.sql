@@ -120,6 +120,7 @@ create table user_items(
     user_id VARCHAR(36) NOT NULL,
     item_id VARCHAR(36) NOT NULL,
     quantity INT,
+    reserved_date DATE,
     borrowed_date DATE,
     return_date DATE,
     status_id VARCHAR(36),

@@ -1,7 +1,10 @@
 package controllers
 
 import (
+	"time"
+
 	"github.com/google/uuid"
+	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/repositories"
@@ -16,14 +19,19 @@ type ItemControllerI interface {
 	RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError
 	AddSubjectToItem(itemSubject models.ItemWithSubjectName) *models.INVError
 	RemoveSubjectFromItem(itemSubject models.ItemWithSubjectName) *models.INVError
+
+	ReserveItem(itemReserve models.ItemReserve) *models.INVError
 }
 
 type ItemController struct {
-	ItemRepo        repositories.ItemRepositoryI
-	KeywordRepo     repositories.KeywordRepositoryI
-	SubjectRepo     repositories.SubjectRepositoryI
-	ItemKeywordRepo repositories.ItemKeywordRepositoryI
-	ItemSubjectRepo repositories.ItemSubjectRepositoryI
+	ItemRepo         repositories.ItemRepositoryI
+	ItemInShelveRepo repositories.ItemInShelveRepositoryI 
+	ItemStatusRepo   repositories.ItemStatusRepositoryI   
+	UserItemRepo     repositories.UserItemRepositoryI     
+	KeywordRepo      repositories.KeywordRepositoryI
+	SubjectRepo      repositories.SubjectRepositoryI
+	ItemKeywordRepo  repositories.ItemKeywordRepositoryI
+	ItemSubjectRepo  repositories.ItemSubjectRepositoryI
 }
 
 func (ic *ItemController) GetItems() (*[]models.ItemWithEverything, *models.INVError) {
@@ -163,6 +171,42 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 	}
 
 	inv_error = ic.ItemSubjectRepo.DeleteSubjectForItem(&itemSubjectWithID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+func (ic *ItemController) ReserveItem(itemReserve models.ItemReserve) *models.INVError {
+	// Check items_in_shelve quantity
+	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(&itemReserve.ItemID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	newQuantityInShelve := *quantityInShelve - itemReserve.Quantity
+	if newQuantityInShelve < 0 {
+		return inv_errors.INV_NOT_ENOUGH_QUANTITY
+	}
+
+	// insert into user_items
+	// Get status_id
+	statusName := "Reserved"
+	statusID, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&statusName)
+	if inv_error != nil {
+		return inv_error
+	}
+	itemReserve.StatusID = statusID.String()
+	itemReserve.ReserveDate = time.Now()
+
+	inv_error = ic.UserItemRepo.ReserveItem(&itemReserve)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// update items_in_shelve quantity
+	inv_error = ic.ItemInShelveRepo.DecreaseQuantityInShelve(&itemReserve.ItemID, &newQuantityInShelve)
 	if inv_error != nil {
 		return inv_error
 	}

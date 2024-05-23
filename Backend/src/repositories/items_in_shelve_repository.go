@@ -15,6 +15,8 @@ type ItemInShelveRepositoryI interface {
 	CreateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError
 	UpdateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError
 	DeleteItemInShelve(itemIdInShelve *uuid.UUID) *models.INVError
+	GetQuantityInShelve(itemId *string) (*int32, *models.INVError)
+	DecreaseQuantityInShelve(itemId *string, quantity *int32) *models.INVError
 }
 
 type ItemInShelveRepository struct {
@@ -104,5 +106,52 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(itemInShelve *model.Items
 
 func (iisr *ItemInShelveRepository) DeleteItemInShelve(itemIdInShelve *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
+	return nil
+}
+
+func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *string) (*int32, *models.INVError) {
+	var quantity models.GetQuantityInShelve
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.ItemsInShelve.Quantity,
+	).FROM(
+		table.ItemsInShelve,
+	).WHERE(
+		table.ItemsInShelve.ItemID.EQ(mysql.String(*itemId)),
+	)
+
+	// Execute the query
+	err := stmt.Query(iisr.DatabaseManager.GetDatabaseConnection(), &quantity)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &quantity.Quantity, nil
+}
+
+func (iisr *ItemInShelveRepository) DecreaseQuantityInShelve(itemId *string, quantity *int32) *models.INVError {
+	// Create the update statement
+	updateQuery := table.ItemsInShelve.UPDATE(
+		table.ItemsInShelve.Quantity,
+	).SET(
+		quantity,
+	).WHERE(table.ItemsInShelve.ItemID.EQ(mysql.String(*itemId)))
+
+	// Execute the query
+	rows, err := updateQuery.Exec(iisr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND
+	}
+
 	return nil
 }

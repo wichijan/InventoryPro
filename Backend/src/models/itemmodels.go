@@ -1,6 +1,10 @@
 package models
 
-import "github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
+import (
+	"time"
+
+	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
+)
 
 type ItemWithStatus struct {
 	ID                 string `alias:"items.id" sql:"primary_key"`
@@ -64,9 +68,22 @@ type ItemWithSubjectName struct {
 }
 
 type ItemWithUser struct {
-	item_id          string `alias:"items.id"`
-	item_Name        string `alias:"items.name"`
-	item_Description string `alias:"items.description"`
-	user_id          string `alias:"users.id"`
-	user_Username    string `alias:"users.username"`
+	Item_id          string `alias:"items.id"`
+	Item_Name        string `alias:"items.name"`
+	Item_Description string `alias:"items.description"`
+	User_id          string `alias:"users.id"`
+	User_Username    string `alias:"users.username"`
+}
+
+type ItemReserveODT struct {
+	ItemID   string `json:"itemId"`
+	Quantity int32  `json:"quantity"`
+}
+
+type ItemReserve struct {
+	ItemID      string
+	UserID      string
+	Quantity    int32
+	StatusID    string
+	ReserveDate time.Time
 }

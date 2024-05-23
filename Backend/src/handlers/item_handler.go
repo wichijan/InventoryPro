@@ -230,3 +230,44 @@ func RemoveSubjectFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 		c.JSON(http.StatusOK, nil)
 	}
 }
+
+
+// @Summary Reserve Item
+// @Description Reserve Item when logged-in
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Success 201 {object} models.ItemReserveODT
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /items/reserve [GET]
+func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		var itemReserveODT models.ItemReserveODT
+		err := c.ShouldBindJSON(&itemReserveODT)
+		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		itemReserve := models.ItemReserve{
+			ItemID:   itemReserveODT.ItemID,
+			UserID:   userId.String(),
+			Quantity: itemReserveODT.Quantity,
+		}
+
+		inv_err := itemCtrl.ReserveItem(itemReserve)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
