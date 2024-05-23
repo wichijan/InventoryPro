@@ -71,7 +71,6 @@ func (utr *UserTypeRepository) GetUserTypeById(id *string) (*string, *models.INV
 	return userTypes.TypeName, nil
 }
 
-
 func (utr *UserTypeRepository) GetUserTypeByName(name *string) (*string, *models.INVError) {
 	var userTypes model.UserTypes
 
@@ -87,7 +86,7 @@ func (utr *UserTypeRepository) GetUserTypeByName(name *string) (*string, *models
 	// Execute the query
 	err := stmt.Query(utr.DatabaseManager.GetDatabaseConnection(), &userTypes)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_USER_TYPE_NOT_FOUND
 	}
 
 	if userTypes.TypeName == nil {
