@@ -36,7 +36,7 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.Items.ClassFour,
 		table.Items.Damaged,
 		table.Items.DamagedDescription,
-		table.Items.Quantity,
+		table.ItemsInShelve.Quantity,
 		table.Items.Picture,
 		table.ItemStatus.StatusName,
 		table.ItemSubjects.AllColumns,
@@ -45,10 +45,11 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.Users.Username,
 	).FROM(
 		table.Items.
-			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)).
+			LEFT_JOIN(table.ItemsInShelve, table.ItemsInShelve.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.UserItems.StatusID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
 	)
 
@@ -79,7 +80,7 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 		table.Items.ClassFour,
 		table.Items.Damaged,
 		table.Items.DamagedDescription,
-		table.Items.Quantity,
+		table.ItemsInShelve.Quantity,
 		table.Items.Picture,
 		table.ItemStatus.StatusName,
 		table.ItemSubjects.AllColumns,
@@ -88,10 +89,11 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 		table.Users.Username,
 	).FROM(
 		table.Items.
-			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.Items.StatusID)).
+			LEFT_JOIN(table.ItemsInShelve, table.ItemsInShelve.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.UserItems.StatusID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
 	).WHERE(
 		table.Items.ID.EQ(mysql.String(itemId.String())),
@@ -120,8 +122,6 @@ func (itr *ItemRepository) CreateItem(item *model.Items) (*uuid.UUID, *models.IN
 		table.Items.ClassFour,
 		table.Items.Damaged,
 		table.Items.DamagedDescription,
-		table.Items.Quantity,
-		table.Items.StatusID,
 	).VALUES(
 		uuid.String(),
 		item.Name,
@@ -132,8 +132,6 @@ func (itr *ItemRepository) CreateItem(item *model.Items) (*uuid.UUID, *models.IN
 		item.ClassFour,
 		item.Damaged,
 		item.DamagedDescription,
-		item.Quantity,
-		item.StatusID,
 	)
 
 	// Execute the query
@@ -165,8 +163,6 @@ func (itr *ItemRepository) UpdateItem(item *model.Items) *models.INVError {
 		table.Items.ClassFour,
 		table.Items.Damaged,
 		table.Items.DamagedDescription,
-		table.Items.Quantity,
-		table.Items.StatusID,
 	).SET(
 		item.Name,
 		item.Description,
@@ -176,8 +172,6 @@ func (itr *ItemRepository) UpdateItem(item *model.Items) *models.INVError {
 		item.ClassFour,
 		item.Damaged,
 		item.DamagedDescription,
-		item.Quantity,
-		item.StatusID,
 	).WHERE(table.Items.ID.EQ(mysql.String(item.ID)))
 
 	// Execute the query

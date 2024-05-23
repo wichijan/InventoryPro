@@ -12,7 +12,6 @@ type ItemWithStatus struct {
 	ClassFour          bool   `alias:"items.class_four"`
 	Damaged            bool   `alias:"items.damaged"`
 	DamagedDesc        string `alias:"items.damaged_description"`
-	Quantity           int32  `alias:"items.quantity"`
 	Picture            string `alias:"items.picture"`
 	Status             string `alias:"item_status.status_name"`
 	BorrowedByUserID   string `alias:"users.id"`
@@ -29,7 +28,7 @@ type ItemWithEverything struct {
 	ClassFour          bool   `alias:"items.class_four"`
 	Damaged            bool   `alias:"items.damaged"`
 	DamagedDesc        string `alias:"items.damaged_description"`
-	Quantity           int32  `alias:"items.quantity"`
+	QuantityInShelve   int32  `alias:"items_in_shelve.quantity"`
 	Picture            string `alias:"items.picture"`
 	Status             string `alias:"item_status.status_name"`
 	BorrowedByUserID   string `alias:"users.id"`

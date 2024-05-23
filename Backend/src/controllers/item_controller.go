@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"log"
-
 	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/models"
@@ -24,7 +22,6 @@ type ItemController struct {
 	ItemRepo        repositories.ItemRepositoryI
 	KeywordRepo     repositories.KeywordRepositoryI
 	SubjectRepo     repositories.SubjectRepositoryI
-	ItemStatusRepo  repositories.ItemStatusRepositoryI
 	ItemKeywordRepo repositories.ItemKeywordRepositoryI
 	ItemSubjectRepo repositories.ItemSubjectRepositoryI
 }
@@ -58,20 +55,6 @@ func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *
 	pureItem.ClassFour = &item.ClassFour
 	pureItem.Damaged = &item.Damaged
 	pureItem.DamagedDescription = &item.DamagedDesc
-	pureItem.Quantity = &item.Quantity
-
-	if item.Status != "" {
-		statusId, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&item.Status)
-		if inv_error != nil {
-			return nil, inv_error
-		}
-
-		log.Print(statusId.String())
-		statusString := statusId.String()
-		pureItem.StatusID = &statusString
-	} else {
-		pureItem.StatusID = nil
-	}
 
 	id, inv_error := ic.ItemRepo.CreateItem(&pureItem)
 	if inv_error != nil {
@@ -92,20 +75,6 @@ func (ic *ItemController) UpdateItem(item *models.ItemWithStatus) *models.INVErr
 	pureItem.ClassFour = &item.ClassFour
 	pureItem.Damaged = &item.Damaged
 	pureItem.DamagedDescription = &item.DamagedDesc
-	pureItem.Quantity = &item.Quantity
-
-	if item.Status != "" {
-		statusId, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&item.Status)
-		if inv_error != nil {
-			return inv_error
-		}
-
-		log.Print(statusId.String())
-		statusString := statusId.String()
-		pureItem.StatusID = &statusString
-	} else {
-		pureItem.StatusID = nil
-	}
 
 	inv_error := ic.ItemRepo.UpdateItem(&pureItem)
 	if inv_error != nil {

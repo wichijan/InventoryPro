@@ -19,6 +19,7 @@ type itemsInShelveTable struct {
 	// Columns
 	ItemID   mysql.ColumnString
 	ShelveID mysql.ColumnString
+	Quantity mysql.ColumnInteger
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -61,8 +62,9 @@ func newItemsInShelveTableImpl(schemaName, tableName, alias string) itemsInShelv
 	var (
 		ItemIDColumn   = mysql.StringColumn("item_id")
 		ShelveIDColumn = mysql.StringColumn("shelve_id")
-		allColumns     = mysql.ColumnList{ItemIDColumn, ShelveIDColumn}
-		mutableColumns = mysql.ColumnList{}
+		QuantityColumn = mysql.IntegerColumn("quantity")
+		allColumns     = mysql.ColumnList{ItemIDColumn, ShelveIDColumn, QuantityColumn}
+		mutableColumns = mysql.ColumnList{QuantityColumn}
 	)
 
 	return itemsInShelveTable{
@@ -71,6 +73,7 @@ func newItemsInShelveTableImpl(schemaName, tableName, alias string) itemsInShelv
 		//Columns
 		ItemID:   ItemIDColumn,
 		ShelveID: ShelveIDColumn,
+		Quantity: QuantityColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

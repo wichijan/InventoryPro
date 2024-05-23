@@ -23,6 +23,7 @@ type Controllers struct {
 	ItemController      controllers.ItemControllerI
 	UserController      controllers.UserControllerI
 	KeywordController   controllers.KeywordControllerI
+	
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -55,10 +56,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	itemRepo := &repositories.ItemRepository{
-		DatabaseManager: databaseManager,
-	}
-
-	itemStatusRepo := &repositories.ItemStatusRepository{
 		DatabaseManager: databaseManager,
 	}
 
@@ -101,7 +98,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			ItemRepo:        itemRepo,
 			KeywordRepo:     keywordRepo,
 			SubjectRepo:     subjectRepo,
-			ItemStatusRepo:  itemStatusRepo,
 			ItemKeywordRepo: itemKeywordRepo,
 			ItemSubjectRepo: itemSubjectRepo,
 		},

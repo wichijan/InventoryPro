@@ -26,9 +26,7 @@ type itemsTable struct {
 	ClassFour          mysql.ColumnBool
 	Damaged            mysql.ColumnBool
 	DamagedDescription mysql.ColumnString
-	Quantity           mysql.ColumnInteger
 	Picture            mysql.ColumnString
-	StatusID           mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -78,11 +76,9 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 		ClassFourColumn          = mysql.BoolColumn("class_four")
 		DamagedColumn            = mysql.BoolColumn("damaged")
 		DamagedDescriptionColumn = mysql.StringColumn("damaged_description")
-		QuantityColumn           = mysql.IntegerColumn("quantity")
 		PictureColumn            = mysql.StringColumn("picture")
-		StatusIDColumn           = mysql.StringColumn("status_id")
-		allColumns               = mysql.ColumnList{IDColumn, NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, QuantityColumn, PictureColumn, StatusIDColumn}
-		mutableColumns           = mysql.ColumnList{NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, QuantityColumn, PictureColumn, StatusIDColumn}
+		allColumns               = mysql.ColumnList{IDColumn, NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn}
+		mutableColumns           = mysql.ColumnList{NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn}
 	)
 
 	return itemsTable{
@@ -98,9 +94,7 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 		ClassFour:          ClassFourColumn,
 		Damaged:            DamagedColumn,
 		DamagedDescription: DamagedDescriptionColumn,
-		Quantity:           QuantityColumn,
 		Picture:            PictureColumn,
-		StatusID:           StatusIDColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

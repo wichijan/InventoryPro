@@ -7,7 +7,15 @@
 
 package model
 
+import (
+	"time"
+)
+
 type UserItems struct {
-	UserID string `sql:"primary_key"`
-	ItemID string `sql:"primary_key"`
+	UserID       string `sql:"primary_key"`
+	ItemID       string `sql:"primary_key"`
+	Quantity     *int32
+	BorrowedDate *time.Time
+	ReturnDate   *time.Time
+	StatusID     *string
 }
