@@ -156,6 +156,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/items/addsubject", handlers.AddSubjectToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
 
+	// Item reserve
+	publicRoutes.Handle(http.MethodPost, "/items/reserve", nil)
+	publicRoutes.Handle(http.MethodPost, "/items/reserve-cancel", nil)
+
+	// Item move
+	publicRoutes.Handle(http.MethodPost, "/items/borrow", nil)
+	publicRoutes.Handle(http.MethodPost, "/items/return", nil)
+
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"
 	docs.SwaggerInfo.Description = "This is the API for the InventoryPro project"
