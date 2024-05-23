@@ -240,11 +240,11 @@ values
 Insert into
     user_types(id, type_name)
 values
-    (UUID(), 'Teacher'),
     (
         "7209efef-5a3f-4fab-8a47-7a157c2df829",
-        'AdminAdmin'
-    );
+        'Teacher'
+    ),
+    (UUID(), 'Jumper');
 
 Insert into
     users(

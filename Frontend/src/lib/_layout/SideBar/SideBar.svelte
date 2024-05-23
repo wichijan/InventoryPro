@@ -8,16 +8,21 @@
     CardList,
     InfoCircle,
     PersonCircle,
+    Gear,
+    GraphUp,
+    Safe,
   } from "svelte-bootstrap-icons";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/stores";
+  import { API_URL } from "$lib/_services/ShelfService";
 
-  let isAdmin = Math.random() > 0.5;
+  let isAdmin = false;
 
   let sidebarItems = [
     { icon: HouseDoor, text: "InventoryPro", href: "/", active: false },
     { icon: CardList, text: "Overview", href: "/overview", active: false },
     { icon: InfoCircle, text: "Detail", href: "/detail", active: false },
+    { icon: Gear, text: "Settings", href: "/settings", active: false },
   ];
 
   $: sidebarItems = sidebarItems;
@@ -27,22 +32,43 @@
   $: recentPages = recentPages;
 
   onMount(() => {
-    if (isAdmin) {
-      sidebarItems.push({
-        icon: PersonCircle,
-        text: "Admin",
-        href: "/admin",
-        active: false,
-      });
-    } else {
-      sidebarItems.push({
-        icon: PersonCircle,
-        text: "Login",
-        href: "/auth/login",
-        active: false,
-      });
-    }
-    sidebarItems = sidebarItems;
+    fetch(API_URL + "users/get-me", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      if (response.ok) {
+        response.json().then((data) => {
+          isAdmin = data.UserType === "Admin";
+          if (isAdmin) {
+            sidebarItems.push({
+              icon: Safe,
+              text: "Admin",
+              href: "/admin",
+              active: false,
+            });
+          } else {
+            sidebarItems.push({
+              icon: GraphUp,
+              text: "Dashboard",
+              href: "/dashboard",
+              active: false,
+            });
+          }
+          sidebarItems = sidebarItems;
+        });
+      } else {
+        sidebarItems.push({
+          icon: PersonCircle,
+          text: "Login oder Register",
+          href: "/auth/login",
+          active: false,
+        });
+        sidebarItems = sidebarItems;
+      }
+    });
   });
 
   afterNavigate(() => {
@@ -56,7 +82,7 @@
   function addRecentPage(page: any) {
     //check double if double move it to the top
     recentPages = recentPages.filter((item) => item.href !== page.url.pathname);
-    
+
     if (recentPages.length > 5) {
       recentPages.pop();
     }
@@ -77,7 +103,6 @@
       text: routeName,
       href: page.url.pathname,
     };
-    console.log(recentPages);
     recentPages = [recentPage, ...recentPages];
   }
 
@@ -91,7 +116,7 @@
 </script>
 
 <div
-  class="fixed top-0 left-0 h-screen w-16 m-0 flex flex-col bg-gray-900 text-white shadow-lg"
+  class="fixed top-0 left-0 h-screen w-16 m-0 flex flex-col bg-white text-white shadow-lg"
 >
   {#each sidebarItems as item}
     <SideBarIcon
@@ -101,7 +126,7 @@
       active={item.active}
     />
   {/each}
-  <hr />
+  <!-- <hr />
   <p class="text-sm mx-auto mt-3">Recent:</p>
   {#each recentPages as item}
     <SideBarIcon
@@ -110,5 +135,5 @@
       href={item.href}
       active={false}
     />
-  {/each}
+  {/each} -->
 </div>
