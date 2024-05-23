@@ -1,5 +1,6 @@
 <script lang="ts">
   import { browser } from "$app/environment";
+  import UserSettings from "$lib/templates/UserSettings.svelte";
   import { onMount } from "svelte";
   import Swal from "sweetalert2";
 
@@ -73,6 +74,9 @@
             Änderungen speichern!
           </div>
         {/if}
+      </div>
+      <div class="flex flex-col">
+        <UserSettings />
       </div>
     </div>
   </div>

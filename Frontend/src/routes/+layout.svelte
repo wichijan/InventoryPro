@@ -7,6 +7,7 @@
   import SideBar from "$lib/_layout/SideBar/SideBar.svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
+  import { API_URL } from "$lib/_services/ShelfService";
 
   let url: string;
 
@@ -15,44 +16,115 @@
   let breadcrumbs: any[] = [];
   $: breadcrumbs = breadcrumbs;
 
-  afterNavigate(() => {
+  afterNavigate(async () => {
     url = $page.url.pathname;
-    setBreadcrumbs();
-  });
-  beforeNavigate(() => {
-    url = $page.url.pathname;
-    setBreadcrumbs();
-  });
-
-  onMount(() => {
-    setBreadcrumbs();
-  });
-
-  function setBreadcrumbs() {
-    breadcrumbs = [];
-    let urlArray = url.split("/");
-    urlArray.forEach((part) => {
-      if (part === "auth") return;
-      if (part === "login" || part === "register") {
-        breadcrumbs.push({
-          text:
-            part.toString().charAt(0).toUpperCase() + part.toString().slice(1),
-          href: `/auth/${part}`,
-        });
-        breadcrumbs = breadcrumbs;
-        return;
-      }
-      if (part !== "") {
-        breadcrumbs.push({
-          text:
-            part.toString().charAt(0).toUpperCase() + part.toString().slice(1),
-          href: `/${part}`,
-        });
-      } else {
-        breadcrumbs.push({ text: "Home", href: "/" });
-      }
-      breadcrumbs = breadcrumbs;
+    await setBreadcrumbs().then((data) => {
+      breadcrumbs = data;
     });
+  });
+
+  onMount(async () => {
+    await setBreadcrumbs().then((data) => {
+      breadcrumbs = data;
+    });
+  });
+
+  async function setBreadcrumbs(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      const breadcrumbs = [];
+      const urlArray = url.split("/");
+
+      const fetchData = async (type, id) => {
+        const response = await fetch(`${API_URL}${type}/${id}`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${type} with id ${id}`);
+        }
+
+        const data = await response.json();
+        return data.Name;
+      };
+
+      for (let i = 0; i < urlArray.length; i++) {
+        const part = urlArray[i];
+
+        if (part === "auth") continue;
+
+        if (part === "login" || part === "register") {
+          breadcrumbs.push({
+            text: capitalize(part),
+            href: `/auth/${part}`,
+          });
+          continue;
+        }
+
+        if (isUUID(part)) {
+          const partBefore = urlArray[i - 1];
+
+          if (partBefore === "detail") {
+            try {
+              const name = await fetchData("items", part);
+              if (name && breadcrumbs[breadcrumbs.length - 1]?.text !== name) {
+                breadcrumbs.push({
+                  text: name,
+                  href: `/detail/${part}`,
+                });
+              }
+            } catch (error) {
+              console.error("Error fetching item details:", error);
+            }
+          } else if (partBefore === "rooms") {
+            try {
+              const name = await fetchData("rooms", part);
+              if (name && breadcrumbs[breadcrumbs.length - 1]?.text !== name) {
+                breadcrumbs.push({
+                  text: name,
+                  href: `/overview/rooms/${part}`,
+                });
+              }
+            } catch (error) {
+              console.error("Error fetching room details:", error);
+            }
+          }
+          continue;
+        }
+
+        if (part === "rooms") {
+          breadcrumbs.push({
+            text: "Rooms",
+            href: "/overview/rooms",
+          });
+          continue;
+        }
+
+        if (part !== "") {
+          breadcrumbs.push({
+            text: capitalize(part),
+            href: `/${part}`,
+          });
+        } else {
+          breadcrumbs.push({ text: "Home", href: "/" });
+        }
+      }
+
+      resolve(breadcrumbs);
+    });
+  }
+
+  function capitalize(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function isUUID(str: string) {
+    const uuidRegex =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+    return uuidRegex.test(str);
   }
 </script>
 
@@ -78,15 +150,6 @@
             {index < breadcrumbs.length - 1 ? "/ " : " "}
           {/each}
         {/key}
-        <!-- <a href="/" class="text-[#344e41] hover:text-blue-500 duration-300"
-          >Home</a
-        >
-        /{" "}
-        <a
-          href="/detail"
-          class="text-[#344e41] hover:text-blue-500 duration-300">Detail</a
-        >
-        /{" "} -->
       </div>
     {/if}
     <div class="flex-grow flex-1 overflow-hidden h-full pl-11">
