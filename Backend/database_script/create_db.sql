@@ -45,9 +45,7 @@ CREATE TABLE items(
     class_four BOOLEAN,
     damaged BOOLEAN,
     damaged_description TEXT,
-    picture TEXT,
-    status_id VARCHAR(36),
-    FOREIGN KEY (status_id) REFERENCES item_status(id)
+    picture TEXT
 );
 
 Create table items_in_shelve(
@@ -124,7 +122,9 @@ create table user_items(
     quantity INT,
     borrowed_date DATE,
     return_date DATE,
+    status_id VARCHAR(36),
     PRIMARY KEY (user_id, item_id),
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (status_id) REFERENCES item_status(id)
 );

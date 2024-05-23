@@ -133,9 +133,7 @@ Insert into
         class_three,
         class_four,
         damaged,
-        damaged_description,
-        quantity,
-        status_id
+        damaged_description
     )
 values
     (
@@ -148,9 +146,7 @@ values
         0,
         0,
         /* false */
-        Null,
-        1,
-        "740d9d99-7ac9-4f44-a67f-cdc2b7dad0a1"
+        Null
     ),
     (
         "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
@@ -161,8 +157,6 @@ values
         0,
         0,
         0,
-        NULL,
-        20,
         NULL
     ),
     (
@@ -174,8 +168,6 @@ values
         1,
         0,
         0,
-        NULL,
-        30,
         NULL
     ),
     (
@@ -187,8 +179,6 @@ values
         0,
         1,
         0,
-        NULL,
-        40,
         NULL
     );
 
