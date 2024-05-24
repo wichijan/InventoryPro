@@ -1060,6 +1060,78 @@ const docTemplate = `{
                 }
             }
         },
+        "/user-roles/add-role": {
+            "post": {
+                "description": "Add Role to User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserRoles"
+                ],
+                "summary": "Add Role to User",
+                "parameters": [
+                    {
+                        "description": "RoleIdODT model",
+                        "name": "RoleIdODT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RoleIdODT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Add Role to User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserRoles"
+                ],
+                "summary": "Add Role to User",
+                "parameters": [
+                    {
+                        "description": "RoleIdODT model",
+                        "name": "RoleIdODT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RoleIdODT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/user-types": {
             "get": {
                 "description": "Get UserTypes",
@@ -1598,6 +1670,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "usertypename": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RoleIdODT": {
+            "type": "object",
+            "properties": {
+                "role_id": {
                     "type": "string"
                 }
             }

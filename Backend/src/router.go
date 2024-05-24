@@ -185,7 +185,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Item reserve
 	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ItemController))
-	securedRoutes.Handle(http.MethodPost, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ItemController))
+	securedRoutes.Handle(http.MethodDelete, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ItemController))
 
 	// Item move
 	securedRoutes.Handle(http.MethodPost, "/items/borrow", nil)
@@ -195,6 +195,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	adminRoutes.Handle(http.MethodGet, "/roles", handlers.GetRolesHandler(controller.RoleController))
 	adminRoutes.Handle(http.MethodPost, "/roles", handlers.CreateRoleHandler(controller.RoleController))
 	adminRoutes.Handle(http.MethodPut, "/roles", handlers.UpdateRoleHandler(controller.RoleController))
+
+	// User roles routes
+	adminRoutes.Handle(http.MethodPost, "/user-roles/add-role", handlers.AddRoleToUserHandler(controller.UserRoleController))
+	adminRoutes.Handle(http.MethodDelete, "/user-roles/remove-role", handlers.RemoveRoleFromUserHandler(controller.UserRoleController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"

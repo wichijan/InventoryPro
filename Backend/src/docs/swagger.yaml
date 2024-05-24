@@ -200,6 +200,11 @@ definitions:
       usertypename:
         type: string
     type: object
+  models.RoleIdODT:
+    properties:
+      role_id:
+        type: string
+    type: object
   models.RoleODT:
     properties:
       role_name:
@@ -988,6 +993,53 @@ paths:
       summary: Get shelve by id with items
       tags:
       - Shelves
+  /user-roles/add-role:
+    delete:
+      consumes:
+      - application/json
+      description: Add Role to User
+      parameters:
+      - description: RoleIdODT model
+        in: body
+        name: RoleIdODT
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleIdODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Add Role to User
+      tags:
+      - UserRoles
+    post:
+      consumes:
+      - application/json
+      description: Add Role to User
+      parameters:
+      - description: RoleIdODT model
+        in: body
+        name: RoleIdODT
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleIdODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Add Role to User
+      tags:
+      - UserRoles
   /user-types:
     get:
       consumes:

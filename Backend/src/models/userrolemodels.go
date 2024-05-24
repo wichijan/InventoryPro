@@ -7,3 +7,7 @@ type UserRoleWithName struct {
 		RoleName string `alias:"roles.role_name"`
 	}
 }
+
+type RoleIdODT struct {
+	RoleID string `json:"role_id"`
+}

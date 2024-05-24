@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
@@ -12,8 +11,7 @@ import (
 
 type UserRoleRepositoryI interface {
 	CreateUserRole(user_role *model.UserRoles) *models.INVError
-	UpdateUserRole(userRole *model.UserRoles) *models.INVError
-	DeleteUserRole(userRoleId *uuid.UUID) *models.INVError
+	DeleteUserRole(userRole *model.UserRoles) *models.INVError
 }
 
 type UserRoleRepository struct {
@@ -21,7 +19,6 @@ type UserRoleRepository struct {
 }
 
 func (urr *UserRoleRepository) CreateUserRole(user_role *model.UserRoles) *models.INVError {
-
 	// Create the insert statement
 	insertQuery := table.UserRoles.INSERT(
 		table.UserRoles.RoleID,
@@ -49,18 +46,16 @@ func (urr *UserRoleRepository) CreateUserRole(user_role *model.UserRoles) *model
 	return nil
 }
 
-func (urr *UserRoleRepository) UpdateUserRole(userRole *model.UserRoles) *models.INVError {
-	// Create the update statement
-	updateQuery := table.UserRoles.UPDATE(
-		table.UserRoles.RoleID,
-		table.UserRoles.UserID,
-	).SET(
-		userRole.RoleID,
-		userRole.UserID,
-	).WHERE(table.UserRoles.UserID.EQ(mysql.String(userRole.UserID)).AND(table.UserRoles.RoleID.EQ(mysql.String(userRole.RoleID))))
+func (urr *UserRoleRepository) DeleteUserRole(userRole *model.UserRoles) *models.INVError {
+	// Create the delete statement
+	deleteQuery := table.UserRoles.DELETE().
+		WHERE(
+			table.UserRoles.UserID.EQ(mysql.String(userRole.UserID)).
+				AND(table.UserRoles.RoleID.EQ(mysql.String(userRole.RoleID))),
+		)
 
 	// Execute the query
-	rows, err := updateQuery.Exec(urr.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(urr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -74,10 +69,5 @@ func (urr *UserRoleRepository) UpdateUserRole(userRole *model.UserRoles) *models
 		return inv_errors.INV_NOT_FOUND
 	}
 
-	return nil
-}
-
-func (urr *UserRoleRepository) DeleteUserRole(userRoleId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
 	return nil
 }
