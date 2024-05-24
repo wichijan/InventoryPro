@@ -35,16 +35,16 @@ func AdminMiddleware(databaseManager managers.DatabaseManagerI) gin.HandlerFunc 
 		// Execute the query
 		err := stmt.Query(databaseManager.GetDatabaseConnection(), &userRoles)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_INTERNAL_ERROR)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN)
 		}
 
 		for _, a := range userRoles.UserNames {
-			if a.RoleName != "Admin" {
-				utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN)
+			if a.RoleName == "Admin" {
+				c.Next()
 				return
 			}
 		}
 
-		c.Next()
+		utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN)
 	}
 }

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -23,13 +22,6 @@ import (
 // @Router /user-roles/add-role [post]
 func AddRoleToUserHandler(userRoleCtrl controllers.UserRoleControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
-		if !ok {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
-			return
-		}
-
 		var roleName models.RoleIdODT
 		err := c.ShouldBindJSON(&roleName)
 		if err != nil {
@@ -38,7 +30,7 @@ func AddRoleToUserHandler(userRoleCtrl controllers.UserRoleControllerI) gin.Hand
 		}
 
 		itemRole := model.UserRoles{
-			UserID: userId.String(),
+			UserID: roleName.UserID,
 			RoleID: roleName.RoleID,
 		}
 
@@ -63,12 +55,6 @@ func AddRoleToUserHandler(userRoleCtrl controllers.UserRoleControllerI) gin.Hand
 // @Router /user-roles/add-role [delete]
 func RemoveRoleFromUserHandler(userRoleCtrl controllers.UserRoleControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
-		if !ok {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
-			return
-		}
-
 		var roleName models.RoleIdODT
 		err := c.ShouldBindJSON(&roleName)
 		if err != nil {
@@ -77,7 +63,7 @@ func RemoveRoleFromUserHandler(userRoleCtrl controllers.UserRoleControllerI) gin
 		}
 
 		itemRole := model.UserRoles{
-			UserID: userId.String(),
+			UserID: roleName.UserID,
 			RoleID: roleName.RoleID,
 		}
 
