@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/docs"
 	"github.com/gin-gonic/gin"
 	"github.com/wichijan/InventoryPro/src/controllers"
-	"github.com/wichijan/InventoryPro/src/docs"
 	"github.com/wichijan/InventoryPro/src/handlers"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/middlewares"
@@ -23,6 +23,8 @@ type Controllers struct {
 	ItemController      controllers.ItemControllerI
 	UserController      controllers.UserControllerI
 	KeywordController   controllers.KeywordControllerI
+	UserRoleController  controllers.UserRoleControllerI
+	RoleController      controllers.RoleControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -34,12 +36,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Create api groups, with special middleware
 	publicRoutes := router.Group("/")
 	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
-	//adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware())
 
 	// Create managers and repositories
 	databaseManager := &managers.DatabaseManager{
 		Connection: dbConnection,
 	}
+
+	adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware(databaseManager))
 
 	// Create repositories
 	warehouseRepo := &repositories.WarehouseRepository{
@@ -94,6 +97,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	userRoleRepo := &repositories.UserRoleRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	roleRepo := &repositories.RoleRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -118,6 +129,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		UserController: &controllers.UserController{
 			UserRepo:     userRepo,
 			UserTypeRepo: userTypeRepo,
+		},
+		UserRoleController: &controllers.UserRoleController{
+			UserRoleRepo: userRoleRepo,
+		},
+		RoleController: &controllers.RoleController{
+			RoleRepo: roleRepo,
 		},
 	}
 
@@ -168,11 +185,20 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Item reserve
 	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ItemController))
-	securedRoutes.Handle(http.MethodPost, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ItemController))
+	securedRoutes.Handle(http.MethodDelete, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ItemController))
 
 	// Item move
 	securedRoutes.Handle(http.MethodPost, "/items/borrow", nil)
 	securedRoutes.Handle(http.MethodPost, "/items/return", nil)
+
+	// Roles routes
+	adminRoutes.Handle(http.MethodGet, "/roles", handlers.GetRolesHandler(controller.RoleController))
+	adminRoutes.Handle(http.MethodPost, "/roles", handlers.CreateRoleHandler(controller.RoleController))
+	adminRoutes.Handle(http.MethodPut, "/roles", handlers.UpdateRoleHandler(controller.RoleController))
+
+	// User roles routes
+	adminRoutes.Handle(http.MethodPost, "/user-roles/add-role", handlers.AddRoleToUserHandler(controller.UserRoleController))
+	adminRoutes.Handle(http.MethodDelete, "/user-roles/remove-role", handlers.RemoveRoleFromUserHandler(controller.UserRoleController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"

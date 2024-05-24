@@ -36,7 +36,7 @@ func GetItemsHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Accept  json
 // @Produce  json
 // @Param id path string true "item id"
-// @Success 200 {array} models.ItemWithEverything
+// @Success 200 {object} models.ItemWithEverything
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items/:id [get]
 func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
@@ -236,7 +236,7 @@ func RemoveSubjectFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 // @Accept  json
 // @Produce  json
 // @Param ItemReserveODT body models.ItemReserveODT true "ItemReserveODT model"
-// @Success 200 {object} 
+// @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /items/reserve [GET]
 func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
@@ -277,7 +277,7 @@ func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Accept  json
 // @Produce  json
 // @Param id path string true "item id"
-// @Success 200 {object} 
+// @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /items/reserve-cancel/:id [GET]
 func CancelReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {

@@ -21,10 +21,10 @@ type RoleRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (rr *RoleRepository) GetShelves() (*[]model.Roles, *models.INVError) {
+func (rr *RoleRepository) GetRoles() (*[]model.Roles, *models.INVError) {
 	var roles []model.Roles
 
-	// Create the query 
+	// Create the query
 	stmt := mysql.SELECT(
 		table.Roles.AllColumns,
 	).FROM(
@@ -100,7 +100,7 @@ func (rr *RoleRepository) UpdateRole(role *model.Roles) *models.INVError {
 	return nil
 }
 
-func (rr *RoleRepository) DeleteShelve(roleId *uuid.UUID) *models.INVError {
+func (rr *RoleRepository) DeleteRole(roleId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }

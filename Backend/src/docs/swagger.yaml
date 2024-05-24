@@ -1,4 +1,11 @@
 definitions:
+  model.Roles:
+    properties:
+      id:
+        type: string
+      roleName:
+        type: string
+    type: object
   model.Rooms:
     properties:
       id:
@@ -6,6 +13,13 @@ definitions:
       name:
         type: string
       warehouseID:
+        type: string
+    type: object
+  model.UserTypes:
+    properties:
+      id:
+        type: string
+      typeName:
         type: string
     type: object
   model.Warehouses:
@@ -36,8 +50,19 @@ definitions:
       errorMessage:
         type: string
     type: object
+  models.ItemReserveODT:
+    properties:
+      itemId:
+        type: string
+      quantity:
+        type: integer
+    type: object
   models.ItemWithEverything:
     properties:
+      borrowedByUserID:
+        type: string
+      borrowedByUserName:
+        type: string
       classFour:
         type: boolean
       classOne:
@@ -57,8 +82,6 @@ definitions:
       keywords:
         items:
           properties:
-            id:
-              type: string
             itemID:
               type: string
             keywordID:
@@ -69,15 +92,13 @@ definitions:
         type: string
       picture:
         type: string
-      quantity:
+      quantityInShelve:
         type: integer
       status:
         type: string
       subject:
         items:
           properties:
-            id:
-              type: string
             itemID:
               type: string
             subjectID:
@@ -94,6 +115,10 @@ definitions:
     type: object
   models.ItemWithStatus:
     properties:
+      borrowedByUserID:
+        type: string
+      borrowedByUserName:
+        type: string
       classFour:
         type: boolean
       classOne:
@@ -114,8 +139,6 @@ definitions:
         type: string
       picture:
         type: string
-      quantity:
-        type: integer
       status:
         type: string
     type: object
@@ -177,6 +200,18 @@ definitions:
       usertypename:
         type: string
     type: object
+  models.RoleIdODT:
+    properties:
+      role_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.RoleODT:
+    properties:
+      role_name:
+        type: string
+    type: object
   models.RoomWithShelves:
     properties:
       id:
@@ -223,10 +258,6 @@ definitions:
             name:
               type: string
             picture:
-              type: string
-            quantity:
-              type: integer
-            statusID:
               type: string
           type: object
         type: array
@@ -494,9 +525,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.ItemWithEverything'
-            type: array
+            $ref: '#/definitions/models.ItemWithEverything'
         "500":
           description: Internal Server Error
           schema:
@@ -616,6 +645,130 @@ paths:
       summary: Remove Subject to item
       tags:
       - Items
+  /items/reserve:
+    get:
+      consumes:
+      - application/json
+      description: Reserve Item when logged-in
+      parameters:
+      - description: ItemReserveODT model
+        in: body
+        name: ItemReserveODT
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemReserveODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Reserve Item
+      tags:
+      - Items
+  /items/reserve-cancel/:id:
+    get:
+      consumes:
+      - application/json
+      description: Cancel Reserve Item when logged-in
+      parameters:
+      - description: item id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Cancel Reserve Item
+      tags:
+      - Items
+  /roles:
+    get:
+      consumes:
+      - application/json
+      description: Get Roles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Roles'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get Roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: Create Role
+      parameters:
+      - description: RoleODT model
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleODT'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Role
+      tags:
+      - Roles
+    put:
+      consumes:
+      - application/json
+      description: Update Role
+      parameters:
+      - description: Roles model
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/model.Roles'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update Role
+      tags:
+      - Roles
   /rooms:
     get:
       consumes:
@@ -842,6 +995,74 @@ paths:
       summary: Get shelve by id with items
       tags:
       - Shelves
+  /user-roles/add-role:
+    delete:
+      consumes:
+      - application/json
+      description: Add Role to User
+      parameters:
+      - description: RoleIdODT model
+        in: body
+        name: RoleIdODT
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleIdODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Add Role to User
+      tags:
+      - UserRoles
+    post:
+      consumes:
+      - application/json
+      description: Add Role to User
+      parameters:
+      - description: RoleIdODT model
+        in: body
+        name: RoleIdODT
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleIdODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Add Role to User
+      tags:
+      - UserRoles
+  /user-types:
+    get:
+      consumes:
+      - application/json
+      description: Get UserTypes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.UserTypes'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get UserTypes
+      tags:
+      - UserTypes
   /users/get-me:
     get:
       consumes:
