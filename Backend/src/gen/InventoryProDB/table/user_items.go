@@ -17,8 +17,13 @@ type userItemsTable struct {
 	mysql.Table
 
 	// Columns
-	UserID mysql.ColumnString
-	ItemID mysql.ColumnString
+	UserID       mysql.ColumnString
+	ItemID       mysql.ColumnString
+	Quantity     mysql.ColumnInteger
+	ReservedDate mysql.ColumnDate
+	BorrowedDate mysql.ColumnDate
+	ReturnDate   mysql.ColumnDate
+	StatusID     mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -59,18 +64,28 @@ func newUserItemsTable(schemaName, tableName, alias string) *UserItemsTable {
 
 func newUserItemsTableImpl(schemaName, tableName, alias string) userItemsTable {
 	var (
-		UserIDColumn   = mysql.StringColumn("user_id")
-		ItemIDColumn   = mysql.StringColumn("item_id")
-		allColumns     = mysql.ColumnList{UserIDColumn, ItemIDColumn}
-		mutableColumns = mysql.ColumnList{}
+		UserIDColumn       = mysql.StringColumn("user_id")
+		ItemIDColumn       = mysql.StringColumn("item_id")
+		QuantityColumn     = mysql.IntegerColumn("quantity")
+		ReservedDateColumn = mysql.DateColumn("reserved_date")
+		BorrowedDateColumn = mysql.DateColumn("borrowed_date")
+		ReturnDateColumn   = mysql.DateColumn("return_date")
+		StatusIDColumn     = mysql.StringColumn("status_id")
+		allColumns         = mysql.ColumnList{UserIDColumn, ItemIDColumn, QuantityColumn, ReservedDateColumn, BorrowedDateColumn, ReturnDateColumn, StatusIDColumn}
+		mutableColumns     = mysql.ColumnList{QuantityColumn, ReservedDateColumn, BorrowedDateColumn, ReturnDateColumn, StatusIDColumn}
 	)
 
 	return userItemsTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		UserID: UserIDColumn,
-		ItemID: ItemIDColumn,
+		UserID:       UserIDColumn,
+		ItemID:       ItemIDColumn,
+		Quantity:     QuantityColumn,
+		ReservedDate: ReservedDateColumn,
+		BorrowedDate: BorrowedDateColumn,
+		ReturnDate:   ReturnDateColumn,
+		StatusID:     StatusIDColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

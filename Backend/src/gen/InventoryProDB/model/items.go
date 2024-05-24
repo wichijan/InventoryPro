@@ -17,7 +17,5 @@ type Items struct {
 	ClassFour          *bool
 	Damaged            *bool
 	DamagedDescription *string
-	Quantity           *int32
 	Picture            *string
-	StatusID           *string
 }

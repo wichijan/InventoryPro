@@ -10,4 +10,5 @@ package model
 type ItemsInShelve struct {
 	ItemID   string `sql:"primary_key"`
 	ShelveID string `sql:"primary_key"`
+	Quantity *int32
 }

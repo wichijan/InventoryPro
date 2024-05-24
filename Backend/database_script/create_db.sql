@@ -45,15 +45,13 @@ CREATE TABLE items(
     class_four BOOLEAN,
     damaged BOOLEAN,
     damaged_description TEXT,
-    quantity INT,
-    picture TEXT,
-    status_id VARCHAR(36),
-    FOREIGN KEY (status_id) REFERENCES item_status(id)
+    picture TEXT
 );
 
 Create table items_in_shelve(
     item_id VARCHAR(36) UNIQUE,
     shelve_id VARCHAR(36),
+    quantity INT,
     PRIMARY KEY (shelve_id, item_id),
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (shelve_id) REFERENCES shelves(id)
@@ -121,7 +119,13 @@ create table user_roles(
 create table user_items(
     user_id VARCHAR(36) NOT NULL,
     item_id VARCHAR(36) NOT NULL,
+    quantity INT,
+    reserved_date DATE,
+    borrowed_date DATE,
+    return_date DATE,
+    status_id VARCHAR(36),
     PRIMARY KEY (user_id, item_id),
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (status_id) REFERENCES item_status(id)
 );

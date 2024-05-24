@@ -133,3 +133,5 @@ func (uc *UserController) CheckUsername(username string) *models.INVError {
 func (uc *UserController) GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError) {
 	return uc.UserRepo.GetUserById(userId)
 }
+
+

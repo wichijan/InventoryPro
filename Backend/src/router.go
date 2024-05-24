@@ -58,10 +58,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
-	itemStatusRepo := &repositories.ItemStatusRepository{
-		DatabaseManager: databaseManager,
-	}
-
 	userRepo := &repositories.UserRepository{
 		DatabaseManager: databaseManager,
 	}
@@ -86,6 +82,18 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	itemInShelveRepo := &repositories.ItemInShelveRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	itemStatusRepo := &repositories.ItemStatusRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	userItemRepo := &repositories.UserItemRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -98,12 +106,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			ShelveRepo: shelveRepo,
 		},
 		ItemController: &controllers.ItemController{
-			ItemRepo:        itemRepo,
-			KeywordRepo:     keywordRepo,
-			SubjectRepo:     subjectRepo,
-			ItemStatusRepo:  itemStatusRepo,
-			ItemKeywordRepo: itemKeywordRepo,
-			ItemSubjectRepo: itemSubjectRepo,
+			ItemRepo:         itemRepo,
+			ItemInShelveRepo: itemInShelveRepo,
+			ItemStatusRepo:   itemStatusRepo,
+			UserItemRepo:     userItemRepo,
+			KeywordRepo:      keywordRepo,
+			SubjectRepo:      subjectRepo,
+			ItemKeywordRepo:  itemKeywordRepo,
+			ItemSubjectRepo:  itemSubjectRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:     userRepo,
@@ -155,6 +165,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/items/removekeyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/addsubject", handlers.AddSubjectToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
+
+	// Item reserve
+	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ItemController))
+	securedRoutes.Handle(http.MethodPost, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ItemController))
+
+	// Item move
+	securedRoutes.Handle(http.MethodPost, "/items/borrow", nil)
+	securedRoutes.Handle(http.MethodPost, "/items/return", nil)
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"

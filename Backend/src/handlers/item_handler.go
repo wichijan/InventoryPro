@@ -172,7 +172,6 @@ func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 	}
 }
 
-
 // @Summary Add Subject to item
 // @Description Add Subject to item
 // @Tags Items
@@ -222,6 +221,81 @@ func RemoveSubjectFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 		}
 
 		inv_err := itemCtrl.RemoveSubjectFromItem(itemAndKeyword)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Reserve Item
+// @Description Reserve Item when logged-in
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param ItemReserveODT body models.ItemReserveODT true "ItemReserveODT model"
+// @Success 200 {object} 
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /items/reserve [GET]
+func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		var itemReserveODT models.ItemReserveODT
+		err := c.ShouldBindJSON(&itemReserveODT)
+		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		itemReserve := models.ItemReserve{
+			ItemID:   itemReserveODT.ItemID,
+			UserID:   userId.String(),
+			Quantity: itemReserveODT.Quantity,
+		}
+
+		inv_err := itemCtrl.ReserveItem(itemReserve)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Cancel Reserve Item
+// @Description Cancel Reserve Item when logged-in
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "item id"
+// @Success 200 {object} 
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /items/reserve-cancel/:id [GET]
+func CancelReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		itemId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		inv_err := itemCtrl.CancelReserveItem(userId, &itemId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
