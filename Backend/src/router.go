@@ -23,6 +23,7 @@ type Controllers struct {
 	ItemController      controllers.ItemControllerI
 	UserController      controllers.UserControllerI
 	KeywordController   controllers.KeywordControllerI
+	UserRoleController  controllers.UserRoleControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -34,12 +35,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Create api groups, with special middleware
 	publicRoutes := router.Group("/")
 	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
-	//adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware())
 
 	// Create managers and repositories
 	databaseManager := &managers.DatabaseManager{
 		Connection: dbConnection,
 	}
+
+	//adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware(databaseManager))
 
 	// Create repositories
 	warehouseRepo := &repositories.WarehouseRepository{
@@ -94,6 +96,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	userRoleRepo := &repositories.UserRoleRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -118,6 +124,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		UserController: &controllers.UserController{
 			UserRepo:     userRepo,
 			UserTypeRepo: userTypeRepo,
+		},
+		UserRoleController: &controllers.UserRoleController{
+			UserRoleRepo: userRoleRepo,
 		},
 	}
 

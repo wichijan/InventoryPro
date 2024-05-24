@@ -11,7 +11,7 @@ import (
 )
 
 type UserRoleRepositoryI interface {
-	GetUserRoles() (*[]model.UserRoles, *models.INVError)
+	GetRolesByUserId(userId *uuid.UUID) (*[]models.UserRoleWithName, *models.INVError)
 	CreateUserRole(user_role *model.UserRoles) *models.INVError
 	UpdateUserRole(userRole *model.UserRoles) *models.INVError
 	DeleteUserRole(userRoleId *uuid.UUID) *models.INVError
@@ -21,14 +21,18 @@ type UserRoleRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (urr *UserRoleRepository) GetUserRoles() (*[]model.UserRoles, *models.INVError) {
-	var userRoles []model.UserRoles
+func (urr *UserRoleRepository) GetRolesByUserId(userId *uuid.UUID) (*[]models.UserRoleWithName, *models.INVError) {
+	var userRoles []models.UserRoleWithName
 
 	// Create the query
 	stmt := mysql.SELECT(
 		table.UserRoles.AllColumns,
+		table.Roles.RoleName,
 	).FROM(
-		table.UserRoles,
+		table.UserRoles.
+			LEFT_JOIN(table.Roles, table.Roles.ID.EQ(table.UserRoles.RoleID)),
+	).WHERE(
+		table.UserRoles.UserID.EQ(mysql.String(userId.String())),
 	)
 
 	// Execute the query
@@ -38,7 +42,7 @@ func (urr *UserRoleRepository) GetUserRoles() (*[]model.UserRoles, *models.INVEr
 	}
 
 	if len(userRoles) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NO_ROLES
 	}
 
 	return &userRoles, nil

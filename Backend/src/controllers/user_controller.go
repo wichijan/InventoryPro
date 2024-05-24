@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"log"
+
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -29,6 +31,8 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 	if err != nil {
 		return nil, inv_errors.INV_UPSTREAM_ERROR
 	}
+
+	log.Print("Hashcode is ", hash)
 
 	inv_err := uc.UserRepo.CheckIfEmailExists(registrationData.Email)
 	if inv_err != nil {
@@ -133,5 +137,3 @@ func (uc *UserController) CheckUsername(username string) *models.INVError {
 func (uc *UserController) GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError) {
 	return uc.UserRepo.GetUserById(userId)
 }
-
-
