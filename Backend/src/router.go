@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/docs"
 	"github.com/gin-gonic/gin"
 	"github.com/wichijan/InventoryPro/src/controllers"
-	"github.com/wichijan/InventoryPro/src/docs"
 	"github.com/wichijan/InventoryPro/src/handlers"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/middlewares"

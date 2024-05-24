@@ -30,9 +30,9 @@ func GetRolesHandler(roleCtrl controllers.RoleControllerI) gin.HandlerFunc {
 	}
 }
 
-// @Summary Create Item
-// @Description Create Item
-// @Tags Items
+// @Summary Create Role
+// @Description Create Role
+// @Tags Roles
 // @Accept  json
 // @Produce  json
 // @Param role body models.RoleODT true "RoleODT model"
@@ -59,13 +59,13 @@ func CreateRoleHandler(roleCtrl controllers.RoleControllerI) gin.HandlerFunc {
 	}
 }
 
-// @Summary Create Item
-// @Description Create Item
-// @Tags Items
+// @Summary Update Role
+// @Description Update Role
+// @Tags Roles
 // @Accept  json
 // @Produce  json
 // @Param role body model.Roles true "Roles model"
-// @Success 200 {object}
+// @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /roles [put]

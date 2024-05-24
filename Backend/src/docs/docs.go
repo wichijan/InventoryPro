@@ -344,10 +344,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ItemWithEverything"
-                            }
+                            "$ref": "#/definitions/models.ItemWithEverything"
                         }
                     },
                     "500": {
@@ -515,6 +512,195 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/reserve": {
+            "get": {
+                "description": "Reserve Item when logged-in",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Reserve Item",
+                "parameters": [
+                    {
+                        "description": "ItemReserveODT model",
+                        "name": "ItemReserveODT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemReserveODT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/reserve-cancel/:id": {
+            "get": {
+                "description": "Cancel Reserve Item when logged-in",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Cancel Reserve Item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/roles": {
+            "get": {
+                "description": "Get Roles",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get Roles",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Roles"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Update Role",
+                "parameters": [
+                    {
+                        "description": "Roles model",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Roles"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Create Role",
+                "parameters": [
+                    {
+                        "description": "RoleODT model",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RoleODT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -874,6 +1060,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/user-types": {
+            "get": {
+                "description": "Get UserTypes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserTypes"
+                ],
+                "summary": "Get UserTypes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.UserTypes"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/users/get-me": {
             "get": {
                 "description": "Get User Data when logged in",
@@ -1073,6 +1291,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.Roles": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "roleName": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Rooms": {
             "type": "object",
             "properties": {
@@ -1083,6 +1312,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "warehouseID": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UserTypes": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "typeName": {
                     "type": "string"
                 }
             }
@@ -1131,9 +1371,26 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ItemReserveODT": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.ItemWithEverything": {
             "type": "object",
             "properties": {
+                "borrowedByUserID": {
+                    "type": "string"
+                },
+                "borrowedByUserName": {
+                    "type": "string"
+                },
                 "classFour": {
                     "type": "boolean"
                 },
@@ -1163,9 +1420,6 @@ const docTemplate = `{
                     "items": {
                         "type": "object",
                         "properties": {
-                            "id": {
-                                "type": "string"
-                            },
                             "itemID": {
                                 "type": "string"
                             },
@@ -1181,7 +1435,7 @@ const docTemplate = `{
                 "picture": {
                     "type": "string"
                 },
-                "quantity": {
+                "quantityInShelve": {
                     "type": "integer"
                 },
                 "status": {
@@ -1192,9 +1446,6 @@ const docTemplate = `{
                     "items": {
                         "type": "object",
                         "properties": {
-                            "id": {
-                                "type": "string"
-                            },
                             "itemID": {
                                 "type": "string"
                             },
@@ -1220,6 +1471,12 @@ const docTemplate = `{
         "models.ItemWithStatus": {
             "type": "object",
             "properties": {
+                "borrowedByUserID": {
+                    "type": "string"
+                },
+                "borrowedByUserName": {
+                    "type": "string"
+                },
                 "classFour": {
                     "type": "boolean"
                 },
@@ -1249,9 +1506,6 @@ const docTemplate = `{
                 },
                 "picture": {
                     "type": "string"
-                },
-                "quantity": {
-                    "type": "integer"
                 },
                 "status": {
                     "type": "string"
@@ -1348,6 +1602,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.RoleODT": {
+            "type": "object",
+            "properties": {
+                "role_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.RoomWithShelves": {
             "type": "object",
             "properties": {
@@ -1418,12 +1680,6 @@ const docTemplate = `{
                                 "type": "string"
                             },
                             "picture": {
-                                "type": "string"
-                            },
-                            "quantity": {
-                                "type": "integer"
-                            },
-                            "statusID": {
                                 "type": "string"
                             }
                         }
