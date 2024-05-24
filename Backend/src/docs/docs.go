@@ -1679,6 +1679,9 @@ const docTemplate = `{
             "properties": {
                 "role_id": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
