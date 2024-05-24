@@ -21,13 +21,14 @@ type ItemControllerI interface {
 	RemoveSubjectFromItem(itemSubject models.ItemWithSubjectName) *models.INVError
 
 	ReserveItem(itemReserve models.ItemReserve) *models.INVError
+	CancelReserveItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
 }
 
 type ItemController struct {
 	ItemRepo         repositories.ItemRepositoryI
-	ItemInShelveRepo repositories.ItemInShelveRepositoryI 
-	ItemStatusRepo   repositories.ItemStatusRepositoryI   
-	UserItemRepo     repositories.UserItemRepositoryI     
+	ItemInShelveRepo repositories.ItemInShelveRepositoryI
+	ItemStatusRepo   repositories.ItemStatusRepositoryI
+	UserItemRepo     repositories.UserItemRepositoryI
 	KeywordRepo      repositories.KeywordRepositoryI
 	SubjectRepo      repositories.SubjectRepositoryI
 	ItemKeywordRepo  repositories.ItemKeywordRepositoryI
@@ -180,7 +181,12 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 
 func (ic *ItemController) ReserveItem(itemReserve models.ItemReserve) *models.INVError {
 	// Check items_in_shelve quantity
-	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(&itemReserve.ItemID)
+	itemId, inv_err := uuid.Parse(itemReserve.ItemID)
+	if inv_err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(&itemId)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -206,7 +212,37 @@ func (ic *ItemController) ReserveItem(itemReserve models.ItemReserve) *models.IN
 	}
 
 	// update items_in_shelve quantity
-	inv_error = ic.ItemInShelveRepo.DecreaseQuantityInShelve(&itemReserve.ItemID, &newQuantityInShelve)
+	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(&itemReserve.ItemID, &newQuantityInShelve)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+func (ic *ItemController) CancelReserveItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError {
+	// Get quantity
+	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(itemId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Get quantity from user_items
+	quantityReservedItem, inv_error := ic.UserItemRepo.GetQuantityFromReservedItem(itemId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Update user_items
+	inv_error = ic.UserItemRepo.DeleteReserveItem(userId, itemId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// update items_in_shelve quantity
+	itemIdStr := itemId.String()
+	newQuantityInShelve := *quantityReservedItem + *quantityInShelve
+	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(&itemIdStr, &newQuantityInShelve)
 	if inv_error != nil {
 		return inv_error
 	}

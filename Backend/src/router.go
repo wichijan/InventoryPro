@@ -168,7 +168,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Item reserve
 	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ItemController))
-	securedRoutes.Handle(http.MethodPost, "/items/reserve-cancel", nil)
+	securedRoutes.Handle(http.MethodPost, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ItemController))
 
 	// Item move
 	securedRoutes.Handle(http.MethodPost, "/items/borrow", nil)

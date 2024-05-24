@@ -15,8 +15,8 @@ type ItemInShelveRepositoryI interface {
 	CreateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError
 	UpdateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError
 	DeleteItemInShelve(itemIdInShelve *uuid.UUID) *models.INVError
-	GetQuantityInShelve(itemId *string) (*int32, *models.INVError)
-	DecreaseQuantityInShelve(itemId *string, quantity *int32) *models.INVError
+	GetQuantityInShelve(itemId *uuid.UUID) (*int32, *models.INVError)
+	UpdateQuantityInShelve(itemId *string, quantity *int32) *models.INVError
 }
 
 type ItemInShelveRepository struct {
@@ -109,8 +109,7 @@ func (iisr *ItemInShelveRepository) DeleteItemInShelve(itemIdInShelve *uuid.UUID
 	return nil
 }
 
-func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *string) (*int32, *models.INVError) {
-	var quantity models.GetQuantityInShelve
+func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *uuid.UUID) (*int32, *models.INVError) {
 
 	// Create the query
 	stmt := mysql.SELECT(
@@ -118,19 +117,23 @@ func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *string) (*int32,
 	).FROM(
 		table.ItemsInShelve,
 	).WHERE(
-		table.ItemsInShelve.ItemID.EQ(mysql.String(*itemId)),
+		table.ItemsInShelve.ItemID.EQ(mysql.String(itemId.String())),
 	)
 
 	// Execute the query
+	var quantity models.GetQuantityInShelve
 	err := stmt.Query(iisr.DatabaseManager.GetDatabaseConnection(), &quantity)
 	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_NOT_FOUND
+		}
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return &quantity.Quantity, nil
 }
 
-func (iisr *ItemInShelveRepository) DecreaseQuantityInShelve(itemId *string, quantity *int32) *models.INVError {
+func (iisr *ItemInShelveRepository) UpdateQuantityInShelve(itemId *string, quantity *int32) *models.INVError {
 	// Create the update statement
 	updateQuery := table.ItemsInShelve.UPDATE(
 		table.ItemsInShelve.Quantity,
