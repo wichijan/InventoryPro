@@ -63,7 +63,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	itemRepo := &repositories.ItemRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	userRepo := &repositories.UserRepository{
@@ -75,7 +75,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	itemKeywordRepo := &repositories.ItemKeywordRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	keywordRepo := &repositories.KeywordRepository{
@@ -87,11 +87,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	itemSubjectRepo := &repositories.ItemSubjectRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemInShelveRepo := &repositories.ItemInShelveRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemStatusRepo := &repositories.ItemStatusRepository{
@@ -99,7 +99,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	userItemRepo := &repositories.UserItemRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	userRoleRepo := &repositories.UserRoleRepository{

@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -12,13 +14,15 @@ import (
 
 type ItemSubjectRepositoryI interface {
 	GetItemsForSubject(subjectId *string) (*[]model.ItemSubjects, *models.INVError)
-	CreateSubjectForItem(keyword *models.ItemWithSubject) *models.INVError
-	DeleteSubjectForItem(keyword *models.ItemWithSubject) *models.INVError
+	CreateSubjectForItem(tx *sql.Tx, keyword *models.ItemWithSubject) *models.INVError
+	DeleteSubjectForItem(tx *sql.Tx, keyword *models.ItemWithSubject) *models.INVError
 	CheckIfSubjectAndItemExists(subjectAndItem models.ItemWithSubject) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type ItemSubjectRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (isjr *ItemSubjectRepository) GetItemsForSubject(subjectId *string) (*[]model.ItemSubjects, *models.INVError) {
@@ -32,7 +36,7 @@ func (isjr *ItemSubjectRepository) GetItemsForSubject(subjectId *string) (*[]mod
 	).WHERE(table.ItemSubjects.SubjectID.EQ(mysql.String(*subjectId)))
 
 	// Execute the query
-	err := stmt.Query(isjr.DatabaseManager.GetDatabaseConnection(), &itemsForSubject)
+	err := stmt.Query(isjr.GetDatabaseConnection(), &itemsForSubject)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -44,7 +48,7 @@ func (isjr *ItemSubjectRepository) GetItemsForSubject(subjectId *string) (*[]mod
 	return &itemsForSubject, nil
 }
 
-func (isjr *ItemSubjectRepository) CreateSubjectForItem(keyword *models.ItemWithSubject) *models.INVError {
+func (isjr *ItemSubjectRepository) CreateSubjectForItem(tx *sql.Tx, keyword *models.ItemWithSubject) *models.INVError {
 
 	// Create the insert statement
 	insertQuery := table.ItemSubjects.INSERT(
@@ -56,7 +60,7 @@ func (isjr *ItemSubjectRepository) CreateSubjectForItem(keyword *models.ItemWith
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(isjr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -73,14 +77,14 @@ func (isjr *ItemSubjectRepository) CreateSubjectForItem(keyword *models.ItemWith
 	return nil
 }
 
-func (isjr *ItemSubjectRepository) DeleteSubjectForItem(keyword *models.ItemWithSubject) *models.INVError {
+func (isjr *ItemSubjectRepository) DeleteSubjectForItem(tx *sql.Tx, keyword *models.ItemWithSubject) *models.INVError {
 	deleteQuery := table.ItemSubjects.DELETE().WHERE(
 		table.ItemSubjects.SubjectID.EQ(mysql.String(keyword.SubjectID)).
 			AND(table.ItemSubjects.ItemID.EQ(mysql.String(keyword.ItemID))),
 	)
 
 	// Execute the query
-	rows, err := deleteQuery.Exec(isjr.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -98,7 +102,7 @@ func (isjr *ItemSubjectRepository) DeleteSubjectForItem(keyword *models.ItemWith
 }
 
 func (isjr *ItemSubjectRepository) CheckIfSubjectAndItemExists(subjectAndItem models.ItemWithSubject) *models.INVError {
-	count, err := utils.CountStatement(table.ItemSubjects, table.ItemSubjects.SubjectID.EQ(mysql.String(subjectAndItem.SubjectID)).AND(table.ItemSubjects.ItemID.EQ(mysql.String(subjectAndItem.ItemID))), isjr.DatabaseManager.GetDatabaseConnection())
+	count, err := utils.CountStatement(table.ItemSubjects, table.ItemSubjects.SubjectID.EQ(mysql.String(subjectAndItem.SubjectID)).AND(table.ItemSubjects.ItemID.EQ(mysql.String(subjectAndItem.ItemID))), isjr.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
