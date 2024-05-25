@@ -16,11 +16,11 @@ type KeywordControllerI interface {
 }
 
 type KeywordController struct {
-	keywordRepo repositories.KeywordRepositoryI
+	KeywordRepo repositories.KeywordRepositoryI
 }
 
 func (kc *KeywordController) GetKeywords() (*[]model.Keywords, *models.INVError) {
-	keywords, inv_error := kc.keywordRepo.GetKeywords()
+	keywords, inv_error := kc.KeywordRepo.GetKeywords()
 	if inv_error != nil {
 		return nil, inv_error
 	}
@@ -29,13 +29,13 @@ func (kc *KeywordController) GetKeywords() (*[]model.Keywords, *models.INVError)
 }
 
 func (kc *KeywordController) CreateKeyword(keywordName *string) (*uuid.UUID, *models.INVError) {
-	tx, err := kc.keywordRepo.NewTransaction()
+	tx, err := kc.KeywordRepo.NewTransaction()
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 	defer tx.Rollback()
 
-	keywordId, inv_error := kc.keywordRepo.CreateKeyword(tx, keywordName)
+	keywordId, inv_error := kc.KeywordRepo.CreateKeyword(tx, keywordName)
 	if inv_error != nil {
 		return nil, inv_error
 	}
@@ -44,13 +44,13 @@ func (kc *KeywordController) CreateKeyword(keywordName *string) (*uuid.UUID, *mo
 }
 
 func (kc *KeywordController) UpdateKeyword(keyword *model.Keywords) *models.INVError {
-	tx, err := kc.keywordRepo.NewTransaction()
+	tx, err := kc.KeywordRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
 	defer tx.Rollback()
 
-	inv_error := kc.keywordRepo.UpdateKeyword(tx, keyword)
+	inv_error := kc.KeywordRepo.UpdateKeyword(tx, keyword)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -59,13 +59,13 @@ func (kc *KeywordController) UpdateKeyword(keyword *model.Keywords) *models.INVE
 }
 
 func (kc *KeywordController) DeleteKeyword(keywordId *uuid.UUID) *models.INVError {
-	tx, err := kc.keywordRepo.NewTransaction()
+	tx, err := kc.KeywordRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
 	defer tx.Rollback()
 
-	inv_error := kc.keywordRepo.DeleteKeyword(tx, keywordId)
+	inv_error := kc.KeywordRepo.DeleteKeyword(tx, keywordId)
 	if inv_error != nil {
 		return inv_error
 	}

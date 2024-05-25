@@ -27,6 +27,7 @@ type Controllers struct {
 	RoleController       controllers.RoleControllerI
 	ShelveTypeController controllers.ShelveTypeControllerI
 	SubjectController    controllers.SubjectControllerI
+	UserTypeController   controllers.UserTypeControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -72,7 +73,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	userTypeRepo := &repositories.UserTypeRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemKeywordRepo := &repositories.ItemKeywordRepository{
@@ -148,6 +149,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		SubjectController: &controllers.SubjectController{
 			SubjectRepo: subjectRepo,
+		},
+		KeywordController: &controllers.KeywordController{
+			KeywordRepo: keywordRepo,
+		},
+		UserTypeController: &controllers.UserTypeController{
+			UserTypeRepo: userTypeRepo,
 		},
 	}
 
@@ -232,6 +239,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// User roles routes
 	adminRoutes.Handle(http.MethodPost, "/user-roles/add-role", handlers.AddRoleToUserHandler(controller.UserRoleController))
 	adminRoutes.Handle(http.MethodDelete, "/user-roles/remove-role", handlers.RemoveRoleFromUserHandler(controller.UserRoleController))
+
+	// User type routes
+	publicRoutes.Handle(http.MethodGet, "/user-types", handlers.GetUserTypesHandler(controller.UserTypeController))
+	publicRoutes.Handle(http.MethodPost, "/user-types", handlers.CreateUserTypeHandler(controller.UserTypeController))
+	publicRoutes.Handle(http.MethodPut, "/user-types", handlers.UpdateUserTypeHandler(controller.UserTypeController))
+	publicRoutes.Handle(http.MethodDelete, "/user-types/:id", handlers.DeleteUserTypeHandler(controller.UserTypeController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"
