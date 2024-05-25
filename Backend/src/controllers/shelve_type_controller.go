@@ -42,7 +42,13 @@ func (stc *ShelveTypeController) CreateShelveType(shelveTypeName *string) (*uuid
 }
 
 func (stc *ShelveTypeController) UpdateShelveType(shelveType *model.ShelveTypes) *models.INVError {
-	inv_error := stc.ShelveTypeRepo.UpdateShelveType(shelveType)
+	tx, err := stc.ShelveTypeRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+	
+	inv_error := stc.ShelveTypeRepo.UpdateShelveType(tx, shelveType)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -50,7 +56,13 @@ func (stc *ShelveTypeController) UpdateShelveType(shelveType *model.ShelveTypes)
 }
 
 func (stc *ShelveTypeController) DeleteShelveType(shelveTypeId *uuid.UUID) *models.INVError {
-	inv_error := stc.ShelveTypeRepo.DeleteShelveType(shelveTypeId)
+	tx, err := stc.ShelveTypeRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	inv_error := stc.ShelveTypeRepo.DeleteShelveType(tx, shelveTypeId)
 	if inv_error != nil {
 		return inv_error
 	}

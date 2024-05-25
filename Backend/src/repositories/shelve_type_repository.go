@@ -16,8 +16,8 @@ type ShelveTypeRepositoryI interface {
 	GetShelveTypes() (*[]model.ShelveTypes, *models.INVError)
 	GetShelveTypeByName(name *string) (*model.ShelveTypes, *models.INVError)
 	CreateShelveType(tx *sql.Tx, shelveTypeName *string) (*uuid.UUID, *models.INVError)
-	UpdateShelveType(shelveType *model.ShelveTypes) *models.INVError
-	DeleteShelveType(shelveTypeId *uuid.UUID) *models.INVError
+	UpdateShelveType(tx *sql.Tx, shelveType *model.ShelveTypes) *models.INVError
+	DeleteShelveType(tx *sql.Tx, shelveTypeId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -101,7 +101,7 @@ func (str *ShelveTypeRepository) CreateShelveType(tx *sql.Tx, shelveTypeName *st
 	return &uuid, nil
 }
 
-func (str *ShelveTypeRepository) UpdateShelveType(shelveType *model.ShelveTypes) *models.INVError {
+func (str *ShelveTypeRepository) UpdateShelveType(tx *sql.Tx, shelveType *model.ShelveTypes) *models.INVError {
 	// Create the update statement
 	updateQuery := table.ShelveTypes.UPDATE(
 		table.ShelveTypes.TypeName,
@@ -110,7 +110,7 @@ func (str *ShelveTypeRepository) UpdateShelveType(shelveType *model.ShelveTypes)
 	).WHERE(table.ShelveTypes.ID.EQ(mysql.String(shelveType.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(str.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -127,11 +127,11 @@ func (str *ShelveTypeRepository) UpdateShelveType(shelveType *model.ShelveTypes)
 	return nil
 }
 
-func (str *ShelveTypeRepository) DeleteShelveType(shelveTypeId *uuid.UUID) *models.INVError {
+func (str *ShelveTypeRepository) DeleteShelveType(tx *sql.Tx, shelveTypeId *uuid.UUID) *models.INVError {
 	stmt := table.ShelveTypes.DELETE().
 		WHERE(table.ShelveTypes.ID.EQ(mysql.String(shelveTypeId.String())))
 
-	_, err := stmt.Exec(str.GetDatabaseConnection())
+	_, err := stmt.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
