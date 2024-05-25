@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/repositories"
@@ -16,9 +17,21 @@ type UserRoleController struct {
 }
 
 func (urc *UserRoleController) CreateUserRole(user_role *model.UserRoles) *models.INVError {
-	return urc.UserRoleRepo.CreateUserRole(user_role)
+	tx, err := urc.UserRoleRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	return urc.UserRoleRepo.CreateUserRole(tx, user_role)
 }
 
 func (urc *UserRoleController) DeleteUserRole(userRole *model.UserRoles) *models.INVError {
-	return urc.UserRoleRepo.DeleteUserRole(userRole)
+	tx, err := urc.UserRoleRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	return urc.UserRoleRepo.DeleteUserRole(tx, userRole)
 }

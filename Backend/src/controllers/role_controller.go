@@ -23,13 +23,25 @@ func (rc *RoleController) GetRoles() (*[]model.Roles, *models.INVError) {
 }
 
 func (rc *RoleController) CreateRole(roleName *string) (*uuid.UUID, *models.INVError) {
-	return rc.RoleRepo.CreateRole(roleName)
+	tx, err := rc.RoleRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	return rc.RoleRepo.CreateRole(tx, roleName)
 }
 
 func (rc *RoleController) UpdateRole(role *model.Roles) *models.INVError {
+	tx, err := rc.RoleRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	if *role.RoleName == "Admin" {
 		return inv_errors.INV_CONFLICT
 	}
 
-	return rc.RoleRepo.UpdateRole(role)
+	return rc.RoleRepo.UpdateRole(tx, role)
 }

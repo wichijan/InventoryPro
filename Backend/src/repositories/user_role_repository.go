@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -10,15 +12,17 @@ import (
 )
 
 type UserRoleRepositoryI interface {
-	CreateUserRole(user_role *model.UserRoles) *models.INVError
-	DeleteUserRole(userRole *model.UserRoles) *models.INVError
+	CreateUserRole(tx *sql.Tx, user_role *model.UserRoles) *models.INVError
+	DeleteUserRole(tx *sql.Tx, userRole *model.UserRoles) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type UserRoleRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
-func (urr *UserRoleRepository) CreateUserRole(user_role *model.UserRoles) *models.INVError {
+func (urr *UserRoleRepository) CreateUserRole(tx *sql.Tx, user_role *model.UserRoles) *models.INVError {
 	// Create the insert statement
 	insertQuery := table.UserRoles.INSERT(
 		table.UserRoles.RoleID,
@@ -29,7 +33,7 @@ func (urr *UserRoleRepository) CreateUserRole(user_role *model.UserRoles) *model
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(urr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -46,7 +50,7 @@ func (urr *UserRoleRepository) CreateUserRole(user_role *model.UserRoles) *model
 	return nil
 }
 
-func (urr *UserRoleRepository) DeleteUserRole(userRole *model.UserRoles) *models.INVError {
+func (urr *UserRoleRepository) DeleteUserRole(tx *sql.Tx, userRole *model.UserRoles) *models.INVError {
 	// Create the delete statement
 	deleteQuery := table.UserRoles.DELETE().
 		WHERE(
@@ -55,7 +59,7 @@ func (urr *UserRoleRepository) DeleteUserRole(userRole *model.UserRoles) *models
 		)
 
 	// Execute the query
-	rows, err := deleteQuery.Exec(urr.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}

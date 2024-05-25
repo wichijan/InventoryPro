@@ -103,11 +103,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	userRoleRepo := &repositories.UserRoleRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	roleRepo := &repositories.RoleRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	// Create controllers
