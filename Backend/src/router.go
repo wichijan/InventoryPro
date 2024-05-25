@@ -228,8 +228,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodDelete, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ItemController))
 
 	// Item move
-	securedRoutes.Handle(http.MethodPost, "/items/borrow", handlers.BorrowItemHandler(controller.ItemController))
-	securedRoutes.Handle(http.MethodPost, "/items/return/:id", handlers.ReturnReserveItemHandler(controller.ItemController))
+	securedRoutes.Handle(http.MethodPost, "/items/borrow", nil)
+	securedRoutes.Handle(http.MethodPost, "/items/return", nil)
 
 	// Roles routes
 	adminRoutes.Handle(http.MethodGet, "/roles", handlers.GetRolesHandler(controller.RoleController))
@@ -241,10 +241,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	adminRoutes.Handle(http.MethodDelete, "/user-roles/remove-role", handlers.RemoveRoleFromUserHandler(controller.UserRoleController))
 
 	// User type routes
-	publicRoutes.Handle(http.MethodGet, "/user-types", handlers.GetUserTypesHandler(controller.UserTypeController))
-	publicRoutes.Handle(http.MethodPost, "/user-types", handlers.CreateUserTypeHandler(controller.UserTypeController))
-	publicRoutes.Handle(http.MethodPut, "/user-types", handlers.UpdateUserTypeHandler(controller.UserTypeController))
-	publicRoutes.Handle(http.MethodDelete, "/user-types/:id", handlers.DeleteUserTypeHandler(controller.UserTypeController))
+	securedRoutes.Handle(http.MethodGet, "/user-types", handlers.GetUserTypesHandler(controller.UserTypeController))
+	adminRoutes.Handle(http.MethodPost, "/user-types", handlers.CreateUserTypeHandler(controller.UserTypeController))
+	adminRoutes.Handle(http.MethodPut, "/user-types", handlers.UpdateUserTypeHandler(controller.UserTypeController))
+	adminRoutes.Handle(http.MethodDelete, "/user-types/:id", handlers.DeleteUserTypeHandler(controller.UserTypeController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"
