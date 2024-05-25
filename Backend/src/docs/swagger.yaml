@@ -621,6 +621,30 @@ paths:
       summary: Add Subject to item
       tags:
       - Items
+  /items/borrow:
+    post:
+      consumes:
+      - application/json
+      description: Borrow Item when logged-in
+      parameters:
+      - description: ItemReserveODT model
+        in: body
+        name: ItemReserveODT
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemReserveODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Borrow Item
+      tags:
+      - Items
   /items/removekeyword:
     post:
       consumes:
@@ -678,7 +702,7 @@ paths:
       tags:
       - Items
   /items/reserve:
-    get:
+    post:
       consumes:
       - application/json
       description: Reserve Item when logged-in
@@ -702,7 +726,7 @@ paths:
       tags:
       - Items
   /items/reserve-cancel/:id:
-    get:
+    post:
       consumes:
       - application/json
       description: Cancel Reserve Item when logged-in
@@ -722,6 +746,29 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Cancel Reserve Item
+      tags:
+      - Items
+  /items/return/:id:
+    post:
+      consumes:
+      - application/json
+      description: Return Reserve Item when logged-in
+      parameters:
+      - description: item id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Return Reserve Item
       tags:
       - Items
   /keywords:

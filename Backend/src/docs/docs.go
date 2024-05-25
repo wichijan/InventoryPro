@@ -442,6 +442,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/items/borrow": {
+            "post": {
+                "description": "Borrow Item when logged-in",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Borrow Item",
+                "parameters": [
+                    {
+                        "description": "ItemReserveODT model",
+                        "name": "ItemReserveODT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemReserveODT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/items/removekeyword": {
             "post": {
                 "description": "Remove keyword to item",
@@ -529,7 +566,7 @@ const docTemplate = `{
             }
         },
         "/items/reserve": {
-            "get": {
+            "post": {
                 "description": "Reserve Item when logged-in",
                 "consumes": [
                     "application/json"
@@ -566,7 +603,7 @@ const docTemplate = `{
             }
         },
         "/items/reserve-cancel/:id": {
-            "get": {
+            "post": {
                 "description": "Cancel Reserve Item when logged-in",
                 "consumes": [
                     "application/json"
@@ -578,6 +615,41 @@ const docTemplate = `{
                     "Items"
                 ],
                 "summary": "Cancel Reserve Item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/return/:id": {
+            "post": {
+                "description": "Return Reserve Item when logged-in",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Return Reserve Item",
                 "parameters": [
                     {
                         "type": "string",
