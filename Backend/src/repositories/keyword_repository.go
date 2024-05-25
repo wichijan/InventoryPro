@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -15,12 +17,15 @@ type KeywordRepositoryI interface {
 	GetKeywords() (*[]model.Keywords, *models.INVError)
 	GetKeywordByName(keywordName *string) (*model.Keywords, *models.INVError)
 	CheckIfKeywordExists(keywordId *string) *models.INVError
-	CreateKeyword(keywordName *string) (*uuid.UUID, *models.INVError)
-	DeleteKeyword(keywordId *uuid.UUID) *models.INVError
+	CreateKeyword(tx *sql.Tx, keywordName *string) (*uuid.UUID, *models.INVError)
+	UpdateKeyword(tx *sql.Tx, keyword *model.Keywords) *models.INVError
+	DeleteKeyword(tx *sql.Tx, keywordId *uuid.UUID) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type KeywordRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (kr *KeywordRepository) GetKeywords() (*[]model.Keywords, *models.INVError) {
@@ -34,7 +39,7 @@ func (kr *KeywordRepository) GetKeywords() (*[]model.Keywords, *models.INVError)
 	)
 
 	// Execute the query
-	err := stmt.Query(kr.DatabaseManager.GetDatabaseConnection(), &keywords)
+	err := stmt.Query(kr.GetDatabaseConnection(), &keywords)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -59,7 +64,7 @@ func (kr *KeywordRepository) GetKeywordByName(keywordName *string) (*model.Keywo
 	)
 
 	// Execute the query
-	err := stmt.Query(kr.DatabaseManager.GetDatabaseConnection(), &keyword)
+	err := stmt.Query(kr.GetDatabaseConnection(), &keyword)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -71,7 +76,7 @@ func (kr *KeywordRepository) GetKeywordByName(keywordName *string) (*model.Keywo
 	return &keyword, nil
 }
 
-func (kr *KeywordRepository) CreateKeyword(keywordName *string) (*uuid.UUID, *models.INVError) {
+func (kr *KeywordRepository) CreateKeyword(tx *sql.Tx, keywordName *string) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the query
@@ -84,7 +89,7 @@ func (kr *KeywordRepository) CreateKeyword(keywordName *string) (*uuid.UUID, *mo
 	)
 
 	// Execute the query
-	_, err := stmt.Exec(kr.DatabaseManager.GetDatabaseConnection())
+	_, err := stmt.Exec(tx)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -92,14 +97,33 @@ func (kr *KeywordRepository) CreateKeyword(keywordName *string) (*uuid.UUID, *mo
 	return &uuid, nil
 }
 
-func (kr *KeywordRepository) DeleteKeyword(keywordId *uuid.UUID) *models.INVError {
+func (kr *KeywordRepository) UpdateKeyword(tx *sql.Tx, keyword *model.Keywords) *models.INVError {
+	// Create the query
+	stmt := table.Keywords.UPDATE(
+		table.Keywords.Keyword,
+	).SET(
+		keyword.Keyword,
+	).WHERE(
+		table.Keywords.ID.EQ(mysql.String(keyword.ID)),
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return nil
+}
+
+func (kr *KeywordRepository) DeleteKeyword(tx *sql.Tx, keywordId *uuid.UUID) *models.INVError {
 	// Create the query
 	stmt := table.Keywords.DELETE().WHERE(
 		table.Keywords.ID.EQ(mysql.String(keywordId.String())),
 	)
 
 	// Execute the query
-	_, err := stmt.Exec(kr.DatabaseManager.GetDatabaseConnection())
+	_, err := stmt.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -108,7 +132,7 @@ func (kr *KeywordRepository) DeleteKeyword(keywordId *uuid.UUID) *models.INVErro
 }
 
 func (kr *KeywordRepository) CheckIfKeywordExists(keywordId *string) *models.INVError {
-	count, err := utils.CountStatement(table.Keywords, table.Keywords.ID.EQ(mysql.String(*keywordId)), kr.DatabaseManager.GetDatabaseConnection())
+	count, err := utils.CountStatement(table.Keywords, table.Keywords.ID.EQ(mysql.String(*keywordId)), kr.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
