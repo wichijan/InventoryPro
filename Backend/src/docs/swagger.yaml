@@ -15,6 +15,22 @@ definitions:
       warehouseID:
         type: string
     type: object
+  model.ShelveTypes:
+    properties:
+      id:
+        type: string
+      typeName:
+        type: string
+    type: object
+  model.Shelves:
+    properties:
+      id:
+        type: string
+      roomID:
+        type: string
+      shelveTypeID:
+        type: string
+    type: object
   model.UserTypes:
     properties:
       id:
@@ -881,6 +897,114 @@ paths:
       summary: Get room by id with shelves
       tags:
       - Rooms
+  /shelve-types:
+    get:
+      consumes:
+      - application/json
+      description: Get shelve-type
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ShelveTypes'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get shelve-type
+      tags:
+      - Shelves
+    post:
+      consumes:
+      - application/json
+      description: Create shelve-type
+      parameters:
+      - description: shelve-type name
+        in: body
+        name: shelveTypeName
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create shelve-type
+      tags:
+      - Shelves
+    put:
+      consumes:
+      - application/json
+      description: Update shelve-type
+      parameters:
+      - description: shelve-type model
+        in: body
+        name: shelveType
+        required: true
+        schema:
+          $ref: '#/definitions/model.ShelveTypes'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update shelve-type
+      tags:
+      - Shelves
+  /shelve-types/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete shelve-type by id
+      parameters:
+      - description: shelve-type id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete shelve-type by id
+      tags:
+      - Shelves
   /shelves:
     get:
       consumes:
@@ -900,6 +1024,64 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get shelves
+      tags:
+      - Shelves
+    post:
+      consumes:
+      - application/json
+      description: Create Shelve
+      parameters:
+      - description: Shelve model
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/model.Rooms'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Shelves'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Shelve
+      tags:
+      - Shelves
+    put:
+      consumes:
+      - application/json
+      description: Update shelve
+      parameters:
+      - description: OwnShelve model
+        in: body
+        name: shelve
+        required: true
+        schema:
+          $ref: '#/definitions/models.OwnShelve'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OwnShelve'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update shelve
       tags:
       - Shelves
   /shelves/{id}:
