@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -15,13 +17,15 @@ type ShelveRepositoryI interface {
 	GetShelveById(id *uuid.UUID) (*models.OwnShelve, *models.INVError)
 	GetShelvesWithItems() (*[]models.ShelveWithItems, *models.INVError)
 	GetShelveByIdWithItems(id *uuid.UUID) (*models.ShelveWithItems, *models.INVError)
-	CreateShelve(shelve *model.Shelves) (*uuid.UUID, *models.INVError)
+	CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uuid.UUID, *models.INVError)
 	UpdateShelve(shelve *model.Shelves) *models.INVError
 	DeleteShelve(shelveId *uuid.UUID) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type ShelveRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (sr *ShelveRepository) GetShelves() (*[]models.OwnShelve, *models.INVError) {
@@ -37,7 +41,7 @@ func (sr *ShelveRepository) GetShelves() (*[]models.OwnShelve, *models.INVError)
 	)
 
 	// Execute the query
-	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &shelves)
+	err := stmt.Query(sr.GetDatabaseConnection(), &shelves)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -64,7 +68,7 @@ func (sr *ShelveRepository) GetShelveById(id *uuid.UUID) (*models.OwnShelve, *mo
 	)
 
 	// Execute the query
-	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &shelve)
+	err := stmt.Query(sr.GetDatabaseConnection(), &shelve)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -72,7 +76,7 @@ func (sr *ShelveRepository) GetShelveById(id *uuid.UUID) (*models.OwnShelve, *mo
 	return &shelve, nil
 }
 
-func (sr *ShelveRepository) CreateShelve(shelve *model.Shelves) (*uuid.UUID, *models.INVError) {
+func (sr *ShelveRepository) CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -87,7 +91,7 @@ func (sr *ShelveRepository) CreateShelve(shelve *model.Shelves) (*uuid.UUID, *mo
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(sr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -115,7 +119,7 @@ func (sr *ShelveRepository) UpdateShelve(shelve *model.Shelves) *models.INVError
 	).WHERE(table.Shelves.ID.EQ(mysql.String(shelve.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(sr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(sr.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -154,7 +158,7 @@ func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *m
 	)
 
 	// Execute the query
-	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &shelvesWithItems)
+	err := stmt.Query(sr.GetDatabaseConnection(), &shelvesWithItems)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -181,7 +185,7 @@ func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.Shelv
 	)
 
 	// Execute the query
-	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &shelveWithItems)
+	err := stmt.Query(sr.GetDatabaseConnection(), &shelveWithItems)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}

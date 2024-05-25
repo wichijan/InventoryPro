@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -16,13 +18,15 @@ type WarehouseRepositoryI interface {
 	GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError)
 	GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError)
 	GetWarehouseByIdWithRooms(id *uuid.UUID) (*models.WarehouseWithRooms, *models.INVError)
-	CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
-	UpdateWarehouse(Warehouse *model.Warehouses) *models.INVError
-	DeleteWarehouse(warehouseId *uuid.UUID) *models.INVError
+	CreateWarehouse(tx *sql.Tx, warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
+	UpdateWarehouse(tx *sql.Tx, Warehouse *model.Warehouses) *models.INVError
+	DeleteWarehouse(tx *sql.Tx, warehouseId *uuid.UUID) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type WarehouseRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (wr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INVError) {
@@ -36,7 +40,7 @@ func (wr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INV
 	)
 
 	// Execute the query
-	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &warehouses)
+	err := stmt.Query(wr.GetDatabaseConnection(), &warehouses)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -61,7 +65,7 @@ func (wr *WarehouseRepository) GetWarehouseById(id *uuid.UUID) (*model.Warehouse
 	)
 
 	// Execute the query
-	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &warehouse)
+	err := stmt.Query(wr.GetDatabaseConnection(), &warehouse)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_NOT_FOUND
@@ -72,7 +76,7 @@ func (wr *WarehouseRepository) GetWarehouseById(id *uuid.UUID) (*model.Warehouse
 	return &warehouse, nil
 }
 
-func (wr *WarehouseRepository) CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError) {
+func (wr *WarehouseRepository) CreateWarehouse(tx *sql.Tx, warehouse *model.Warehouses) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -88,7 +92,7 @@ func (wr *WarehouseRepository) CreateWarehouse(warehouse *model.Warehouses) (*uu
 		)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(wr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -105,7 +109,7 @@ func (wr *WarehouseRepository) CreateWarehouse(warehouse *model.Warehouses) (*uu
 	return &uuid, nil
 }
 
-func (wr *WarehouseRepository) UpdateWarehouse(warehouse *model.Warehouses) *models.INVError {
+func (wr *WarehouseRepository) UpdateWarehouse(tx *sql.Tx, warehouse *model.Warehouses) *models.INVError {
 
 	// Create the update statement
 	updateQuery := table.Warehouses.UPDATE(
@@ -117,7 +121,7 @@ func (wr *WarehouseRepository) UpdateWarehouse(warehouse *model.Warehouses) *mod
 	).WHERE(table.Warehouses.ID.EQ(mysql.String(warehouse.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(wr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -134,7 +138,7 @@ func (wr *WarehouseRepository) UpdateWarehouse(warehouse *model.Warehouses) *mod
 	return nil
 }
 
-func (wr *WarehouseRepository) DeleteWarehouse(warehouseId *uuid.UUID) *models.INVError {
+func (wr *WarehouseRepository) DeleteWarehouse(tx *sql.Tx, warehouseId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }
@@ -153,7 +157,7 @@ func (wr *WarehouseRepository) GetWarehousesWithRooms() (*[]models.WarehouseWith
 	)
 
 	// Execute the query
-	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &warehouse)
+	err := stmt.Query(wr.GetDatabaseConnection(), &warehouse)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_NOT_FOUND
@@ -179,7 +183,7 @@ func (wr *WarehouseRepository) GetWarehouseByIdWithRooms(id *uuid.UUID) (*models
 	)
 
 	// Execute the query
-	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &warehouse)
+	err := stmt.Query(wr.GetDatabaseConnection(), &warehouse)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_NOT_FOUND

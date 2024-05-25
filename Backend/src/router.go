@@ -47,7 +47,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Create repositories
 	warehouseRepo := &repositories.WarehouseRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	roomRepo := &repositories.RoomRepository{
@@ -55,11 +55,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	shelveRepo := &repositories.ShelveRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	shelveTypeRepo := &repositories.ShelveTypeRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemRepo := &repositories.ItemRepository{
@@ -184,7 +184,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// ShelveType routes
 	adminRoutes.Handle(http.MethodGet, "/shelve-types", handlers.GetShelveTypesHandler(controller.ShelveTypeController))
-	adminRoutes.Handle(http.MethodPost, "/shelve-types", handlers.CreateShelveTypeHandler(controller.ShelveTypeController))
+	publicRoutes.Handle(http.MethodPost, "/shelve-types", handlers.CreateShelveTypeHandler(controller.ShelveTypeController))
 	adminRoutes.Handle(http.MethodPut, "/shelve-types", handlers.UpdateShelveTypeHandler(controller.ShelveTypeController))
 	adminRoutes.Handle(http.MethodDelete, "/shelve-types/:id", handlers.DeleteShelveTypeHandler(controller.ShelveTypeController))
 

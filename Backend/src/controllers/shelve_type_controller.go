@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/google/uuid"
+	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/repositories"
@@ -27,7 +28,13 @@ func (stc *ShelveTypeController) GetShelveTypes() (*[]model.ShelveTypes, *models
 }
 
 func (stc *ShelveTypeController) CreateShelveType(shelveTypeName *string) (*uuid.UUID, *models.INVError) {
-	shelveTypeId, inv_error := stc.ShelveTypeRepo.CreateShelveType(shelveTypeName)
+	tx, err := stc.ShelveTypeRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	shelveTypeId, inv_error := stc.ShelveTypeRepo.CreateShelveType(tx, shelveTypeName)
 	if inv_error != nil {
 		return nil, inv_error
 	}
