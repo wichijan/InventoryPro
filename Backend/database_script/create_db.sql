@@ -119,12 +119,12 @@ create table user_roles(
 create table user_items(
     user_id VARCHAR(36) NOT NULL,
     item_id VARCHAR(36) NOT NULL,
+    status_id VARCHAR(36) NOT NULL,
     quantity INT,
     reserved_date DATE,
     borrowed_date DATE,
     return_date DATE,
-    status_id VARCHAR(36),
-    PRIMARY KEY (user_id, item_id),
+    PRIMARY KEY (user_id, item_id, status_id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (status_id) REFERENCES item_status(id)

@@ -87,3 +87,11 @@ type ItemReserve struct {
 	StatusID    string
 	ReserveDate time.Time
 }
+
+type ItemBorrow struct {
+	ItemID     string
+	UserID     string
+	Quantity   int32
+	StatusID   string
+	BorrowDate time.Time
+}
