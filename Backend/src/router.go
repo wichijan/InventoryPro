@@ -26,6 +26,7 @@ type Controllers struct {
 	UserRoleController   controllers.UserRoleControllerI
 	RoleController       controllers.RoleControllerI
 	ShelveTypeController controllers.ShelveTypeControllerI
+	SubjectController    controllers.SubjectControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -83,7 +84,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	subjectRepo := &repositories.SubjectRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemSubjectRepo := &repositories.ItemSubjectRepository{
@@ -145,6 +146,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		ShelveTypeController: &controllers.ShelveTypeController{
 			ShelveTypeRepo: shelveTypeRepo,
 		},
+		SubjectController: &controllers.SubjectController{
+			SubjectRepo: subjectRepo,
+		},
 	}
 
 	// user routes
@@ -193,10 +197,18 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	// Keyword for item
 	publicRoutes.Handle(http.MethodPost, "/items/addkeyword", handlers.AddKeywordToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removekeyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
+	// Subject for item
 	publicRoutes.Handle(http.MethodPost, "/items/addsubject", handlers.AddSubjectToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
+
+	// Subject Routes
+	publicRoutes.Handle(http.MethodGet, "/subjects", handlers.GetSubjectsHandler(controller.SubjectController))
+	publicRoutes.Handle(http.MethodPost, "/subjects", handlers.CreateSubjectHandler(controller.SubjectController))
+	publicRoutes.Handle(http.MethodPut, "/subjects", handlers.UpdateSubjectHandler(controller.SubjectController))
+	publicRoutes.Handle(http.MethodDelete, "/subjects/:id", handlers.DeleteSubjectHandler(controller.SubjectController))
 
 	// Item reserve
 	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ItemController))

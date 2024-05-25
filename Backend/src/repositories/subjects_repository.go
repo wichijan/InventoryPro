@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -13,13 +15,15 @@ import (
 type SubjectRepositoryI interface {
 	GetSubjects() (*[]model.Subjects, *models.INVError)
 	GetSubjectByName(subjectName *string) (*model.Subjects, *models.INVError)
-	CreateSubject(subject *model.Subjects) (*uuid.UUID, *models.INVError)
-	UpdateSubject(subject *model.Subjects) *models.INVError
-	DeleteSubject(subjectId *uuid.UUID) *models.INVError
+	CreateSubject(tx *sql.Tx, subject *models.SubjectODT) (*uuid.UUID, *models.INVError)
+	UpdateSubject(tx *sql.Tx, subject *model.Subjects) *models.INVError
+	DeleteSubject(tx *sql.Tx, subjectId *uuid.UUID) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type SubjectRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (sr *SubjectRepository) GetSubjects() (*[]model.Subjects, *models.INVError) {
@@ -33,7 +37,7 @@ func (sr *SubjectRepository) GetSubjects() (*[]model.Subjects, *models.INVError)
 	)
 
 	// Execute the query
-	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &subjects)
+	err := stmt.Query(sr.GetDatabaseConnection(), &subjects)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -58,7 +62,7 @@ func (sr *SubjectRepository) GetSubjectByName(subjectName *string) (*model.Subje
 	)
 
 	// Execute the query
-	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &subject)
+	err := stmt.Query(sr.GetDatabaseConnection(), &subject)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -70,7 +74,7 @@ func (sr *SubjectRepository) GetSubjectByName(subjectName *string) (*model.Subje
 	return &subject, nil
 }
 
-func (sr *SubjectRepository) CreateSubject(subject *model.Subjects) (*uuid.UUID, *models.INVError) {
+func (sr *SubjectRepository) CreateSubject(tx *sql.Tx, subject *models.SubjectODT) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -85,7 +89,7 @@ func (sr *SubjectRepository) CreateSubject(subject *model.Subjects) (*uuid.UUID,
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(sr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -102,7 +106,7 @@ func (sr *SubjectRepository) CreateSubject(subject *model.Subjects) (*uuid.UUID,
 	return &uuid, nil
 }
 
-func (sr *SubjectRepository) UpdateSubject(subject *model.Subjects) *models.INVError {
+func (sr *SubjectRepository) UpdateSubject(tx *sql.Tx, subject *model.Subjects) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Subjects.UPDATE(
 		table.Subjects.Name,
@@ -113,7 +117,7 @@ func (sr *SubjectRepository) UpdateSubject(subject *model.Subjects) *models.INVE
 	).WHERE(table.Subjects.ID.EQ(mysql.String(subject.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(sr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -130,7 +134,7 @@ func (sr *SubjectRepository) UpdateSubject(subject *model.Subjects) *models.INVE
 	return nil
 }
 
-func (sr *SubjectRepository) DeleteSubject(subjectId *uuid.UUID) *models.INVError {
+func (sr *SubjectRepository) DeleteSubject(tx *sql.Tx, subjectId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }
