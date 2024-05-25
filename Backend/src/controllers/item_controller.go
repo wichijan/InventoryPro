@@ -54,6 +54,12 @@ func (ic *ItemController) GetItemById(itemId *uuid.UUID) (*models.ItemWithEveryt
 }
 
 func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *models.INVError) {
+	tx, err := ic.ItemRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	var pureItem model.Items
 	pureItem.ID = item.ID
 	pureItem.Name = &item.Name
@@ -65,7 +71,7 @@ func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *
 	pureItem.Damaged = &item.Damaged
 	pureItem.DamagedDescription = &item.DamagedDesc
 
-	id, inv_error := ic.ItemRepo.CreateItem(&pureItem)
+	id, inv_error := ic.ItemRepo.CreateItem(tx, &pureItem)
 	if inv_error != nil {
 		return nil, inv_error
 	}
@@ -74,6 +80,12 @@ func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *
 }
 
 func (ic *ItemController) UpdateItem(item *models.ItemWithStatus) *models.INVError {
+	tx, err := ic.ItemRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	var pureItem model.Items
 	pureItem.ID = item.ID
 	pureItem.Name = &item.Name
@@ -85,7 +97,7 @@ func (ic *ItemController) UpdateItem(item *models.ItemWithStatus) *models.INVErr
 	pureItem.Damaged = &item.Damaged
 	pureItem.DamagedDescription = &item.DamagedDesc
 
-	inv_error := ic.ItemRepo.UpdateItem(&pureItem)
+	inv_error := ic.ItemRepo.UpdateItem(tx, &pureItem)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -94,6 +106,12 @@ func (ic *ItemController) UpdateItem(item *models.ItemWithStatus) *models.INVErr
 }
 
 func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError {
+	tx, err := ic.ItemKeywordRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	keyword, inv_error := ic.KeywordRepo.GetKeywordByName(&itemKeyword.KeywordName)
 	if inv_error != nil {
 		return inv_error
@@ -109,7 +127,7 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 		return inv_err
 	}
 
-	inv_error = ic.ItemKeywordRepo.CreateKeywordForItem(&itemKeywordWithID)
+	inv_error = ic.ItemKeywordRepo.CreateKeywordForItem(tx, &itemKeywordWithID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -118,6 +136,12 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 }
 
 func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError {
+	tx, err := ic.ItemKeywordRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	keyword, inv_error := ic.KeywordRepo.GetKeywordByName(&itemKeyword.KeywordName)
 	if inv_error != nil {
 		return inv_error
@@ -128,7 +152,7 @@ func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywo
 		KeywordID: keyword.ID,
 	}
 
-	inv_error = ic.ItemKeywordRepo.DeleteKeywordForItem(&itemKeywordWithID)
+	inv_error = ic.ItemKeywordRepo.DeleteKeywordForItem(tx, &itemKeywordWithID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -137,6 +161,12 @@ func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywo
 }
 
 func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectName) *models.INVError {
+	tx, err := ic.ItemSubjectRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	subject, inv_error := ic.SubjectRepo.GetSubjectByName(&itemSubject.SubjectName)
 	if inv_error != nil {
 		return inv_error
@@ -152,7 +182,7 @@ func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectNam
 		return inv_err
 	}
 
-	inv_error = ic.ItemSubjectRepo.CreateSubjectForItem(&itemSubjectWithID)
+	inv_error = ic.ItemSubjectRepo.CreateSubjectForItem(tx, &itemSubjectWithID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -161,6 +191,12 @@ func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectNam
 }
 
 func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubjectName) *models.INVError {
+	tx, err := ic.ItemSubjectRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+	
 	subject, inv_error := ic.SubjectRepo.GetSubjectByName(&itemSubject.SubjectName)
 	if inv_error != nil {
 		return inv_error
@@ -171,7 +207,7 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 		SubjectID: subject.ID,
 	}
 
-	inv_error = ic.ItemSubjectRepo.DeleteSubjectForItem(&itemSubjectWithID)
+	inv_error = ic.ItemSubjectRepo.DeleteSubjectForItem(tx, &itemSubjectWithID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -180,6 +216,12 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 }
 
 func (ic *ItemController) ReserveItem(itemReserve models.ItemReserve) *models.INVError {
+	tx, err := ic.UserItemRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	// Check items_in_shelve quantity
 	itemId, inv_err := uuid.Parse(itemReserve.ItemID)
 	if inv_err != nil {
@@ -206,13 +248,13 @@ func (ic *ItemController) ReserveItem(itemReserve models.ItemReserve) *models.IN
 	itemReserve.StatusID = statusID.String()
 	itemReserve.ReserveDate = time.Now()
 
-	inv_error = ic.UserItemRepo.ReserveItem(&itemReserve)
+	inv_error = ic.UserItemRepo.ReserveItem(tx, &itemReserve)
 	if inv_error != nil {
 		return inv_error
 	}
 
 	// update items_in_shelve quantity
-	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(&itemReserve.ItemID, &newQuantityInShelve)
+	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(tx, &itemReserve.ItemID, &newQuantityInShelve)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -221,6 +263,12 @@ func (ic *ItemController) ReserveItem(itemReserve models.ItemReserve) *models.IN
 }
 
 func (ic *ItemController) CancelReserveItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError {
+	tx, err := ic.UserItemRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	// Get quantity
 	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(itemId)
 	if inv_error != nil {
@@ -234,7 +282,7 @@ func (ic *ItemController) CancelReserveItem(userId *uuid.UUID, itemId *uuid.UUID
 	}
 
 	// Update user_items
-	inv_error = ic.UserItemRepo.DeleteReserveItem(userId, itemId)
+	inv_error = ic.UserItemRepo.DeleteReserveItem(tx, userId, itemId)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -242,7 +290,7 @@ func (ic *ItemController) CancelReserveItem(userId *uuid.UUID, itemId *uuid.UUID
 	// update items_in_shelve quantity
 	itemIdStr := itemId.String()
 	newQuantityInShelve := *quantityReservedItem + *quantityInShelve
-	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(&itemIdStr, &newQuantityInShelve)
+	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(tx, &itemIdStr, &newQuantityInShelve)
 	if inv_error != nil {
 		return inv_error
 	}

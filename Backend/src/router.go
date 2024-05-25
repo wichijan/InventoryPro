@@ -26,6 +26,8 @@ type Controllers struct {
 	UserRoleController   controllers.UserRoleControllerI
 	RoleController       controllers.RoleControllerI
 	ShelveTypeController controllers.ShelveTypeControllerI
+	SubjectController    controllers.SubjectControllerI
+	UserTypeController   controllers.UserTypeControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -47,51 +49,51 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Create repositories
 	warehouseRepo := &repositories.WarehouseRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	roomRepo := &repositories.RoomRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	shelveRepo := &repositories.ShelveRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	shelveTypeRepo := &repositories.ShelveTypeRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemRepo := &repositories.ItemRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	userRepo := &repositories.UserRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	userTypeRepo := &repositories.UserTypeRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemKeywordRepo := &repositories.ItemKeywordRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	keywordRepo := &repositories.KeywordRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	subjectRepo := &repositories.SubjectRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemSubjectRepo := &repositories.ItemSubjectRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemInShelveRepo := &repositories.ItemInShelveRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	itemStatusRepo := &repositories.ItemStatusRepository{
@@ -99,15 +101,15 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	userItemRepo := &repositories.UserItemRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	userRoleRepo := &repositories.UserRoleRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	roleRepo := &repositories.RoleRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	// Create controllers
@@ -144,6 +146,15 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ShelveTypeController: &controllers.ShelveTypeController{
 			ShelveTypeRepo: shelveTypeRepo,
+		},
+		SubjectController: &controllers.SubjectController{
+			SubjectRepo: subjectRepo,
+		},
+		KeywordController: &controllers.KeywordController{
+			KeywordRepo: keywordRepo,
+		},
+		UserTypeController: &controllers.UserTypeController{
+			UserTypeRepo: userTypeRepo,
 		},
 	}
 
@@ -184,7 +195,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// ShelveType routes
 	adminRoutes.Handle(http.MethodGet, "/shelve-types", handlers.GetShelveTypesHandler(controller.ShelveTypeController))
-	adminRoutes.Handle(http.MethodPost, "/shelve-types", handlers.CreateShelveTypeHandler(controller.ShelveTypeController))
+	publicRoutes.Handle(http.MethodPost, "/shelve-types", handlers.CreateShelveTypeHandler(controller.ShelveTypeController))
 	adminRoutes.Handle(http.MethodPut, "/shelve-types", handlers.UpdateShelveTypeHandler(controller.ShelveTypeController))
 	adminRoutes.Handle(http.MethodDelete, "/shelve-types/:id", handlers.DeleteShelveTypeHandler(controller.ShelveTypeController))
 
@@ -193,10 +204,24 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	// Keyword for item
 	publicRoutes.Handle(http.MethodPost, "/items/addkeyword", handlers.AddKeywordToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removekeyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
+	// Subject for item
 	publicRoutes.Handle(http.MethodPost, "/items/addsubject", handlers.AddSubjectToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
+
+	// Subject Routes
+	publicRoutes.Handle(http.MethodGet, "/subjects", handlers.GetSubjectsHandler(controller.SubjectController))
+	publicRoutes.Handle(http.MethodPost, "/subjects", handlers.CreateSubjectHandler(controller.SubjectController))
+	publicRoutes.Handle(http.MethodPut, "/subjects", handlers.UpdateSubjectHandler(controller.SubjectController))
+	publicRoutes.Handle(http.MethodDelete, "/subjects/:id", handlers.DeleteSubjectHandler(controller.SubjectController))
+
+	// Keyword routes
+	publicRoutes.Handle(http.MethodGet, "/keywords", handlers.GetKeywordsHandler(controller.KeywordController))
+	publicRoutes.Handle(http.MethodPost, "/keywords", handlers.CreateKeywordHandler(controller.KeywordController))
+	publicRoutes.Handle(http.MethodPut, "/keywords", handlers.UpdateKeywordHandler(controller.KeywordController))
+	publicRoutes.Handle(http.MethodDelete, "/keywords/:id", handlers.DeleteKeywordHandler(controller.KeywordController))
 
 	// Item reserve
 	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ItemController))
@@ -214,6 +239,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// User roles routes
 	adminRoutes.Handle(http.MethodPost, "/user-roles/add-role", handlers.AddRoleToUserHandler(controller.UserRoleController))
 	adminRoutes.Handle(http.MethodDelete, "/user-roles/remove-role", handlers.RemoveRoleFromUserHandler(controller.UserRoleController))
+
+	// User type routes
+	publicRoutes.Handle(http.MethodGet, "/user-types", handlers.GetUserTypesHandler(controller.UserTypeController))
+	publicRoutes.Handle(http.MethodPost, "/user-types", handlers.CreateUserTypeHandler(controller.UserTypeController))
+	publicRoutes.Handle(http.MethodPut, "/user-types", handlers.UpdateUserTypeHandler(controller.UserTypeController))
+	publicRoutes.Handle(http.MethodDelete, "/user-types/:id", handlers.DeleteUserTypeHandler(controller.UserTypeController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "InventoryPro API"

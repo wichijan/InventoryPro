@@ -25,6 +25,12 @@ type UserController struct {
 }
 
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) (*models.LoginResponse, *models.INVError) {
+	tx, err := uc.UserRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	userId := uuid.New()
 
 	hash, err := utils.HashPassword(registrationData.Password)
@@ -72,7 +78,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		UserTypeID:  userTypeId,
 	}
 
-	inv_err = uc.UserRepo.CreateUser(user)
+	inv_err = uc.UserRepo.CreateUser(tx, user)
 	if inv_err != nil {
 		return nil, inv_err
 	}
@@ -95,7 +101,6 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 }
 
 func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.LoginResponse, *models.INVError) {
-
 	// get user from database
 	user, inv_err := uc.UserRepo.GetUserByUsername(loginData.Username)
 	if inv_err != nil {

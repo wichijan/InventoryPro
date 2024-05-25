@@ -32,6 +32,12 @@ func (sc *ShelveController) GetShelves() (*[]models.OwnShelve, *models.INVError)
 }
 
 func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, *models.INVError) {
+	tx, err := sc.ShelveRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	if shelve == nil {
 		return nil, inv_errors.INV_BAD_REQUEST
 	}
@@ -41,7 +47,7 @@ func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, 
 
 	shelveTypeObj, inv_error := sc.ShelveTypeRepo.GetShelveTypeByName(&shelve.ShelveTypeName)
 	if inv_error == inv_errors.INV_NOT_FOUND {
-		shelveTypeId, inv_error_Create := sc.ShelveTypeRepo.CreateShelveType(&shelve.ShelveTypeName)
+		shelveTypeId, inv_error_Create := sc.ShelveTypeRepo.CreateShelveType(tx, &shelve.ShelveTypeName)
 		if inv_error_Create != nil {
 			return nil, inv_error
 		}
@@ -53,7 +59,7 @@ func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, 
 		newShelve.ShelveTypeID = &shelveTypeObj.ID
 	}
 
-	shelveId, inv_error := sc.ShelveRepo.CreateShelve(&newShelve)
+	shelveId, inv_error := sc.ShelveRepo.CreateShelve(tx, &newShelve)
 	if inv_error != nil {
 		return nil, inv_error
 	}
@@ -61,6 +67,12 @@ func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, 
 }
 
 func (sc *ShelveController) UpdateShelve(shelve *models.OwnShelve) *models.INVError {
+	tx, err := sc.ShelveRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	if shelve == nil {
 		return inv_errors.INV_BAD_REQUEST
 	}
@@ -75,7 +87,7 @@ func (sc *ShelveController) UpdateShelve(shelve *models.OwnShelve) *models.INVEr
 	newShelve.RoomID = &shelve.RoomID
 	newShelve.ShelveTypeID = &shelveType.ID
 
-	inv_errors := sc.ShelveRepo.UpdateShelve(&newShelve)
+	inv_errors := sc.ShelveRepo.UpdateShelve(tx, &newShelve)
 	if inv_errors != nil {
 		return inv_errors
 	}
@@ -84,6 +96,11 @@ func (sc *ShelveController) UpdateShelve(shelve *models.OwnShelve) *models.INVEr
 }
 
 func (sc *ShelveController) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
+	tx, err := sc.ShelveRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
 
 	return nil
 }

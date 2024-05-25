@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -16,13 +18,15 @@ type RoomRepositoryI interface {
 	GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INVError)
 	GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError)
 	GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWithShelves, *models.INVError)
-	CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError)
-	UpdateRoom(room *model.Rooms) *models.INVError
-	DeleteRoom(roomId *uuid.UUID) *models.INVError
+	CreateRoom(tx *sql.Tx, room *model.Rooms) (*uuid.UUID, *models.INVError)
+	UpdateRoom(tx *sql.Tx, room *model.Rooms) *models.INVError
+	DeleteRoom(tx *sql.Tx, roomId *uuid.UUID) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type RoomRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (ror *RoomRepository) GetRooms() (*[]model.Rooms, *models.INVError) {
@@ -36,7 +40,7 @@ func (ror *RoomRepository) GetRooms() (*[]model.Rooms, *models.INVError) {
 	)
 
 	// Execute the query
-	err := stmt.Query(ror.DatabaseManager.GetDatabaseConnection(), &rooms)
+	err := stmt.Query(ror.GetDatabaseConnection(), &rooms)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -61,7 +65,7 @@ func (wr *RoomRepository) GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INV
 	)
 
 	// Execute the query
-	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &rooms)
+	err := stmt.Query(wr.GetDatabaseConnection(), &rooms)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_NOT_FOUND
@@ -72,7 +76,7 @@ func (wr *RoomRepository) GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INV
 	return &rooms, nil
 }
 
-func (ror *RoomRepository) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError) {
+func (ror *RoomRepository) CreateRoom(tx *sql.Tx, room *model.Rooms) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -87,7 +91,7 @@ func (ror *RoomRepository) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.IN
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(ror.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -104,7 +108,7 @@ func (ror *RoomRepository) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.IN
 	return &uuid, nil
 }
 
-func (ror *RoomRepository) UpdateRoom(room *model.Rooms) *models.INVError {
+func (ror *RoomRepository) UpdateRoom(tx *sql.Tx, room *model.Rooms) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Rooms.UPDATE(
 		table.Rooms.Name,
@@ -115,7 +119,7 @@ func (ror *RoomRepository) UpdateRoom(room *model.Rooms) *models.INVError {
 	).WHERE(table.Rooms.ID.EQ(mysql.String(room.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(ror.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -132,7 +136,7 @@ func (ror *RoomRepository) UpdateRoom(room *model.Rooms) *models.INVError {
 	return nil
 }
 
-func (ror *RoomRepository) DeleteRoom(roomId *uuid.UUID) *models.INVError {
+func (ror *RoomRepository) DeleteRoom(tx *sql.Tx, roomId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }
@@ -150,7 +154,7 @@ func (wr *RoomRepository) GetRoomsWithShelves() (*[]models.RoomWithShelves, *mod
 	)
 
 	// Execute the query
-	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &rooms)
+	err := stmt.Query(wr.GetDatabaseConnection(), &rooms)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_NOT_FOUND
@@ -176,7 +180,7 @@ func (wr *RoomRepository) GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWi
 	)
 
 	// Execute the query
-	err := stmt.Query(wr.DatabaseManager.GetDatabaseConnection(), &rooms)
+	err := stmt.Query(wr.GetDatabaseConnection(), &rooms)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_NOT_FOUND

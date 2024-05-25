@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -13,13 +15,15 @@ import (
 type ItemRepositoryI interface {
 	GetItems() (*[]models.ItemWithEverything, *models.INVError)
 	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
-	CreateItem(item *model.Items) (*uuid.UUID, *models.INVError)
-	UpdateItem(item *model.Items) *models.INVError
-	DeleteItem(itemId *uuid.UUID) *models.INVError
+	CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID, *models.INVError)
+	UpdateItem(tx *sql.Tx, item *model.Items) *models.INVError
+	DeleteItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type ItemRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INVError) {
@@ -54,7 +58,7 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 	)
 
 	// Execute the query
-	err := stmt.Query(itr.DatabaseManager.GetDatabaseConnection(), &items)
+	err := stmt.Query(itr.GetDatabaseConnection(), &items)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -100,7 +104,7 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 	)
 
 	// Execute the query
-	err := stmt.Query(itr.DatabaseManager.GetDatabaseConnection(), &items)
+	err := stmt.Query(itr.GetDatabaseConnection(), &items)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -108,7 +112,7 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 	return &items, nil
 }
 
-func (itr *ItemRepository) CreateItem(item *model.Items) (*uuid.UUID, *models.INVError) {
+func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -135,7 +139,7 @@ func (itr *ItemRepository) CreateItem(item *model.Items) (*uuid.UUID, *models.IN
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(itr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -152,7 +156,7 @@ func (itr *ItemRepository) CreateItem(item *model.Items) (*uuid.UUID, *models.IN
 	return &uuid, nil
 }
 
-func (itr *ItemRepository) UpdateItem(item *model.Items) *models.INVError {
+func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Items.UPDATE(
 		table.Items.Name,
@@ -175,7 +179,7 @@ func (itr *ItemRepository) UpdateItem(item *model.Items) *models.INVError {
 	).WHERE(table.Items.ID.EQ(mysql.String(item.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(itr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -192,7 +196,7 @@ func (itr *ItemRepository) UpdateItem(item *model.Items) *models.INVError {
 	return nil
 }
 
-func (itr *ItemRepository) DeleteItem(itemId *uuid.UUID) *models.INVError {
+func (itr *ItemRepository) DeleteItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }

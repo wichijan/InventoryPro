@@ -31,11 +31,17 @@ func (mc *WarehouseController) GetWarehouses() (*[]model.Warehouses, *models.INV
 }
 
 func (mc *WarehouseController) CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError) {
+	tx, err := mc.WarehouseRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+	
 	if warehouse == nil {
 		return nil, inv_errors.INV_BAD_REQUEST
 	}
 
-	warehouseId, inv_errors := mc.WarehouseRepo.CreateWarehouse(warehouse)
+	warehouseId, inv_errors := mc.WarehouseRepo.CreateWarehouse(tx, warehouse)
 	if inv_errors != nil {
 		return nil, inv_errors
 	}
@@ -43,7 +49,13 @@ func (mc *WarehouseController) CreateWarehouse(warehouse *model.Warehouses) (*uu
 }
 
 func (mc *WarehouseController) UpdateWarehouse(warehouse *model.Warehouses) *models.INVError {
-	inv_errors := mc.WarehouseRepo.UpdateWarehouse(warehouse)
+	tx, err := mc.WarehouseRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+	
+	inv_errors := mc.WarehouseRepo.UpdateWarehouse(tx, warehouse)
 	if inv_errors != nil {
 		return inv_errors
 	}
@@ -52,6 +64,12 @@ func (mc *WarehouseController) UpdateWarehouse(warehouse *model.Warehouses) *mod
 
 func (mc *WarehouseController) DeleteWarehouse(warehouse_id *uuid.UUID) *models.INVError {
 	// TODO Needs to be implemented
+	tx, err := mc.WarehouseRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	return nil
 }
 

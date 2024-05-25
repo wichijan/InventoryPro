@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -14,13 +16,15 @@ type UserTypeRepositoryI interface {
 	GetUserTypes() (*[]model.UserTypes, *models.INVError)
 	GetUserTypeById(id *string) (*string, *models.INVError)
 	GetUserTypeByName(name *string) (*string, *models.INVError)
-	CreateUserType(type_name *string) (*uuid.UUID, *models.INVError)
-	UpdateUserType(userType *model.UserTypes) *models.INVError
-	DeleteUserType(userTypeId *uuid.UUID) *models.INVError
+	CreateUserType(tx *sql.Tx, type_name *string) (*uuid.UUID, *models.INVError)
+	UpdateUserType(tx *sql.Tx, userType *model.UserTypes) *models.INVError
+	DeleteUserType(tx *sql.Tx, userTypeId *uuid.UUID) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type UserTypeRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (utr *UserTypeRepository) GetUserTypes() (*[]model.UserTypes, *models.INVError) {
@@ -34,7 +38,7 @@ func (utr *UserTypeRepository) GetUserTypes() (*[]model.UserTypes, *models.INVEr
 	)
 
 	// Execute the query
-	err := stmt.Query(utr.DatabaseManager.GetDatabaseConnection(), &userTypes)
+	err := stmt.Query(utr.GetDatabaseConnection(), &userTypes)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -59,7 +63,7 @@ func (utr *UserTypeRepository) GetUserTypeById(id *string) (*string, *models.INV
 	)
 
 	// Execute the query
-	err := stmt.Query(utr.DatabaseManager.GetDatabaseConnection(), &userTypes)
+	err := stmt.Query(utr.GetDatabaseConnection(), &userTypes)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -84,7 +88,7 @@ func (utr *UserTypeRepository) GetUserTypeByName(name *string) (*string, *models
 	)
 
 	// Execute the query
-	err := stmt.Query(utr.DatabaseManager.GetDatabaseConnection(), &userTypes)
+	err := stmt.Query(utr.GetDatabaseConnection(), &userTypes)
 	if err != nil {
 		return nil, inv_errors.INV_USER_TYPE_NOT_FOUND
 	}
@@ -96,7 +100,7 @@ func (utr *UserTypeRepository) GetUserTypeByName(name *string) (*string, *models
 	return &userTypes.ID, nil
 }
 
-func (utr *UserTypeRepository) CreateUserType(type_name *string) (*uuid.UUID, *models.INVError) {
+func (utr *UserTypeRepository) CreateUserType(tx *sql.Tx, type_name *string) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -109,7 +113,7 @@ func (utr *UserTypeRepository) CreateUserType(type_name *string) (*uuid.UUID, *m
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(utr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -126,7 +130,7 @@ func (utr *UserTypeRepository) CreateUserType(type_name *string) (*uuid.UUID, *m
 	return &uuid, nil
 }
 
-func (utr *UserTypeRepository) UpdateUserType(userType *model.UserTypes) *models.INVError {
+func (utr *UserTypeRepository) UpdateUserType(tx *sql.Tx, userType *model.UserTypes) *models.INVError {
 	// Create the update statement
 	updateQuery := table.UserTypes.UPDATE(
 		table.UserTypes.TypeName,
@@ -135,7 +139,7 @@ func (utr *UserTypeRepository) UpdateUserType(userType *model.UserTypes) *models
 	).WHERE(table.UserTypes.ID.EQ(mysql.String(userType.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(utr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -152,7 +156,7 @@ func (utr *UserTypeRepository) UpdateUserType(userType *model.UserTypes) *models
 	return nil
 }
 
-func (utr *UserTypeRepository) DeleteUserType(userTypeId *uuid.UUID) *models.INVError {
+func (utr *UserTypeRepository) DeleteUserType(tx *sql.Tx, userTypeId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }

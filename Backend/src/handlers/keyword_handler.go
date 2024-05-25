@@ -12,72 +12,71 @@ import (
 	"github.com/wichijan/InventoryPro/src/utils"
 )
 
-// @Summary Get UserTypes
-// @Description Get UserTypes
-// @Tags UserTypes
+// @Summary Get Keywords
+// @Description Get Keywords
+// @Tags Keywords
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} model.UserTypes
+// @Success 200 {array} model.Keywords
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /user-types [get]
-func GetUserTypesHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
+// @Router /keywords [get]
+func GetKeywordsHandler(keywordCtrl controllers.KeywordControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userTypes, inv_err := userTypeCtrl.GetUserTypes()
+		keywords, inv_err := keywordCtrl.GetKeywords()
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, userTypes)
+		c.JSON(http.StatusOK, keywords)
 	}
 }
 
-// @Summary Create UserType
-// @Description Create UserType
-// @Tags UserTypes
+// @Summary Create Keyword
+// @Description Create Keyword
+// @Tags Keywords
 // @Accept  json
 // @Produce  json
-// @Param userType body string true "UserTypeODT model"
+// @Param keyword body string true "KeywordODT model"
 // @Success 200 {object} uuid.UUID
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /user-types [post]
-func CreateUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
+// @Router /keywords [post]
+func CreateKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var userTypeName models.UserTypeODT
-		if err := c.ShouldBindJSON(&userTypeName); err != nil || userTypeName.Name == nil {
+		var keywordName models.KeywordODT
+		if err := c.ShouldBindJSON(&keywordName); err != nil || keywordName.Name == nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		userTypeId, inv_err := userTypeCtrl.CreateUserType(userTypeName.Name)
+		keywordId, inv_err := keywordCtrl.CreateKeyword(keywordName.Name)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, userTypeId)
+		c.JSON(http.StatusOK, keywordId)
 	}
 }
 
-// @Summary Update UserType
-// @Description Update UserType
-// @Tags UserTypes
+// @Summary Update Keyword
+// @Description Update Keyword
+// @Tags Keywords
 // @Accept  json
 // @Produce  json
-// @Param userType body model.UserTypes true "UserType model"
+// @Param keyword body model.Keywords true "Keyword model"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /user-types [put]
-func UpdateUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
+// @Router /keywords [put]
+func UpdateKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var userType model.UserTypes
-		err := c.ShouldBindJSON(&userType)
-		if err != nil {
+		var keyword model.Keywords
+		if err := c.ShouldBindJSON(&keyword); err != nil || keyword.ID == "" || keyword.Keyword == nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		inv_err := userTypeCtrl.UpdateUserType(&userType)
+		inv_err := keywordCtrl.UpdateKeyword(&keyword)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -86,17 +85,17 @@ func UpdateUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.Han
 	}
 }
 
-// @Summary Delete UserType
-// @Description Delete UserType
-// @Tags UserTypes
+// @Summary Delete Keyword
+// @Description Delete Keyword
+// @Tags Keywords
 // @Accept  json
 // @Produce  json
-// @Param id path string true "UserType id"
+// @Param id path string true "Keyword ID"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /user-types [delete]
-func DeleteUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
+// @Router /keywords [delete]
+func DeleteKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -104,7 +103,7 @@ func DeleteUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.Han
 			return
 		}
 
-		inv_err := userTypeCtrl.DeleteUserType(&id)
+		inv_err := keywordCtrl.DeleteKeyword(&id)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

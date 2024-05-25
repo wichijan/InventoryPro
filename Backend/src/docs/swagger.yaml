@@ -1,4 +1,11 @@
 definitions:
+  model.Keywords:
+    properties:
+      id:
+        type: string
+      keyword:
+        type: string
+    type: object
   model.Roles:
     properties:
       id:
@@ -29,6 +36,15 @@ definitions:
       roomID:
         type: string
       shelveTypeID:
+        type: string
+    type: object
+  model.Subjects:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
         type: string
     type: object
   model.UserTypes:
@@ -708,6 +724,109 @@ paths:
       summary: Cancel Reserve Item
       tags:
       - Items
+  /keywords:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Keyword
+      parameters:
+      - description: Keyword ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Keyword
+      tags:
+      - Keywords
+    get:
+      consumes:
+      - application/json
+      description: Get Keywords
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Keywords'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get Keywords
+      tags:
+      - Keywords
+    post:
+      consumes:
+      - application/json
+      description: Create Keyword
+      parameters:
+      - description: KeywordODT model
+        in: body
+        name: keyword
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Keyword
+      tags:
+      - Keywords
+    put:
+      consumes:
+      - application/json
+      description: Update Keyword
+      parameters:
+      - description: Keyword model
+        in: body
+        name: keyword
+        required: true
+        schema:
+          $ref: '#/definitions/model.Keywords'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update Keyword
+      tags:
+      - Keywords
   /roles:
     get:
       consumes:
@@ -1177,6 +1296,110 @@ paths:
       summary: Get shelve by id with items
       tags:
       - Shelves
+  /subjects:
+    get:
+      consumes:
+      - application/json
+      description: Get Subjects
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Subjects'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get Subjects
+      tags:
+      - Subjects
+    post:
+      consumes:
+      - application/json
+      description: Create Subject
+      parameters:
+      - description: SubjectODT model
+        in: body
+        name: subject
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Subject
+      tags:
+      - Subjects
+    put:
+      consumes:
+      - application/json
+      description: Update Subject
+      parameters:
+      - description: Subject model
+        in: body
+        name: subject
+        required: true
+        schema:
+          $ref: '#/definitions/model.Subjects'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update Subject
+      tags:
+      - Subjects
+  /subjects/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Subject
+      parameters:
+      - description: Subject id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Subject
+      tags:
+      - Subjects
   /user-roles/add-role:
     delete:
       consumes:
@@ -1225,6 +1448,32 @@ paths:
       tags:
       - UserRoles
   /user-types:
+    delete:
+      consumes:
+      - application/json
+      description: Delete UserType
+      parameters:
+      - description: UserType id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete UserType
+      tags:
+      - UserTypes
     get:
       consumes:
       - application/json
@@ -1243,6 +1492,62 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get UserTypes
+      tags:
+      - UserTypes
+    post:
+      consumes:
+      - application/json
+      description: Create UserType
+      parameters:
+      - description: UserTypeODT model
+        in: body
+        name: userType
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create UserType
+      tags:
+      - UserTypes
+    put:
+      consumes:
+      - application/json
+      description: Update UserType
+      parameters:
+      - description: UserType model
+        in: body
+        name: userType
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserTypes'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update UserType
       tags:
       - UserTypes
   /users/get-me:

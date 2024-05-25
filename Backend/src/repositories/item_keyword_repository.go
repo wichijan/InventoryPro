@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -12,13 +14,15 @@ import (
 
 type ItemKeywordRepositoryI interface {
 	GetKeywordsForItems() (*[]model.KeywordsForItems, *models.INVError)
-	CreateKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError
-	DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError
+	CreateKeywordForItem(tx *sql.Tx, keyword *models.ItemWithKeyword) *models.INVError
+	DeleteKeywordForItem(tx *sql.Tx, keyword *models.ItemWithKeyword) *models.INVError
 	CheckIfKeywordAndItemExists(keywordAndItem models.ItemWithKeyword) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type ItemKeywordRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (kfir *ItemKeywordRepository) GetKeywordsForItems() (*[]model.KeywordsForItems, *models.INVError) {
@@ -32,7 +36,7 @@ func (kfir *ItemKeywordRepository) GetKeywordsForItems() (*[]model.KeywordsForIt
 	)
 
 	// Execute the query
-	err := stmt.Query(kfir.DatabaseManager.GetDatabaseConnection(), &keywords)
+	err := stmt.Query(kfir.GetDatabaseConnection(), &keywords)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -44,7 +48,7 @@ func (kfir *ItemKeywordRepository) GetKeywordsForItems() (*[]model.KeywordsForIt
 	return &keywords, nil
 }
 
-func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError {
+func (kfir *ItemKeywordRepository) CreateKeywordForItem(tx *sql.Tx, keyword *models.ItemWithKeyword) *models.INVError {
 
 	// Create the insert statement
 	insertQuery := table.KeywordsForItems.INSERT(
@@ -56,7 +60,7 @@ func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWith
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(kfir.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -73,14 +77,14 @@ func (kfir *ItemKeywordRepository) CreateKeywordForItem(keyword *models.ItemWith
 	return nil
 }
 
-func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keyword *models.ItemWithKeyword) *models.INVError {
+func (kfir *ItemKeywordRepository) DeleteKeywordForItem(tx *sql.Tx, keyword *models.ItemWithKeyword) *models.INVError {
 	deleteQuery := table.KeywordsForItems.DELETE().WHERE(
 		table.KeywordsForItems.KeywordID.EQ(mysql.String(keyword.KeywordID)).
 			AND(table.KeywordsForItems.ItemID.EQ(mysql.String(keyword.ItemID))),
 	)
 
 	// Execute the query
-	rows, err := deleteQuery.Exec(kfir.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -98,7 +102,7 @@ func (kfir *ItemKeywordRepository) DeleteKeywordForItem(keyword *models.ItemWith
 }
 
 func (kfir *ItemKeywordRepository) CheckIfKeywordAndItemExists(keywordAndItem models.ItemWithKeyword) *models.INVError {
-	count, err := utils.CountStatement(table.KeywordsForItems, table.KeywordsForItems.KeywordID.EQ(mysql.String(keywordAndItem.KeywordID)).AND(table.KeywordsForItems.ItemID.EQ(mysql.String(keywordAndItem.ItemID))), kfir.DatabaseManager.GetDatabaseConnection())
+	count, err := utils.CountStatement(table.KeywordsForItems, table.KeywordsForItems.KeywordID.EQ(mysql.String(keywordAndItem.KeywordID)).AND(table.KeywordsForItems.ItemID.EQ(mysql.String(keywordAndItem.ItemID))), kfir.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}

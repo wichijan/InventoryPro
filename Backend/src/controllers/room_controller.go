@@ -31,11 +31,17 @@ func (rc *RoomController) GetRooms() (*[]model.Rooms, *models.INVError) {
 }
 
 func (rc *RoomController) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError) {
+	tx, err := rc.RoomRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	if room == nil {
 		return nil, inv_errors.INV_BAD_REQUEST
 	}
 
-	roomId, inv_errors := rc.RoomRepo.CreateRoom(room)
+	roomId, inv_errors := rc.RoomRepo.CreateRoom(tx, room)
 	if inv_errors != nil {
 		return nil, inv_errors
 	}
@@ -43,7 +49,13 @@ func (rc *RoomController) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INV
 }
 
 func (rc *RoomController) UpdateRoom(room *model.Rooms) *models.INVError {
-	inv_errors := rc.RoomRepo.UpdateRoom(room)
+	tx, err := rc.RoomRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	inv_errors := rc.RoomRepo.UpdateRoom(tx, room)
 	if inv_errors != nil {
 		return inv_errors
 	}
@@ -52,6 +64,12 @@ func (rc *RoomController) UpdateRoom(room *model.Rooms) *models.INVError {
 
 func (rc *RoomController) DeleteRoom(roomId *uuid.UUID) *models.INVError {
 	// TODO Needs to be implemented
+	tx, err := rc.RoomRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	return nil
 }
 

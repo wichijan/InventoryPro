@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -14,13 +16,15 @@ import (
 type UserRepositoryI interface {
 	GetUserById(id *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
 	GetUserByUsername(username string) (*models.UserWithTypeName, *models.INVError)
-	CreateUser(user model.Users) *models.INVError
+	CreateUser(tx *sql.Tx, user model.Users) *models.INVError
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type UserRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, *models.INVError) {
@@ -41,7 +45,7 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, 
 	).WHERE(
 		table.Users.ID.EQ(utils.MySqlString(id.String())),
 	)
-	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &user)
+	err := stmt.Query(ur.GetDatabaseConnection(), &user)
 	if err != nil {
 		if err.Error() == "jet: sql: no rows in result set" {
 			return nil, inv_errors.INV_USER_NOT_FOUND
@@ -70,7 +74,7 @@ func (ur *UserRepository) GetUserByUsername(username string) (*models.UserWithTy
 	).WHERE(
 		table.Users.Username.EQ(mysql.String(username)),
 	)
-	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &user)
+	err := stmt.Query(ur.GetDatabaseConnection(), &user)
 	if err != nil {
 		if err.Error() == "jet: sql: no rows in result set" {
 			return nil, inv_errors.INV_USER_NOT_FOUND
@@ -81,7 +85,7 @@ func (ur *UserRepository) GetUserByUsername(username string) (*models.UserWithTy
 	return &user, nil
 }
 
-func (ur *UserRepository) CreateUser(user model.Users) *models.INVError {
+func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVError {
 	stmt := table.Users.INSERT(
 		table.Users.ID,
 		table.Users.FirstName,
@@ -104,7 +108,7 @@ func (ur *UserRepository) CreateUser(user model.Users) *models.INVError {
 		user.UserTypeID,
 	)
 
-	_, err := stmt.Exec(ur.DatabaseManager.GetDatabaseConnection())
+	_, err := stmt.Exec(tx)
 
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
@@ -113,7 +117,7 @@ func (ur *UserRepository) CreateUser(user model.Users) *models.INVError {
 }
 
 func (ur *UserRepository) CheckIfUsernameExists(username string) *models.INVError {
-	count, err := utils.CountStatement(table.Users, table.Users.Username.EQ(mysql.String(username)), ur.DatabaseManager.GetDatabaseConnection())
+	count, err := utils.CountStatement(table.Users, table.Users.Username.EQ(mysql.String(username)), ur.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -124,7 +128,7 @@ func (ur *UserRepository) CheckIfUsernameExists(username string) *models.INVErro
 }
 
 func (ur *UserRepository) CheckIfEmailExists(email string) *models.INVError {
-	count, err := utils.CountStatement(table.Users, table.Users.Email.EQ(mysql.String(email)), ur.DatabaseManager.GetDatabaseConnection())
+	count, err := utils.CountStatement(table.Users, table.Users.Email.EQ(mysql.String(email)), ur.GetDatabaseConnection())
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}

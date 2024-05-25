@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/google/uuid"
+	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/repositories"
@@ -27,7 +28,13 @@ func (stc *ShelveTypeController) GetShelveTypes() (*[]model.ShelveTypes, *models
 }
 
 func (stc *ShelveTypeController) CreateShelveType(shelveTypeName *string) (*uuid.UUID, *models.INVError) {
-	shelveTypeId, inv_error := stc.ShelveTypeRepo.CreateShelveType(shelveTypeName)
+	tx, err := stc.ShelveTypeRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	shelveTypeId, inv_error := stc.ShelveTypeRepo.CreateShelveType(tx, shelveTypeName)
 	if inv_error != nil {
 		return nil, inv_error
 	}
@@ -35,7 +42,13 @@ func (stc *ShelveTypeController) CreateShelveType(shelveTypeName *string) (*uuid
 }
 
 func (stc *ShelveTypeController) UpdateShelveType(shelveType *model.ShelveTypes) *models.INVError {
-	inv_error := stc.ShelveTypeRepo.UpdateShelveType(shelveType)
+	tx, err := stc.ShelveTypeRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+	
+	inv_error := stc.ShelveTypeRepo.UpdateShelveType(tx, shelveType)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -43,7 +56,13 @@ func (stc *ShelveTypeController) UpdateShelveType(shelveType *model.ShelveTypes)
 }
 
 func (stc *ShelveTypeController) DeleteShelveType(shelveTypeId *uuid.UUID) *models.INVError {
-	inv_error := stc.ShelveTypeRepo.DeleteShelveType(shelveTypeId)
+	tx, err := stc.ShelveTypeRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	inv_error := stc.ShelveTypeRepo.DeleteShelveType(tx, shelveTypeId)
 	if inv_error != nil {
 		return inv_error
 	}

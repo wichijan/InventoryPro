@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -12,15 +14,17 @@ import (
 
 type ItemInShelveRepositoryI interface {
 	GetItemsInShelve(shelveId *string) (*[]model.ItemsInShelve, *models.INVError)
-	CreateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError
-	UpdateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError
-	DeleteItemInShelve(itemIdInShelve *uuid.UUID) *models.INVError
+	CreateItemInShelve(tx *sql.Tx, itemInShelve *model.ItemsInShelve) *models.INVError
+	UpdateItemInShelve(tx *sql.Tx, itemInShelve *model.ItemsInShelve) *models.INVError
+	DeleteItemInShelve(tx *sql.Tx, itemIdInShelve *uuid.UUID) *models.INVError
 	GetQuantityInShelve(itemId *uuid.UUID) (*int32, *models.INVError)
-	UpdateQuantityInShelve(itemId *string, quantity *int32) *models.INVError
+	UpdateQuantityInShelve(tx *sql.Tx, itemId *string, quantity *int32) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type ItemInShelveRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (iisr *ItemInShelveRepository) GetItemsInShelve(shelveId *string) (*[]model.ItemsInShelve, *models.INVError) {
@@ -34,7 +38,7 @@ func (iisr *ItemInShelveRepository) GetItemsInShelve(shelveId *string) (*[]model
 	).WHERE(table.ItemsInShelve.ShelveID.EQ(mysql.String(*shelveId)))
 
 	// Execute the query
-	err := stmt.Query(iisr.DatabaseManager.GetDatabaseConnection(), &itemsInShelve)
+	err := stmt.Query(iisr.GetDatabaseConnection(), &itemsInShelve)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -46,7 +50,7 @@ func (iisr *ItemInShelveRepository) GetItemsInShelve(shelveId *string) (*[]model
 	return &itemsInShelve, nil
 }
 
-func (iisr *ItemInShelveRepository) CreateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError {
+func (iisr *ItemInShelveRepository) CreateItemInShelve(tx *sql.Tx, itemInShelve *model.ItemsInShelve) *models.INVError {
 
 	// Create the insert statement
 	insertQuery := table.ItemsInShelve.INSERT(
@@ -58,7 +62,7 @@ func (iisr *ItemInShelveRepository) CreateItemInShelve(itemInShelve *model.Items
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(iisr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -75,7 +79,7 @@ func (iisr *ItemInShelveRepository) CreateItemInShelve(itemInShelve *model.Items
 	return nil
 }
 
-func (iisr *ItemInShelveRepository) UpdateItemInShelve(itemInShelve *model.ItemsInShelve) *models.INVError {
+func (iisr *ItemInShelveRepository) UpdateItemInShelve(tx *sql.Tx, itemInShelve *model.ItemsInShelve) *models.INVError {
 	// Create the update statement
 	updateQuery := table.ItemsInShelve.UPDATE(
 		table.ItemsInShelve.ItemID,
@@ -87,7 +91,7 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(itemInShelve *model.Items
 		AND(table.ItemsInShelve.ShelveID.EQ(mysql.String(itemInShelve.ShelveID))))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(iisr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -104,7 +108,7 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(itemInShelve *model.Items
 	return nil
 }
 
-func (iisr *ItemInShelveRepository) DeleteItemInShelve(itemIdInShelve *uuid.UUID) *models.INVError {
+func (iisr *ItemInShelveRepository) DeleteItemInShelve(tx *sql.Tx, itemIdInShelve *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }
@@ -122,7 +126,7 @@ func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *uuid.UUID) (*int
 
 	// Execute the query
 	var quantity models.GetQuantityInShelve
-	err := stmt.Query(iisr.DatabaseManager.GetDatabaseConnection(), &quantity)
+	err := stmt.Query(iisr.GetDatabaseConnection(), &quantity)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_NOT_FOUND
@@ -133,7 +137,7 @@ func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *uuid.UUID) (*int
 	return &quantity.Quantity, nil
 }
 
-func (iisr *ItemInShelveRepository) UpdateQuantityInShelve(itemId *string, quantity *int32) *models.INVError {
+func (iisr *ItemInShelveRepository) UpdateQuantityInShelve(tx *sql.Tx, itemId *string, quantity *int32) *models.INVError {
 	// Create the update statement
 	updateQuery := table.ItemsInShelve.UPDATE(
 		table.ItemsInShelve.Quantity,
@@ -142,7 +146,7 @@ func (iisr *ItemInShelveRepository) UpdateQuantityInShelve(itemId *string, quant
 	).WHERE(table.ItemsInShelve.ItemID.EQ(mysql.String(*itemId)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(iisr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}

@@ -12,72 +12,71 @@ import (
 	"github.com/wichijan/InventoryPro/src/utils"
 )
 
-// @Summary Get UserTypes
-// @Description Get UserTypes
-// @Tags UserTypes
+// @Summary Get Subjects
+// @Description Get Subjects
+// @Tags Subjects
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} model.UserTypes
+// @Success 200 {array} model.Subjects
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /user-types [get]
-func GetUserTypesHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
+// @Router /subjects [get]
+func GetSubjectsHandler(subjectCtrl controllers.SubjectControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userTypes, inv_err := userTypeCtrl.GetUserTypes()
+		subjects, inv_err := subjectCtrl.GetSubjects()
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, userTypes)
+		c.JSON(http.StatusOK, subjects)
 	}
 }
 
-// @Summary Create UserType
-// @Description Create UserType
-// @Tags UserTypes
+// @Summary Create Subject
+// @Description Create Subject
+// @Tags Subjects
 // @Accept  json
 // @Produce  json
-// @Param userType body string true "UserTypeODT model"
+// @Param subject body string true "SubjectODT model"
 // @Success 200 {object} uuid.UUID
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /user-types [post]
-func CreateUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
+// @Router /subjects [post]
+func CreateSubjectHandler(subjectCtrl controllers.SubjectControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var userTypeName models.UserTypeODT
-		if err := c.ShouldBindJSON(&userTypeName); err != nil || userTypeName.Name == nil {
+		var subjectName models.SubjectODT
+		if err := c.ShouldBindJSON(&subjectName); err != nil || subjectName.Name == nil || subjectName.Description == nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		userTypeId, inv_err := userTypeCtrl.CreateUserType(userTypeName.Name)
+		subjectId, inv_err := subjectCtrl.CreateSubject(&subjectName)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		c.JSON(http.StatusOK, userTypeId)
+		c.JSON(http.StatusOK, subjectId)
 	}
 }
 
-// @Summary Update UserType
-// @Description Update UserType
-// @Tags UserTypes
+// @Summary Update Subject
+// @Description Update Subject
+// @Tags Subjects
 // @Accept  json
 // @Produce  json
-// @Param userType body model.UserTypes true "UserType model"
+// @Param subject body model.Subjects true "Subject model"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /user-types [put]
-func UpdateUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
+// @Router /subjects [put]
+func UpdateSubjectHandler(subjectCtrl controllers.SubjectControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var userType model.UserTypes
-		err := c.ShouldBindJSON(&userType)
-		if err != nil {
+		var subject model.Subjects
+		if err := c.ShouldBindJSON(&subject); err != nil || subject.Name == nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		inv_err := userTypeCtrl.UpdateUserType(&userType)
+		inv_err := subjectCtrl.UpdateSubject(&subject)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -86,17 +85,17 @@ func UpdateUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.Han
 	}
 }
 
-// @Summary Delete UserType
-// @Description Delete UserType
-// @Tags UserTypes
+// @Summary Delete Subject
+// @Description Delete Subject
+// @Tags Subjects
 // @Accept  json
 // @Produce  json
-// @Param id path string true "UserType id"
+// @Param id path string true "Subject id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /user-types [delete]
-func DeleteUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
+// @Router /subjects/{id} [delete]
+func DeleteSubjectHandler(subjectCtrl controllers.SubjectControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -104,7 +103,7 @@ func DeleteUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.Han
 			return
 		}
 
-		inv_err := userTypeCtrl.DeleteUserType(&id)
+		inv_err := subjectCtrl.DeleteSubject(&id)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -12,13 +14,15 @@ import (
 
 type RoleRepositoryI interface {
 	GetRoles() (*[]model.Roles, *models.INVError)
-	CreateRole(roleName *string) (*uuid.UUID, *models.INVError)
-	UpdateRole(role *model.Roles) *models.INVError
-	DeleteRole(roleId *uuid.UUID) *models.INVError
+	CreateRole(tx *sql.Tx, roleName *string) (*uuid.UUID, *models.INVError)
+	UpdateRole(tx *sql.Tx, role *model.Roles) *models.INVError
+	DeleteRole(tx *sql.Tx, roleId *uuid.UUID) *models.INVError
+
+	managers.DatabaseManagerI
 }
 
 type RoleRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 func (rr *RoleRepository) GetRoles() (*[]model.Roles, *models.INVError) {
@@ -32,7 +36,7 @@ func (rr *RoleRepository) GetRoles() (*[]model.Roles, *models.INVError) {
 	)
 
 	// Execute the query
-	err := stmt.Query(rr.DatabaseManager.GetDatabaseConnection(), &roles)
+	err := stmt.Query(rr.GetDatabaseConnection(), &roles)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -44,7 +48,7 @@ func (rr *RoleRepository) GetRoles() (*[]model.Roles, *models.INVError) {
 	return &roles, nil
 }
 
-func (rr *RoleRepository) CreateRole(roleName *string) (*uuid.UUID, *models.INVError) {
+func (rr *RoleRepository) CreateRole(tx *sql.Tx, roleName *string) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
@@ -57,7 +61,7 @@ func (rr *RoleRepository) CreateRole(roleName *string) (*uuid.UUID, *models.INVE
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(rr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
@@ -74,7 +78,7 @@ func (rr *RoleRepository) CreateRole(roleName *string) (*uuid.UUID, *models.INVE
 	return &uuid, nil
 }
 
-func (rr *RoleRepository) UpdateRole(role *model.Roles) *models.INVError {
+func (rr *RoleRepository) UpdateRole(tx *sql.Tx, role *model.Roles) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Roles.UPDATE(
 		table.Roles.RoleName,
@@ -83,7 +87,7 @@ func (rr *RoleRepository) UpdateRole(role *model.Roles) *models.INVError {
 	).WHERE(table.Roles.ID.EQ(mysql.String(role.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(rr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -100,7 +104,7 @@ func (rr *RoleRepository) UpdateRole(role *model.Roles) *models.INVError {
 	return nil
 }
 
-func (rr *RoleRepository) DeleteRole(roleId *uuid.UUID) *models.INVError {
+func (rr *RoleRepository) DeleteRole(tx *sql.Tx, roleId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }
