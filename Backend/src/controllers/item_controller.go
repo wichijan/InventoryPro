@@ -22,6 +22,9 @@ type ItemControllerI interface {
 
 	ReserveItem(itemReserve models.ItemReserve) *models.INVError
 	CancelReserveItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
+
+	BorrowItem(itemReserve models.ItemBorrow) *models.INVError
+	ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
 }
 
 type ItemController struct {
@@ -196,7 +199,7 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 		return inv_errors.INV_INTERNAL_ERROR
 	}
 	defer tx.Rollback()
-	
+
 	subject, inv_error := ic.SubjectRepo.GetSubjectByName(&itemSubject.SubjectName)
 	if inv_error != nil {
 		return inv_error
@@ -281,8 +284,107 @@ func (ic *ItemController) CancelReserveItem(userId *uuid.UUID, itemId *uuid.UUID
 		return inv_error
 	}
 
+	// Get status_id
+	statusName := "Reserved"
+	statusID, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&statusName)
+	if inv_error != nil {
+		return inv_error
+	}
+	statusIdString := statusID.String()
+
 	// Update user_items
-	inv_error = ic.UserItemRepo.DeleteReserveItem(tx, userId, itemId)
+	inv_error = ic.UserItemRepo.DeleteReserveItem(tx, userId, itemId, &statusIdString)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// update items_in_shelve quantity
+	itemIdStr := itemId.String()
+	newQuantityInShelve := *quantityReservedItem + *quantityInShelve
+	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(tx, &itemIdStr, &newQuantityInShelve)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrow) *models.INVError {
+	tx, err := ic.UserItemRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	// Check items_in_shelve quantity
+	itemId, inv_err := uuid.Parse(itemReserve.ItemID)
+	if inv_err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(&itemId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	newQuantityInShelve := *quantityInShelve - itemReserve.Quantity
+	if newQuantityInShelve < 0 {
+		return inv_errors.INV_NOT_ENOUGH_QUANTITY
+	}
+
+	// insert into user_items
+	// Get status_id
+	statusName := "Borrowed"
+	statusID, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&statusName)
+	if inv_error != nil {
+		return inv_error
+	}
+	itemReserve.StatusID = statusID.String()
+	itemReserve.BorrowDate = time.Now()
+
+	inv_error = ic.UserItemRepo.BorrowItem(tx, &itemReserve)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// update items_in_shelve quantity
+	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(tx, &itemReserve.ItemID, &newQuantityInShelve)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError {
+	tx, err := ic.UserItemRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	// Get quantity
+	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(itemId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Get quantity from user_items
+	quantityReservedItem, inv_error := ic.UserItemRepo.GetQuantityFromReservedItem(itemId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Get status_id
+	statusName := "Borrowed"
+	statusID, inv_error := ic.ItemStatusRepo.GetStatusIdByName(&statusName)
+	if inv_error != nil {
+		return inv_error
+	}
+	statusIdString := statusID.String()
+
+	// Update user_items
+	inv_error = ic.UserItemRepo.ReturnItem(tx, userId, itemId, &statusIdString)
 	if inv_error != nil {
 		return inv_error
 	}

@@ -238,7 +238,7 @@ func RemoveSubjectFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 // @Param ItemReserveODT body models.ItemReserveODT true "ItemReserveODT model"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /items/reserve [GET]
+// @Router /items/reserve [post]
 func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -279,7 +279,7 @@ func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Param id path string true "item id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /items/reserve-cancel/:id [GET]
+// @Router /items/reserve-cancel/:id [post]
 func CancelReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -296,6 +296,83 @@ func CancelReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerF
 		}
 
 		inv_err := itemCtrl.CancelReserveItem(userId, &itemId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+
+// @Summary Borrow Item
+// @Description Borrow Item when logged-in
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param ItemReserveODT body models.ItemReserveODT true "ItemReserveODT model"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /items/borrow [post]
+func BorrowItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		var itemReserveODT models.ItemReserveODT
+		err := c.ShouldBindJSON(&itemReserveODT)
+		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		itemReserve := models.ItemBorrow{
+			ItemID:   itemReserveODT.ItemID,
+			UserID:   userId.String(),
+			Quantity: itemReserveODT.Quantity,
+		}
+
+		inv_err := itemCtrl.BorrowItem(itemReserve)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+
+// @Summary Return Reserve Item
+// @Description Return Reserve Item when logged-in
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "item id"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /items/return/:id [post]
+func ReturnReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		itemId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		inv_err := itemCtrl.ReturnItem(userId, &itemId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
