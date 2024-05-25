@@ -51,7 +51,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	roomRepo := &repositories.RoomRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	shelveRepo := &repositories.ShelveRepository{

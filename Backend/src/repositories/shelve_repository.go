@@ -18,8 +18,8 @@ type ShelveRepositoryI interface {
 	GetShelvesWithItems() (*[]models.ShelveWithItems, *models.INVError)
 	GetShelveByIdWithItems(id *uuid.UUID) (*models.ShelveWithItems, *models.INVError)
 	CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uuid.UUID, *models.INVError)
-	UpdateShelve(shelve *model.Shelves) *models.INVError
-	DeleteShelve(shelveId *uuid.UUID) *models.INVError
+	UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *models.INVError
+	DeleteShelve(tx *sql.Tx, shelveId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -108,7 +108,7 @@ func (sr *ShelveRepository) CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uu
 	return &uuid, nil
 }
 
-func (sr *ShelveRepository) UpdateShelve(shelve *model.Shelves) *models.INVError {
+func (sr *ShelveRepository) UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Shelves.UPDATE(
 		table.Shelves.ShelveTypeID,
@@ -119,7 +119,7 @@ func (sr *ShelveRepository) UpdateShelve(shelve *model.Shelves) *models.INVError
 	).WHERE(table.Shelves.ID.EQ(mysql.String(shelve.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(sr.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -136,7 +136,7 @@ func (sr *ShelveRepository) UpdateShelve(shelve *model.Shelves) *models.INVError
 	return nil
 }
 
-func (sr *ShelveRepository) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
+func (sr *ShelveRepository) DeleteShelve(tx *sql.Tx, shelveId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
 	return nil
 }

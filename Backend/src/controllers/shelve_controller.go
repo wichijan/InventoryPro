@@ -67,6 +67,12 @@ func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, 
 }
 
 func (sc *ShelveController) UpdateShelve(shelve *models.OwnShelve) *models.INVError {
+	tx, err := sc.ShelveRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	if shelve == nil {
 		return inv_errors.INV_BAD_REQUEST
 	}
@@ -81,7 +87,7 @@ func (sc *ShelveController) UpdateShelve(shelve *models.OwnShelve) *models.INVEr
 	newShelve.RoomID = &shelve.RoomID
 	newShelve.ShelveTypeID = &shelveType.ID
 
-	inv_errors := sc.ShelveRepo.UpdateShelve(&newShelve)
+	inv_errors := sc.ShelveRepo.UpdateShelve(tx, &newShelve)
 	if inv_errors != nil {
 		return inv_errors
 	}
@@ -90,6 +96,11 @@ func (sc *ShelveController) UpdateShelve(shelve *models.OwnShelve) *models.INVEr
 }
 
 func (sc *ShelveController) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
+	tx, err := sc.ShelveRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
 
 	return nil
 }
