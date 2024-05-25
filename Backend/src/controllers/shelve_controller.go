@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"log"
-
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -15,14 +13,14 @@ type ShelveControllerI interface {
 	GetShelveById(id *uuid.UUID) (*models.OwnShelve, *models.INVError)
 	GetShelvesWithItems() (*[]models.ShelveWithItems, *models.INVError)
 	GetShelveByIdWithItems(id *uuid.UUID) (*models.ShelveWithItems, *models.INVError)
-	CreateShelve(shelve *models.OwnShelve) (*uuid.UUID, *models.INVError)
+	CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, *models.INVError)
 	UpdateShelve(shelve *models.OwnShelve) *models.INVError
 	DeleteShelve(shelveId *uuid.UUID) *models.INVError
 }
 
 type ShelveController struct {
-	ShelveRepo repositories.ShelveRepositoryI
-	ShelveType repositories.ShelveTypeRepositoryI
+	ShelveRepo     repositories.ShelveRepositoryI
+	ShelveTypeRepo repositories.ShelveTypeRepositoryI
 }
 
 func (sc *ShelveController) GetShelves() (*[]models.OwnShelve, *models.INVError) {
@@ -33,26 +31,27 @@ func (sc *ShelveController) GetShelves() (*[]models.OwnShelve, *models.INVError)
 	return shelves, nil
 }
 
-func (sc *ShelveController) CreateShelve(shelve *models.OwnShelve) (*uuid.UUID, *models.INVError) {
-	log.Print("Creating shelve")
-	
+func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, *models.INVError) {
 	if shelve == nil {
 		return nil, inv_errors.INV_BAD_REQUEST
 	}
 
-	log.Print("Shelve not null")
-	log.Printf("ShelveType is %v ", &shelve.ShelveTypeName)
-
-	shelveType, inv_error := sc.ShelveType.GetShelveTypeByName(&shelve.ShelveTypeName)
-	if inv_error != nil {
-		return nil, inv_error
-	}
-
-	log.Print("Type name ist %v and theirs id is %v", shelve.ShelveTypeName, shelveType.ID)
-
 	var newShelve model.Shelves
-	newShelve.ShelveTypeID = &shelveType.ID
 	newShelve.RoomID = &shelve.RoomID
+
+	shelveTypeObj, inv_error := sc.ShelveTypeRepo.GetShelveTypeByName(&shelve.ShelveTypeName)
+	if inv_error == inv_errors.INV_NOT_FOUND {
+		shelveTypeId, inv_error_Create := sc.ShelveTypeRepo.CreateShelveType(&shelve.ShelveTypeName)
+		if inv_error_Create != nil {
+			return nil, inv_error
+		}
+		shelveTypeIdString := shelveTypeId.String()
+		newShelve.ShelveTypeID = &shelveTypeIdString
+	} else if inv_error != nil {
+		return nil, inv_error
+	} else {
+		newShelve.ShelveTypeID = &shelveTypeObj.ID
+	}
 
 	shelveId, inv_error := sc.ShelveRepo.CreateShelve(&newShelve)
 	if inv_error != nil {
@@ -66,25 +65,26 @@ func (sc *ShelveController) UpdateShelve(shelve *models.OwnShelve) *models.INVEr
 		return inv_errors.INV_BAD_REQUEST
 	}
 
-	shelveType, inv_error := sc.ShelveType.GetShelveTypeByName(&shelve.ShelveTypeName)
+	shelveType, inv_error := sc.ShelveTypeRepo.GetShelveTypeByName(&shelve.ShelveTypeName)
 	if inv_error != nil {
 		return inv_error
 	}
 
 	var newShelve model.Shelves
-	newShelve.ShelveTypeID = &shelveType.ID
-	newShelve.RoomID = &shelve.RoomID
 	newShelve.ID = shelve.ID
+	newShelve.RoomID = &shelve.RoomID
+	newShelve.ShelveTypeID = &shelveType.ID
 
 	inv_errors := sc.ShelveRepo.UpdateShelve(&newShelve)
 	if inv_errors != nil {
 		return inv_errors
 	}
+
 	return nil
 }
 
 func (sc *ShelveController) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
-	// TODO Needs to be implemented
+
 	return nil
 }
 

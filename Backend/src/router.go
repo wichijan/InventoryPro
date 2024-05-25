@@ -17,14 +17,15 @@ import (
 )
 
 type Controllers struct {
-	WarehouseController controllers.WarehouseControllerI
-	RoomController      controllers.RoomControllerI
-	ShelveController    controllers.ShelveControllerI
-	ItemController      controllers.ItemControllerI
-	UserController      controllers.UserControllerI
-	KeywordController   controllers.KeywordControllerI
-	UserRoleController  controllers.UserRoleControllerI
-	RoleController      controllers.RoleControllerI
+	WarehouseController  controllers.WarehouseControllerI
+	RoomController       controllers.RoomControllerI
+	ShelveController     controllers.ShelveControllerI
+	ItemController       controllers.ItemControllerI
+	UserController       controllers.UserControllerI
+	KeywordController    controllers.KeywordControllerI
+	UserRoleController   controllers.UserRoleControllerI
+	RoleController       controllers.RoleControllerI
+	ShelveTypeController controllers.ShelveTypeControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -54,6 +55,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	shelveRepo := &repositories.ShelveRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	shelveTypeRepo := &repositories.ShelveTypeRepository{
 		DatabaseManager: databaseManager,
 	}
 
@@ -114,7 +119,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			RoomRepo: roomRepo,
 		},
 		ShelveController: &controllers.ShelveController{
-			ShelveRepo: shelveRepo,
+			ShelveRepo:     shelveRepo,
+			ShelveTypeRepo: shelveTypeRepo,
 		},
 		ItemController: &controllers.ItemController{
 			ItemRepo:         itemRepo,
@@ -135,6 +141,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		RoleController: &controllers.RoleController{
 			RoleRepo: roleRepo,
+		},
+		ShelveTypeController: &controllers.ShelveTypeController{
+			ShelveTypeRepo: shelveTypeRepo,
 		},
 	}
 
@@ -170,8 +179,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/shelveswithitems", handlers.GetShelvesWithItemsHandler(controller.ShelveController))
 	publicRoutes.Handle(http.MethodGet, "/shelveswithitems/:id", handlers.GetShelveByIdWithItemsHandler(controller.ShelveController))
 	publicRoutes.Handle(http.MethodGet, "/shelves/:id", handlers.GetShelveByIdHandler(controller.ShelveController))
-	//publicRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
-	//publicRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
+
+	// ShelveType routes
+	adminRoutes.Handle(http.MethodGet, "/shelve-types", handlers.GetShelveTypesHandler(controller.ShelveTypeController))
+	adminRoutes.Handle(http.MethodPost, "/shelve-types", handlers.CreateShelveTypeHandler(controller.ShelveTypeController))
+	adminRoutes.Handle(http.MethodPut, "/shelve-types", handlers.UpdateShelveTypeHandler(controller.ShelveTypeController))
+	adminRoutes.Handle(http.MethodDelete, "/shelve-types/:id", handlers.DeleteShelveTypeHandler(controller.ShelveTypeController))
 
 	// Items routes
 	publicRoutes.Handle(http.MethodGet, "/items", handlers.GetItemsHandler(controller.ItemController))

@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -50,9 +48,6 @@ func (str *ShelveTypeRepository) GetShelveTypes() (*[]model.ShelveTypes, *models
 func (str *ShelveTypeRepository) GetShelveTypeByName(name *string) (*model.ShelveTypes, *models.INVError) {
 	var shelveType model.ShelveTypes
 
-	log.Print("Type name is ")
-	log.Print("Type name is %v ", name)
-
 	// Create the query
 	stmt := mysql.SELECT(
 		table.ShelveTypes.AllColumns,
@@ -60,11 +55,12 @@ func (str *ShelveTypeRepository) GetShelveTypeByName(name *string) (*model.Shelv
 		table.ShelveTypes,
 	).WHERE(table.ShelveTypes.TypeName.EQ(mysql.String(*name)))
 
-	log.Print(stmt.DebugSql())
-
 	// Execute the query
 	err := stmt.Query(str.DatabaseManager.GetDatabaseConnection(), &shelveType)
 	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_NOT_FOUND
+		}
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
@@ -128,6 +124,13 @@ func (str *ShelveTypeRepository) UpdateShelveType(shelveType *model.ShelveTypes)
 }
 
 func (str *ShelveTypeRepository) DeleteShelveType(shelveTypeId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
+	stmt := table.ShelveTypes.DELETE().
+		WHERE(table.ShelveTypes.ID.EQ(mysql.String(shelveTypeId.String())))
+
+	_, err := stmt.Exec(str.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
+	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/utils"
 )
 
@@ -106,7 +107,6 @@ func GetShelveByIdWithItemsHandler(shelveCtrl controllers.ShelveControllerI) gin
 	}
 }
 
-/*
 // @Summary Create Shelve
 // @Description Create Shelve
 // @Tags Shelves
@@ -119,7 +119,7 @@ func GetShelveByIdWithItemsHandler(shelveCtrl controllers.ShelveControllerI) gin
 // @Router /shelves [post]
 func CreateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var shelve models.OwnShelve
+		var shelve models.ShelveOTD
 		err := c.ShouldBindJSON(&shelve)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
@@ -135,16 +135,14 @@ func CreateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFu
 		c.JSON(http.StatusCreated, shelveId)
 	}
 }
-*/
 
-/*
 // @Summary Update shelve
 // @Description Update shelve
 // @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Param shelve body model.Rooms true "Shelve model"
-// @Success 200 {object} model.Shelves
+// @Param shelve body models.OwnShelve true "OwnShelve model"
+// @Success 200 {object} models.OwnShelve
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /shelves [put]
@@ -165,7 +163,6 @@ func UpdateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFu
 		c.JSON(http.StatusOK, shelve)
 	}
 }
-*/
 
 /*
 // @Summary Delete room
