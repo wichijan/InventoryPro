@@ -253,7 +253,7 @@ values
         'Admin',
         'Admin',
         'admin@admin.com',
-        "$2a$10$.YBgvOl80FxRGsscdG1rvOnsK2FRCvYeNdHdOzgpiZlXuU066adCy",
+        "$2a$10$vVkAH9C3viW9uFo1HiQUi.oTB.BtVb7j9JAMbgLVL99vc1P4QM9MW",
         "7209efef-5a3f-4fab-8a47-7a157c2df829"
     );
 
