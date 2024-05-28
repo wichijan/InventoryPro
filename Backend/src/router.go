@@ -204,6 +204,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodPost, "/items-upload", handlers.UploadImageForItemHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodGet, "/items-picture/:id", handlers.GetBase64ImageForItemHandler(controller.ItemController))
 	// Keyword for item
 	publicRoutes.Handle(http.MethodPost, "/items/addkeyword", handlers.AddKeywordToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removekeyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -305,7 +306,6 @@ func CancelReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerF
 	}
 }
 
-
 // @Summary Borrow Item
 // @Description Borrow Item when logged-in
 // @Tags Items
@@ -347,7 +347,6 @@ func BorrowItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
-
 // @Summary Return Reserve Item
 // @Description Return Reserve Item when logged-in
 // @Tags Items
@@ -379,5 +378,75 @@ func ReturnReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerF
 		}
 
 		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Upload Img for Item
+// @Description Upload Img for Item. Form with enctype="multipart/form-data" <input type="file" name="file" /> & <input type="hidden" name="id" /> for item id
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items-upload [post]
+func UploadImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// single file
+		form, err := c.MultipartForm()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Unable to read the form data"})
+			return
+		}
+		file := form.File["file"][0]
+		itemId, err := uuid.Parse(form.Value["id"][0])
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		log.Print("Uploading image for item: ", itemId.String())
+
+		imageId, inv_err := itemCtrl.UploadImage(&itemId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		imageName := "./../uploads/" + imageId.String() + ".jpeg"
+		c.SaveUploadedFile(file, imageName)
+
+		c.JSON(http.StatusOK, imageName)
+	}
+}
+
+// @Summary Upload Img for Item
+// @Description Upload Img for Item. Form with enctype="multipart/form-data" <input type="file" name="file" /> & <input type="hidden" name="id" /> for item id
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "item id"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items-picture/:id [get]
+func GetBase64ImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// single file
+		id, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+		log.Print("ID: ", id.String())
+
+		imageId, inv_err := itemCtrl.GetImageIdFromItem(&id)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		imageName := "./../uploads/" + imageId.String() + ".jpeg"
+		log.Print("Reading image: ", imageName)
+
+		c.JSON(http.StatusOK, gin.H{"ImagePath": imageName})
 	}
 }

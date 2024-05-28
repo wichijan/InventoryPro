@@ -95,3 +95,7 @@ type ItemBorrow struct {
 	StatusID   string
 	BorrowDate time.Time
 }
+
+type ItemPicture struct {
+	PictureId string `alias:"items.picture"`
+}

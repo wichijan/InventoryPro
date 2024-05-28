@@ -36,5 +36,3 @@ __debug_bin*
 # internal only
 first-install-db.sh
 ideen.md
-
-../uploads/*

@@ -25,6 +25,9 @@ type ItemControllerI interface {
 
 	BorrowItem(itemReserve models.ItemBorrow) *models.INVError
 	ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
+
+	UploadImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	GetImageIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 }
 
 type ItemController struct {
@@ -438,4 +441,32 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 	}
 
 	return nil
+}
+
+func (ic *ItemController) UploadImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+	tx, err := ic.UserItemRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	pictureId, inv_error := ic.ItemRepo.StoreItemPicture(tx, itemId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return pictureId, nil
+}
+
+func (ic *ItemController) GetImageIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+	pictureId, inv_error := ic.ItemRepo.GetPictureIdFromItem(itemId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	return pictureId, nil
 }
