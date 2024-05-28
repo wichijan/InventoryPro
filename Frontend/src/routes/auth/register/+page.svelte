@@ -4,6 +4,8 @@
   import Swal from "sweetalert2";
   import { fly } from "svelte/transition";
 
+  export let data;
+
   /*
      "email": "string",
   "firstname": "string",
@@ -283,13 +285,25 @@
               Usertyp
             </label>
             <div class="mt-1 rounded-md shadow-sm">
-              <input
+              <!-- <input
                 bind:value={usertypename}
                 type="text"
                 class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
                 placeholder="Usertyp"
                 required
-              />
+              /> -->
+              <!--Dropdown menu for user-types-->
+              <select
+                bind:value={usertypename}
+                class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
+                required
+              >
+                {#await data.userTypes then types}
+                  {#each types as type}
+                    <option value={type.TypeName}>{type.TypeName}</option>
+                  {/each}
+                {/await}
+              </select>
             </div>
           </div>
 

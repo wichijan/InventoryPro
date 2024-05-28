@@ -4,10 +4,13 @@
 
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
+  import { browser } from "$app/environment";
 
   export let data;
 
   const shelvesItems: any | unknown[] = data.shelvesItems;
+
+  let warehouseName: string = "";
 
   let allItems: any[] = [];
   let itemsCopy = allItems;
@@ -39,6 +42,7 @@
         latestThreeItems = [...latestThreeItems, item];
       }
     });
+    browser ? (warehouseName = localStorage.getItem("warehouse")) : "";
   });
 
   async function getRoomName(roomID: number) {
@@ -70,6 +74,20 @@
     });
   }
 </script>
+
+<div class="w-full bg-tertiary rounded ml-10 mt-5 px-2 py-2 flex">
+  <div class="text-lg">
+    Zeigt items für das Warehouse: <b>{warehouseName}</b>
+  </div>
+  <button
+    class="bg-[#d5bdaf] hover:bg-d6ccc2 hover:text-white hover:shadow-lg duration-500 text-black rounded-md ml-3 px-1 "
+    on:click={() => {
+      goto("/settings");
+    }}
+  >
+    Warehouse ändern
+  </button>
+</div>
 
 {#if shelvesItems.length > 0}
   <div class="flex min-h-screen items-center flex-col">

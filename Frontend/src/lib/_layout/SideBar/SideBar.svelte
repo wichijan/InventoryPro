@@ -108,7 +108,7 @@
 
   function getActive() {
     sidebarItems = sidebarItems.map((item) => {
-      item.active = item.href.includes($page.url.pathname);
+      item.active = $page.url.pathname.includes(item.href) && item.href !== "/";
       return item;
     });
     sidebarItems = sidebarItems;

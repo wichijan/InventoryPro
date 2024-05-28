@@ -55,7 +55,7 @@
               >
             </li>
             <li>
-              <a href="#" class="hover:underline">TBA</a>
+              <a href="/" class="hover:underline">TBA</a>
             </li>
           </ul>
         </div>
