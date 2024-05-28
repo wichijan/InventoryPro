@@ -19,6 +19,10 @@ type ItemRepositoryI interface {
 	UpdateItem(tx *sql.Tx, item *model.Items) *models.INVError
 	DeleteItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 
+	StoreItemPicture(tx *sql.Tx, itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	GetPictureIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
+
 	managers.DatabaseManagerI
 }
 
@@ -198,5 +202,89 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 
 func (itr *ItemRepository) DeleteItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
+	return nil
+}
+
+func (itr *ItemRepository) StoreItemPicture(tx *sql.Tx, itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+	uuid := uuid.New()
+
+	// Create the insert statement
+	updatePictureQuery := table.Items.UPDATE(
+		table.Items.Picture,
+	).SET(
+		uuid.String(),
+	).WHERE(table.Items.ID.EQ(mysql.String(itemId.String())))
+
+	// Execute the query
+	rows, err := updatePictureQuery.Exec(tx)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return nil, inv_errors.INV_NOT_FOUND
+	}
+
+	return &uuid, nil
+}
+
+func (itr *ItemRepository) GetPictureIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+	var picture models.ItemPicture
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Items.Picture,
+	).FROM(
+		table.Items,
+	).WHERE(
+		table.Items.ID.EQ(mysql.String(itemId.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(itr.GetDatabaseConnection(), &picture)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if picture.PictureId == "" {
+		return nil, inv_errors.INV_NOT_FOUND
+	}
+
+	pictureId, err := uuid.Parse(picture.PictureId)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &pictureId, nil
+}
+
+func (itr *ItemRepository) RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
+	// Create the update statement
+	updatePictureQuery := table.Items.UPDATE(
+		table.Items.Picture,
+	).SET(
+		"",
+	).WHERE(table.Items.ID.EQ(mysql.String(itemId.String())))
+
+	// Execute the query
+	rows, err := updatePictureQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND
+	}
+
 	return nil
 }

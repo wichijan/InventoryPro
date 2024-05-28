@@ -82,6 +82,11 @@ definitions:
       errorMessage:
         type: string
     type: object
+  models.ItemPicturePath:
+    properties:
+      path:
+        type: string
+    type: object
   models.ItemReserveODT:
     properties:
       itemId:
@@ -538,6 +543,83 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Update Item
+      tags:
+      - Items
+  /items-picture:
+    post:
+      consumes:
+      - application/json
+      description: Upload Img for Item. Form with enctype="multipart/form-data" <input
+        type="file" name="file" /> & <input type="hidden" name="id" /> for item id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Upload Img for Item
+      tags:
+      - Items
+  /items-picture/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Picture from item and replace with ""
+      parameters:
+      - description: item id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Img for Item
+      tags:
+      - Items
+    get:
+      consumes:
+      - application/json
+      description: Get ImagePath For Item
+      parameters:
+      - description: item id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ItemPicturePath'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get ImagePath For Item
       tags:
       - Items
   /items/:id:
