@@ -29,7 +29,16 @@ func (rc *RoleController) CreateRole(roleName *string) (*uuid.UUID, *models.INVE
 	}
 	defer tx.Rollback()
 
-	return rc.RoleRepo.CreateRole(tx, roleName)
+	roleId, inv_error := rc.RoleRepo.CreateRole(tx, roleName)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return roleId, nil
 }
 
 func (rc *RoleController) UpdateRole(role *model.Roles) *models.INVError {
@@ -41,6 +50,10 @@ func (rc *RoleController) UpdateRole(role *model.Roles) *models.INVError {
 
 	if *role.RoleName == "Admin" {
 		return inv_errors.INV_CONFLICT
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return rc.RoleRepo.UpdateRole(tx, role)

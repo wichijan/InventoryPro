@@ -38,6 +38,11 @@ func (stc *ShelveTypeController) CreateShelveType(shelveTypeName *string) (*uuid
 	if inv_error != nil {
 		return nil, inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return shelveTypeId, nil
 }
 
@@ -52,6 +57,11 @@ func (stc *ShelveTypeController) UpdateShelveType(shelveType *model.ShelveTypes)
 	if inv_error != nil {
 		return inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 
@@ -66,5 +76,10 @@ func (stc *ShelveTypeController) DeleteShelveType(shelveTypeId *uuid.UUID) *mode
 	if inv_error != nil {
 		return inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	
 	return nil
 }

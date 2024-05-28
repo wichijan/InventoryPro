@@ -47,6 +47,11 @@ func (sc *SubjectController) CreateSubject(subject *models.SubjectODT) (*uuid.UU
 	if inv_error != nil {
 		return nil, inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return subjectId, nil
 }
 
@@ -61,6 +66,11 @@ func (sc *SubjectController) UpdateSubject(subject *model.Subjects) *models.INVE
 	if inv_error != nil {
 		return inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 
@@ -75,5 +85,10 @@ func (sc *SubjectController) DeleteSubject(subjectId *uuid.UUID) *models.INVErro
 	if inv_error != nil {
 		return inv_error
 	}
+	
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }

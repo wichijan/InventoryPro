@@ -41,10 +41,15 @@ func (rc *RoomController) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INV
 		return nil, inv_errors.INV_BAD_REQUEST
 	}
 
-	roomId, inv_errors := rc.RoomRepo.CreateRoom(tx, room)
-	if inv_errors != nil {
-		return nil, inv_errors
+	roomId, inv_error := rc.RoomRepo.CreateRoom(tx, room)
+	if inv_error != nil {
+		return nil, inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return roomId, nil
 }
 
@@ -55,10 +60,15 @@ func (rc *RoomController) UpdateRoom(room *model.Rooms) *models.INVError {
 	}
 	defer tx.Rollback()
 
-	inv_errors := rc.RoomRepo.UpdateRoom(tx, room)
-	if inv_errors != nil {
-		return inv_errors
+	inv_error := rc.RoomRepo.UpdateRoom(tx, room)
+	if inv_error != nil {
+		return inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 
@@ -69,6 +79,10 @@ func (rc *RoomController) DeleteRoom(roomId *uuid.UUID) *models.INVError {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
 	defer tx.Rollback()
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
 
 	return nil
 }

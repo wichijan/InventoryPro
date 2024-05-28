@@ -93,6 +93,10 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		return nil, inv_errors.INV_UPSTREAM_ERROR
 	}
 
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return &models.LoginResponse{
 		User:         userForResponse,
 		Token:        token,

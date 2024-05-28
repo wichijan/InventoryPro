@@ -36,15 +36,20 @@ func (mc *WarehouseController) CreateWarehouse(warehouse *model.Warehouses) (*uu
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 	defer tx.Rollback()
-	
+
 	if warehouse == nil {
 		return nil, inv_errors.INV_BAD_REQUEST
 	}
 
-	warehouseId, inv_errors := mc.WarehouseRepo.CreateWarehouse(tx, warehouse)
-	if inv_errors != nil {
-		return nil, inv_errors
+	warehouseId, inv_error := mc.WarehouseRepo.CreateWarehouse(tx, warehouse)
+	if inv_error != nil {
+		return nil, inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return warehouseId, nil
 }
 
@@ -54,7 +59,7 @@ func (mc *WarehouseController) UpdateWarehouse(warehouse *model.Warehouses) *mod
 		return inv_errors.INV_INTERNAL_ERROR
 	}
 	defer tx.Rollback()
-	
+
 	inv_errors := mc.WarehouseRepo.UpdateWarehouse(tx, warehouse)
 	if inv_errors != nil {
 		return inv_errors

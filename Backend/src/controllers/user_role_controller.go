@@ -23,7 +23,16 @@ func (urc *UserRoleController) CreateUserRole(user_role *model.UserRoles) *model
 	}
 	defer tx.Rollback()
 
-	return urc.UserRoleRepo.CreateUserRole(tx, user_role)
+	inv_error := urc.UserRoleRepo.CreateUserRole(tx, user_role)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return nil
 }
 
 func (urc *UserRoleController) DeleteUserRole(userRole *model.UserRoles) *models.INVError {
@@ -33,5 +42,14 @@ func (urc *UserRoleController) DeleteUserRole(userRole *model.UserRoles) *models
 	}
 	defer tx.Rollback()
 
-	return urc.UserRoleRepo.DeleteUserRole(tx, userRole)
+	inv_error := urc.UserRoleRepo.DeleteUserRole(tx, userRole)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return nil
 }
