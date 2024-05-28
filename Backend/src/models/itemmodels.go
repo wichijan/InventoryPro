@@ -99,3 +99,7 @@ type ItemBorrow struct {
 type ItemPicture struct {
 	PictureId string `alias:"items.picture"`
 }
+
+type ItemPicturePath struct {
+	Path string
+}

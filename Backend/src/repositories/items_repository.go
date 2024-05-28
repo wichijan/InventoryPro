@@ -21,6 +21,7 @@ type ItemRepositoryI interface {
 
 	StoreItemPicture(tx *sql.Tx, itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetPictureIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -260,4 +261,30 @@ func (itr *ItemRepository) GetPictureIdFromItem(itemId *uuid.UUID) (*uuid.UUID, 
 	}
 
 	return &pictureId, nil
+}
+
+func (itr *ItemRepository) RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
+	// Create the update statement
+	updatePictureQuery := table.Items.UPDATE(
+		table.Items.Picture,
+	).SET(
+		"",
+	).WHERE(table.Items.ID.EQ(mysql.String(itemId.String())))
+
+	// Execute the query
+	rows, err := updatePictureQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND
+	}
+
+	return nil
 }

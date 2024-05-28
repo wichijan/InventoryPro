@@ -389,7 +389,7 @@ func ReturnReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerF
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items-upload [post]
+// @Router /items-picture [post]
 func UploadImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// single file
@@ -419,17 +419,17 @@ func UploadImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 	}
 }
 
-// @Summary Upload Img for Item
-// @Description Upload Img for Item. Form with enctype="multipart/form-data" <input type="file" name="file" /> & <input type="hidden" name="id" /> for item id
+// @Summary Get ImagePath For Item
+// @Description Get ImagePath For Item
 // @Tags Items
 // @Accept  json
 // @Produce  json
 // @Param id path string true "item id"
-// @Success 200
+// @Success 200 {object} models.ItemPicturePath
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items-picture/:id [get]
-func GetBase64ImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+func GetImagePathForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// single file
 		id, err := uuid.Parse(c.Param("id"))
@@ -447,6 +447,36 @@ func GetBase64ImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 		imageName := "./../uploads/" + imageId.String() + ".jpeg"
 		log.Print("Reading image: ", imageName)
 
-		c.JSON(http.StatusOK, gin.H{"ImagePath": imageName})
+		c.JSON(http.StatusOK, models.ItemPicturePath{Path: imageName})
+	}
+}
+
+// @Summary Delete Img for Item
+// @Description Delete Picture from item and replace with ""
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "item id"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items-picture/:id [delete]
+func RemoveImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// single file
+		id, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+		log.Print("ID: ", id.String())
+
+		inv_err := itemCtrl.RemoveImageIdFromItem(&id)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
 	}
 }
