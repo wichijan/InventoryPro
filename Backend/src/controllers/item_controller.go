@@ -79,6 +79,10 @@ func (ic *ItemController) CreateItem(item *models.ItemWithStatus) (*uuid.UUID, *
 		return nil, inv_error
 	}
 
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return id, nil
 }
 
@@ -103,6 +107,10 @@ func (ic *ItemController) UpdateItem(item *models.ItemWithStatus) *models.INVErr
 	inv_error := ic.ItemRepo.UpdateItem(tx, &pureItem)
 	if inv_error != nil {
 		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return nil
@@ -135,6 +143,10 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 		return inv_error
 	}
 
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 
@@ -158,6 +170,10 @@ func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywo
 	inv_error = ic.ItemKeywordRepo.DeleteKeywordForItem(tx, &itemKeywordWithID)
 	if inv_error != nil {
 		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return nil
@@ -190,6 +206,10 @@ func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectNam
 		return inv_error
 	}
 
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 
@@ -213,6 +233,10 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 	inv_error = ic.ItemSubjectRepo.DeleteSubjectForItem(tx, &itemSubjectWithID)
 	if inv_error != nil {
 		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return nil
@@ -262,6 +286,10 @@ func (ic *ItemController) ReserveItem(itemReserve models.ItemReserve) *models.IN
 		return inv_error
 	}
 
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 
@@ -304,6 +332,10 @@ func (ic *ItemController) CancelReserveItem(userId *uuid.UUID, itemId *uuid.UUID
 	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(tx, &itemIdStr, &newQuantityInShelve)
 	if inv_error != nil {
 		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return nil
@@ -353,6 +385,10 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrow) *models.INVE
 		return inv_error
 	}
 
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 
@@ -395,6 +431,10 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(tx, &itemIdStr, &newQuantityInShelve)
 	if inv_error != nil {
 		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return nil

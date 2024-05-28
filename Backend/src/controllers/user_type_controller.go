@@ -30,7 +30,16 @@ func (utc *UserTypeController) CreateUserType(type_name *string) (*uuid.UUID, *m
 	}
 	defer tx.Rollback()
 
-	return utc.UserTypeRepo.CreateUserType(tx, type_name)
+	userTypeId, inv_error := utc.UserTypeRepo.CreateUserType(tx, type_name)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return userTypeId, nil
 }
 
 func (utc *UserTypeController) UpdateUserType(userType *model.UserTypes) *models.INVError {
@@ -40,7 +49,16 @@ func (utc *UserTypeController) UpdateUserType(userType *model.UserTypes) *models
 	}
 	defer tx.Rollback()
 
-	return utc.UserTypeRepo.UpdateUserType(tx, userType)
+	inv_error := utc.UserTypeRepo.UpdateUserType(tx, userType)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return nil
 }
 
 func (utc *UserTypeController) DeleteUserType(userTypeId *uuid.UUID) *models.INVError {
@@ -50,5 +68,14 @@ func (utc *UserTypeController) DeleteUserType(userTypeId *uuid.UUID) *models.INV
 	}
 	defer tx.Rollback()
 
-	return utc.UserTypeRepo.DeleteUserType(tx, userTypeId)
+	inv_error := utc.UserTypeRepo.DeleteUserType(tx, userTypeId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return nil
 }

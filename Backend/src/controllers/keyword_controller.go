@@ -40,6 +40,10 @@ func (kc *KeywordController) CreateKeyword(keywordName *string) (*uuid.UUID, *mo
 		return nil, inv_error
 	}
 
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return keywordId, nil
 }
 
@@ -55,6 +59,10 @@ func (kc *KeywordController) UpdateKeyword(keyword *model.Keywords) *models.INVE
 		return inv_error
 	}
 
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 
@@ -68,6 +76,10 @@ func (kc *KeywordController) DeleteKeyword(keywordId *uuid.UUID) *models.INVErro
 	inv_error := kc.KeywordRepo.DeleteKeyword(tx, keywordId)
 	if inv_error != nil {
 		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
 	return nil

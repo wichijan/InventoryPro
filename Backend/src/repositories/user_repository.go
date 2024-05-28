@@ -76,7 +76,7 @@ func (ur *UserRepository) GetUserByUsername(username string) (*models.UserWithTy
 	)
 	err := stmt.Query(ur.GetDatabaseConnection(), &user)
 	if err != nil {
-		if err.Error() == "jet: sql: no rows in result set" {
+		if err.Error() == "qrm: no rows in result set" {
 			return nil, inv_errors.INV_USER_NOT_FOUND
 		}
 		return nil, inv_errors.INV_INTERNAL_ERROR
@@ -109,10 +109,10 @@ func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVEr
 	)
 
 	_, err := stmt.Exec(tx)
-
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
+	
 	return nil
 }
 
