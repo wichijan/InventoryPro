@@ -38,24 +38,24 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.Items.ID,
 		table.Items.Name,
 		table.Items.Description,
+		table.Items.RegularShelfID,
 		table.Items.ClassOne,
 		table.Items.ClassTwo,
 		table.Items.ClassThree,
 		table.Items.ClassFour,
 		table.Items.Damaged,
-		table.Items.DamagedDescription,
-		table.ItemsInShelve.Quantity,
 		table.Items.Picture,
-		table.ItemStatus.StatusName,
+		table.Items.HintText,
+		table.Items.DamagedDescription,
+		table.ItemsInShelf.Quantity,
 		table.ItemSubjects.AllColumns,
 		table.KeywordsForItems.AllColumns,
 		table.Users.ID,
 		table.Users.Username,
 	).FROM(
 		table.Items.
-			LEFT_JOIN(table.ItemsInShelve, table.ItemsInShelve.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.UserItems.StatusID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
@@ -82,24 +82,22 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 		table.Items.ID,
 		table.Items.Name,
 		table.Items.Description,
+		table.Items.RegularShelfID,
 		table.Items.ClassOne,
 		table.Items.ClassTwo,
 		table.Items.ClassThree,
 		table.Items.ClassFour,
 		table.Items.Damaged,
-		table.Items.DamagedDescription,
-		table.ItemsInShelve.Quantity,
 		table.Items.Picture,
-		table.ItemStatus.StatusName,
-		table.ItemSubjects.AllColumns,
-		table.KeywordsForItems.AllColumns,
+		table.Items.HintText,
+		table.Items.DamagedDescription,
+		table.ItemsInShelf.Quantity,
 		table.Users.ID,
 		table.Users.Username,
 	).FROM(
 		table.Items.
-			LEFT_JOIN(table.ItemsInShelve, table.ItemsInShelve.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.ItemStatus, table.ItemStatus.ID.EQ(table.UserItems.StatusID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
@@ -130,6 +128,10 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 		table.Items.ClassFour,
 		table.Items.Damaged,
 		table.Items.DamagedDescription,
+		table.Items.Picture,
+		table.Items.HintText,
+		table.Items.ItemTypeID,
+		table.Items.RegularShelfID,
 	).VALUES(
 		uuid.String(),
 		item.Name,
@@ -140,6 +142,10 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 		item.ClassFour,
 		item.Damaged,
 		item.DamagedDescription,
+		item.Picture,
+		item.HintText,
+		item.ItemTypeID,
+		item.RegularShelfID,
 	)
 
 	// Execute the query
@@ -160,7 +166,7 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 	return &uuid, nil
 }
 
-func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INVError {
+func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *models.ItemUpdate) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Items.UPDATE(
 		table.Items.Name,
@@ -171,6 +177,9 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 		table.Items.ClassFour,
 		table.Items.Damaged,
 		table.Items.DamagedDescription,
+		table.Items.Picture,
+		table.Items.HintText,
+		table.Items.RegularShelfID,
 	).SET(
 		item.Name,
 		item.Description,
@@ -179,7 +188,10 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 		item.ClassThree,
 		item.ClassFour,
 		item.Damaged,
-		item.DamagedDescription,
+		item.DamagedDesc,
+		item.Picture,
+		item.HintText,
+		item.RegularShelfId,
 	).WHERE(table.Items.ID.EQ(mysql.String(item.ID)))
 
 	// Execute the query

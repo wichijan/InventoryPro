@@ -7,7 +7,6 @@
 
 package model
 
-type ItemStatus struct {
-	ID         string `sql:"primary_key"`
-	StatusName *string
+type SingleObject struct {
+	ItemID string `sql:"primary_key"`
 }

@@ -7,7 +7,9 @@
 
 package model
 
-type Shelves struct {
-	ID     string `sql:"primary_key"`
-	RoomID *string
+type QuickShelves struct {
+	QuickShelfID string `sql:"primary_key"`
+	ItemID       *string
+	UserID       *string
+	RoomID       *string
 }

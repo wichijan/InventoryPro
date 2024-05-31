@@ -7,7 +7,10 @@
 
 package model
 
-type Shelves struct {
-	ID     string `sql:"primary_key"`
-	RoomID *string
+type Books struct {
+	ItemID    string `sql:"primary_key"`
+	Isbn      string
+	Author    *string
+	Publisher *string
+	Edition   *string
 }

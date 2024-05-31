@@ -25,6 +25,10 @@ type UserWithTypeName struct {
 	JobTitle     *string `alias:"users.job_title"`
 	PhoneNumber  *string `alias:"users.phone_number"`
 	UserTypeName *string `alias:"user_types.type_name"`
+	ProfilePicture *string `alias:"users.profile_picture"`
+	RegistrationTime *string `alias:"users.registration_time"`
+	RegistrationAccepted *bool `alias:"users.registration_accepted"`
+	IsActive     *bool   `alias:"users.is_active"`
 }
 
 type LoginRequest struct {

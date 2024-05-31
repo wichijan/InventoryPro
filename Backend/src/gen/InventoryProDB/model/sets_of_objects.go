@@ -7,7 +7,10 @@
 
 package model
 
-type Shelves struct {
-	ID     string `sql:"primary_key"`
-	RoomID *string
+type SetsOfObjects struct {
+	ItemID        string `sql:"primary_key"`
+	TotalObjects  *int32
+	UsefulObjects *int32
+	BrokenObjects *int32
+	LostObjects   *int32
 }

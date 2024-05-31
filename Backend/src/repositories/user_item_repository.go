@@ -12,11 +12,8 @@ import (
 )
 
 type UserItemRepositoryI interface {
-	ReserveItem(tx *sql.Tx, itemReserve *models.ItemReserve) *models.INVError
-	DeleteReserveItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, statusId *string) *models.INVError
-
 	BorrowItem(tx *sql.Tx, itemBorrow *models.ItemBorrow) *models.INVError
-	ReturnItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, statusId *string) *models.INVError
+	ReturnItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
 
 	GetQuantityFromReservedItem(itemId *uuid.UUID) (*int32, *models.INVError)
 
@@ -27,47 +24,6 @@ type UserItemRepository struct {
 	managers.DatabaseManagerI
 }
 
-func (uir *UserItemRepository) ReserveItem(tx *sql.Tx, itemReserve *models.ItemReserve) *models.INVError {
-	// Create the insert statement
-	insertQuery := table.UserItems.INSERT(
-		table.UserItems.UserID,
-		table.UserItems.ItemID,
-		table.UserItems.ReservedDate,
-		table.UserItems.Quantity,
-		table.UserItems.StatusID,
-	).VALUES(
-		itemReserve.UserID,
-		itemReserve.ItemID,
-		itemReserve.ReserveDate,
-		itemReserve.Quantity,
-		itemReserve.StatusID,
-	)
-
-	// Execute the query
-	_, err := insertQuery.Exec(tx)
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	return nil
-}
-
-func (uir *UserItemRepository) DeleteReserveItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, statusId *string) *models.INVError {
-	// Create the delete statement
-	deleteQuery := table.UserItems.DELETE().WHERE(
-		table.UserItems.UserID.EQ(mysql.String(userId.String())).
-			AND(table.UserItems.ItemID.EQ(mysql.String(itemId.String())).
-				AND(table.UserItems.StatusID.EQ(mysql.String(*statusId)))),
-	)
-
-	// Execute the query
-	_, err := deleteQuery.Exec(tx)
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	return nil
-}
 
 func (uir *UserItemRepository) GetQuantityFromReservedItem(itemId *uuid.UUID) (*int32, *models.INVError) {
 	var quantity models.GetQuantityReserved
@@ -98,15 +54,12 @@ func (uir *UserItemRepository) BorrowItem(tx *sql.Tx, itemBorrow *models.ItemBor
 	insertQuery := table.UserItems.INSERT(
 		table.UserItems.UserID,
 		table.UserItems.ItemID,
-		table.UserItems.BorrowedDate,
 		table.UserItems.Quantity,
-		table.UserItems.StatusID,
 	).VALUES(
 		itemBorrow.UserID,
 		itemBorrow.ItemID,
-		itemBorrow.BorrowDate,
+		itemBorrow.TransactionDate,
 		itemBorrow.Quantity,
-		itemBorrow.StatusID,
 	)
 
 	// Execute the query
@@ -118,12 +71,11 @@ func (uir *UserItemRepository) BorrowItem(tx *sql.Tx, itemBorrow *models.ItemBor
 	return nil
 }
 
-func (uir *UserItemRepository) ReturnItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, statusId *string) *models.INVError {
+func (uir *UserItemRepository) ReturnItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID) *models.INVError {
 	// Create the delete statement
 	deleteQuery := table.UserItems.DELETE().WHERE(
 		table.UserItems.UserID.EQ(mysql.String(userId.String())).
-			AND(table.UserItems.ItemID.EQ(mysql.String(itemId.String())).
-				AND(table.UserItems.StatusID.EQ(mysql.String(*statusId)))),
+			AND(table.UserItems.ItemID.EQ(mysql.String(itemId.String()))),
 	)
 
 	// Execute the query

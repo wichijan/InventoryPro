@@ -7,8 +7,8 @@
 
 package model
 
-type ItemsInShelve struct {
+type ItemsInShelf struct {
 	ItemID   string `sql:"primary_key"`
-	ShelveID string `sql:"primary_key"`
+	ShelfID  string `sql:"primary_key"`
 	Quantity *int32
 }

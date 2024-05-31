@@ -18,8 +18,10 @@ type itemsTable struct {
 
 	// Columns
 	ID                 mysql.ColumnString
+	ItemTypeID         mysql.ColumnString
 	Name               mysql.ColumnString
 	Description        mysql.ColumnString
+	RegularShelfID     mysql.ColumnString
 	ClassOne           mysql.ColumnBool
 	ClassTwo           mysql.ColumnBool
 	ClassThree         mysql.ColumnBool
@@ -27,6 +29,7 @@ type itemsTable struct {
 	Damaged            mysql.ColumnBool
 	DamagedDescription mysql.ColumnString
 	Picture            mysql.ColumnString
+	HintText           mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -68,8 +71,10 @@ func newItemsTable(schemaName, tableName, alias string) *ItemsTable {
 func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 	var (
 		IDColumn                 = mysql.StringColumn("id")
+		ItemTypeIDColumn         = mysql.StringColumn("item_type_id")
 		NameColumn               = mysql.StringColumn("name")
 		DescriptionColumn        = mysql.StringColumn("description")
+		RegularShelfIDColumn     = mysql.StringColumn("regular_shelf_id")
 		ClassOneColumn           = mysql.BoolColumn("class_one")
 		ClassTwoColumn           = mysql.BoolColumn("class_two")
 		ClassThreeColumn         = mysql.BoolColumn("class_three")
@@ -77,8 +82,9 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 		DamagedColumn            = mysql.BoolColumn("damaged")
 		DamagedDescriptionColumn = mysql.StringColumn("damaged_description")
 		PictureColumn            = mysql.StringColumn("picture")
-		allColumns               = mysql.ColumnList{IDColumn, NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn}
-		mutableColumns           = mysql.ColumnList{NameColumn, DescriptionColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn}
+		HintTextColumn           = mysql.StringColumn("hint_text")
+		allColumns               = mysql.ColumnList{IDColumn, ItemTypeIDColumn, NameColumn, DescriptionColumn, RegularShelfIDColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn, HintTextColumn}
+		mutableColumns           = mysql.ColumnList{ItemTypeIDColumn, NameColumn, DescriptionColumn, RegularShelfIDColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn, HintTextColumn}
 	)
 
 	return itemsTable{
@@ -86,8 +92,10 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 
 		//Columns
 		ID:                 IDColumn,
+		ItemTypeID:         ItemTypeIDColumn,
 		Name:               NameColumn,
 		Description:        DescriptionColumn,
+		RegularShelfID:     RegularShelfIDColumn,
 		ClassOne:           ClassOneColumn,
 		ClassTwo:           ClassTwoColumn,
 		ClassThree:         ClassThreeColumn,
@@ -95,6 +103,7 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 		Damaged:            DamagedColumn,
 		DamagedDescription: DamagedDescriptionColumn,
 		Picture:            PictureColumn,
+		HintText:           HintTextColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

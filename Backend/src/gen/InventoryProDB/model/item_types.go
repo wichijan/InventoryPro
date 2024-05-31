@@ -7,7 +7,7 @@
 
 package model
 
-type Shelves struct {
-	ID     string `sql:"primary_key"`
-	RoomID *string
+type ItemTypes struct {
+	ID       string `sql:"primary_key"`
+	TypeName *string
 }

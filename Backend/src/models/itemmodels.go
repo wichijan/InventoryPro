@@ -6,10 +6,13 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 )
 
-type ItemWithStatus struct {
+type ItemWThin struct {
 	ID                 string `alias:"items.id" sql:"primary_key"`
 	Name               string `alias:"items.name"`
 	Description        string `alias:"items.description"`
+	ItemTypeName 	   string `alias:"item_types.type_name"`
+	RegularShelfId  string `alias:"items_in_shelf.shelf_id"`
+	QuantityInShelf   int32  `alias:"items_in_shelf.quantity"`
 	ClassOne           bool   `alias:"items.class_one"`
 	ClassTwo           bool   `alias:"items.class_two"`
 	ClassThree         bool   `alias:"items.class_three"`
@@ -17,7 +20,8 @@ type ItemWithStatus struct {
 	Damaged            bool   `alias:"items.damaged"`
 	DamagedDesc        string `alias:"items.damaged_description"`
 	Picture            string `alias:"items.picture"`
-	Status             string `alias:"item_status.status_name"`
+	HintText 		 string `alias:"items.hint_text"`
+	
 	BorrowedByUserID   string `alias:"users.id"`
 	BorrowedByUserName string `alias:"users.username"`
 }
@@ -26,15 +30,18 @@ type ItemWithEverything struct {
 	ID                 string `alias:"items.id" sql:"primary_key"`
 	Name               string `alias:"items.name"`
 	Description        string `alias:"items.description"`
+	ItemTypeName 	   string `alias:"item_types.type_name"`
+	RegularShelfId  string `alias:"items_in_shelf.shelf_id"`
+	QuantityInShelf   int32  `alias:"items_in_shelf.quantity"`
 	ClassOne           bool   `alias:"items.class_one"`
 	ClassTwo           bool   `alias:"items.class_two"`
 	ClassThree         bool   `alias:"items.class_three"`
 	ClassFour          bool   `alias:"items.class_four"`
 	Damaged            bool   `alias:"items.damaged"`
 	DamagedDesc        string `alias:"items.damaged_description"`
-	QuantityInShelve   int32  `alias:"items_in_shelve.quantity"`
 	Picture            string `alias:"items.picture"`
-	Status             string `alias:"item_status.status_name"`
+	HintText 		 string `alias:"items.hint_text"`
+
 	BorrowedByUserID   string `alias:"users.id"`
 	BorrowedByUserName string `alias:"users.username"`
 
@@ -45,6 +52,37 @@ type ItemWithEverything struct {
 	Subject []struct {
 		model.ItemSubjects
 	}
+}
+
+type ItemCreate struct {
+	Name               string `alias:"items.name"`
+	Description        string `alias:"items.description"`
+	ItemTypeName 	   string `alias:"item_types.type_name"`
+	RegularShelfId  string `alias:"items_in_shelf.shelf_id"`
+	QuantityInShelf   int32  `alias:"items_in_shelf.quantity"`
+	ClassOne           bool   `alias:"items.class_one"`
+	ClassTwo           bool   `alias:"items.class_two"`
+	ClassThree         bool   `alias:"items.class_three"`
+	ClassFour          bool   `alias:"items.class_four"`
+	Damaged            bool   `alias:"items.damaged"`
+	DamagedDesc        string `alias:"items.damaged_description"`
+	Picture            string `alias:"items.picture"`
+	HintText 		 string `alias:"items.hint_text"`
+}
+type ItemUpdate struct {
+	ID                 string `alias:"items.id"`
+	Name               string `alias:"items.name"`
+	Description        string `alias:"items.description"`
+	RegularShelfId  string `alias:"items_in_shelf.shelf_id"`
+	QuantityInShelf   int32  `alias:"items_in_shelf.quantity"`
+	ClassOne           bool   `alias:"items.class_one"`
+	ClassTwo           bool   `alias:"items.class_two"`
+	ClassThree         bool   `alias:"items.class_three"`
+	ClassFour          bool   `alias:"items.class_four"`
+	Damaged            bool   `alias:"items.damaged"`
+	DamagedDesc        string `alias:"items.damaged_description"`
+	Picture            string `alias:"items.picture"`
+	HintText 		 string `alias:"items.hint_text"`
 }
 
 type ItemWithKeyword struct {
@@ -80,20 +118,11 @@ type ItemReserveODT struct {
 	Quantity int32  `json:"quantity"`
 }
 
-type ItemReserve struct {
-	ItemID      string
-	UserID      string
-	Quantity    int32
-	StatusID    string
-	ReserveDate time.Time
-}
-
 type ItemBorrow struct {
 	ItemID     string
 	UserID     string
 	Quantity   int32
-	StatusID   string
-	BorrowDate time.Time
+	TransactionDate time.Time
 }
 
 type ItemPicture struct {
@@ -102,4 +131,8 @@ type ItemPicture struct {
 
 type ItemPicturePath struct {
 	Path string
+}
+
+type ItemTypes struct {
+	TypeName string `alias:"item_types.type_name"`
 }

@@ -58,17 +58,18 @@ CREATE TABLE books(
 );
 
 Create table single_object (
-    object_id VARCHAR(36),
-    PRIMARY KEY (object_id),
-    FOREIGN KEY (object_id) REFERENCES items(id)
+    item_id VARCHAR(36),
+    PRIMARY KEY (item_id),
+    FOREIGN KEY (item_id) REFERENCES items(id)
 );
 
 Create table sets_of_objects (
-    object_id VARCHAR(36) PRIMARY KEY,
+    item_id VARCHAR(36) PRIMARY KEY,
+    total_objects INT,
     useful_objects INT,
     broken_objects INT,
     lost_objects INT,
-    FOREIGN KEY (object_id) REFERENCES items(id)
+    FOREIGN KEY (item_id) REFERENCES items(id)
 );
 
 create table subjects(
@@ -158,7 +159,6 @@ CREATE TABLE quick_shelves (
     item_id VARCHAR(36), 
     user_id VARCHAR(36), /* So we know how many items a user has places into quick shelf */
     room_id VARCHAR(36), /* So we know where shelf is */
-    added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (room_id) REFERENCES rooms(id)
