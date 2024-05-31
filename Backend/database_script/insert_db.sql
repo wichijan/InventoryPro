@@ -14,17 +14,6 @@ values
     (UUID(), 'Intern');
 
 Insert into
-    item_status(id, status_name)
-values
-    (
-        "740d9d99-7ac9-4f44-a67f-cdc2b7dad0a1",
-        'Available'
-    ),
-    (UUID(), 'Reserved'),
-    (UUID(), 'Borrowed'),
-    (UUID(), 'Lost');
-
-Insert into
     subjects(id, name, description)
 values
     (
@@ -56,6 +45,36 @@ values
         "e1234a08-cd29-4f8a-9d8e-2716d6d2b546",
         'Reading',
         'Reading is the action or skill of reading written or printed matter silently or aloud.'
+    ),
+    (
+        UUID(),
+        'German',
+        'German for learning the German language.'
+    ),
+    (
+        UUID(),
+        'Religion',
+        'Religion for learning religion .'
+    ),
+    (
+        UUID(),
+        'Sachkunde',
+        ''
+    ),
+    (
+        UUID(),
+        'Werken',
+        ''
+    ),
+    (
+        UUID(),
+        'Sport',
+        'Sport for fitness and health.'
+    ),
+    (
+        UUID(),
+        'Music',
+        'Music for learning music.'
     );
 
 Insert into
@@ -92,33 +111,15 @@ values
     );
 
 Insert into
-    shelve_types(id, type_name)
-values
-    (
-        "a2ef8893-67c4-4703-b29c-b0274eafdc69",
-        'Small'
-    ),
-    (UUID(), 'Medium'),
-    (UUID(), 'Large'),
-    (
-        "17ee7aea-857e-4f5b-b1cb-4d3ce5b49517",
-        'SchnellRegal'
-    );
-
-Insert into
-    shelves(id, shelve_type_id, room_id)
+    shelves(id, room_id)
 values
     (
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
-        "a2ef8893-67c4-4703-b29c-b0274eafdc69",
-        /* Small Shelve */
         "62144dad-ea04-4591-921c-a37c85ed9226"
         /* Room 1 */
     ),
     (
         UUID(),
-        "17ee7aea-857e-4f5b-b1cb-4d3ce5b49517",
-        /* SchnellRegal */
         "30ed1352-4d0b-4508-8470-2cf7a4362414"
         /* Hall */
     );
@@ -183,7 +184,7 @@ values
     );
 
 Insert into
-    items_in_shelve(item_id, shelve_id)
+    items_in_shelf(item_id, shelf_id)
 values
     (
         "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
