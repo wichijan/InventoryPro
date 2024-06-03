@@ -166,10 +166,11 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 	return &uuid, nil
 }
 
-func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *models.ItemUpdate) *models.INVError {
+func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Items.UPDATE(
 		table.Items.Name,
+		table.Items.ItemTypeID,
 		table.Items.Description,
 		table.Items.ClassOne,
 		table.Items.ClassTwo,
@@ -182,16 +183,17 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *models.ItemUpdate) *mode
 		table.Items.RegularShelfID,
 	).SET(
 		item.Name,
+		item.ItemTypeID,
 		item.Description,
 		item.ClassOne,
 		item.ClassTwo,
 		item.ClassThree,
 		item.ClassFour,
 		item.Damaged,
-		item.DamagedDesc,
+		item.DamagedDescription,
 		item.Picture,
 		item.HintText,
-		item.RegularShelfId,
+		item.RegularShelfID,
 	).WHERE(table.Items.ID.EQ(mysql.String(item.ID)))
 
 	// Execute the query

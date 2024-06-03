@@ -62,14 +62,14 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param room body model.Rooms true "ItemWithStatus model"
-// @Success 201 {object} models.ItemWithStatus
+// @Param room body models.ItemWThin true "ItemWThin model"
+// @Success 201 {object} models.ItemWThin
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items [post]
 func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var item models.ItemWithStatus
+		var item models.ItemWThin
 		err := c.ShouldBindJSON(&item)
 		if err != nil || item.Name == "" {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
@@ -91,14 +91,14 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param item body models.ItemWithStatus true "ItemWithStatus model"
-// @Success 201 {object} models.ItemWithStatus
+// @Param item body models.ItemWThin true "ItemWThin model"
+// @Success 201 {object} models.ItemWThin
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items [put]
 func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var item models.ItemWithStatus
+		var item models.ItemWThin
 		err := c.ShouldBindJSON(&item)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
@@ -236,11 +236,11 @@ func RemoveSubjectFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param ItemReserveODT body models.ItemReserveODT true "ItemReserveODT model"
+// @Param ReservationCreateODT body models.ReservationCreateODT true "ReservationCreateODT model"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /items/reserve [post]
-func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+func ReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
@@ -249,26 +249,28 @@ func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 			return
 		}
 
-		var itemReserveODT models.ItemReserveODT
+		var itemReserveODT models.ReservationCreateODT
 		err := c.ShouldBindJSON(&itemReserveODT)
 		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		itemReserve := models.ItemReserve{
+		itemReserve := models.ReservationCreate{
 			ItemID:   itemReserveODT.ItemID,
 			UserID:   userId.String(),
 			Quantity: itemReserveODT.Quantity,
+			TimeFrom: itemReserveODT.TimeFrom,
+			TimeTo:  itemReserveODT.TimeTo,
 		}
 
-		inv_err := itemCtrl.ReserveItem(itemReserve)
+		reservationId, inv_err := reservationCtrl.CreateReservation(&itemReserve)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
 
-		c.JSON(http.StatusOK, nil)
+		c.JSON(http.StatusOK, reservationId)
 	}
 }
 
@@ -277,11 +279,11 @@ func ReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param id path string true "item id"
+// @Param id path string true "reservation id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /items/reserve-cancel/:id [post]
-func CancelReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+func CancelReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
@@ -290,13 +292,13 @@ func CancelReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerF
 			return
 		}
 
-		itemId, err := uuid.Parse(c.Param("id"))
+		reservationId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		inv_err := itemCtrl.CancelReserveItem(userId, &itemId)
+		inv_err := reservationCtrl.DeleteReservation(userId, &reservationId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -331,7 +333,7 @@ func BorrowItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 			return
 		}
 
-		itemReserve := models.ItemBorrow{
+		itemReserve := models.ItemBorrowCreate{
 			ItemID:   itemReserveODT.ItemID,
 			UserID:   userId.String(),
 			Quantity: itemReserveODT.Quantity,

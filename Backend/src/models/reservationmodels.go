@@ -7,3 +7,10 @@ type ReservationCreate struct {
 	TimeFrom string `alias:"reservations.time_from"`
 	TimeTo string `alias:"reservations.time_to"`
 }
+
+type ReservationCreateODT struct {
+	ItemID string `alias:"reservations.item_id"`
+	Quantity int `alias:"reservations.quantity"`
+	TimeFrom string `alias:"reservations.time_from"`
+	TimeTo string `alias:"reservations.time_to"`
+}

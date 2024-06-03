@@ -2,7 +2,7 @@ package models
 
 import (
 	"time"
-
+	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 )
 
@@ -11,7 +11,7 @@ type ItemWThin struct {
 	Name               string `alias:"items.name"`
 	Description        string `alias:"items.description"`
 	ItemTypeName 	   string `alias:"item_types.type_name"`
-	RegularShelfId  string `alias:"items_in_shelf.shelf_id"`
+	RegularShelfId  string `alias:"items.RegularShelfID"`
 	QuantityInShelf   int32  `alias:"items_in_shelf.quantity"`
 	ClassOne           bool   `alias:"items.class_one"`
 	ClassTwo           bool   `alias:"items.class_two"`
@@ -71,6 +71,7 @@ type ItemCreate struct {
 }
 type ItemUpdate struct {
 	ID                 string `alias:"items.id"`
+	ItemTypeID 	   string `alias:"items.item_type_id"`
 	Name               string `alias:"items.name"`
 	Description        string `alias:"items.description"`
 	RegularShelfId  string `alias:"items_in_shelf.shelf_id"`
@@ -84,6 +85,9 @@ type ItemUpdate struct {
 	Picture            string `alias:"items.picture"`
 	HintText 		 string `alias:"items.hint_text"`
 }
+
+
+
 
 type ItemWithKeyword struct {
 	ItemID    string `json:"itemId"`
@@ -124,6 +128,19 @@ type ItemBorrow struct {
 	Quantity   int32
 	TransactionDate time.Time
 }
+
+type ItemBorrowCreate struct {
+	ItemID     string
+	UserID     string
+	Quantity   int32
+}
+
+type ItemMove struct {
+	ItemID     uuid.UUID
+	UserID     uuid.UUID
+	NewUserID     uuid.UUID
+}
+
 
 type ItemPicture struct {
 	PictureId string `alias:"items.picture"`

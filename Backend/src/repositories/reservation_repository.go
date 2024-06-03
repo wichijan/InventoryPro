@@ -18,7 +18,7 @@ type ReservationRepositoryI interface {
 	GetReservationByItemId(itemId *uuid.UUID) (*[]model.Reservations, *models.INVError)
 	GetReservationByItemIdAndUserId(itemId *uuid.UUID, userId *uuid.UUID) (*model.Reservations, *models.INVError)
 	CreateReservation(tx *sql.Tx, reservation *models.ReservationCreate) (*string, *models.INVError)
-	DeleteReservation(tx *sql.Tx, reservationID *uuid.UUID) *models.INVError
+	DeleteReservation(tx *sql.Tx, userId *uuid.UUID, reservationID *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -117,10 +117,11 @@ func (rr *ReservationRepository) CreateReservation(tx *sql.Tx, reservation *mode
 	return nil, nil
 }
 
-func (rr *ReservationRepository) DeleteReservation(tx *sql.Tx, reservationID *uuid.UUID) *models.INVError {
+func (rr *ReservationRepository) DeleteReservation(tx *sql.Tx, userId *uuid.UUID, reservationID *uuid.UUID) *models.INVError {
 	// Create the delete statement
 	deleteQuery := table.Reservations.DELETE().WHERE(
-		table.Reservations.ReservationID.EQ(mysql.String(reservationID.String())),
+		table.Reservations.ReservationID.EQ(mysql.String(reservationID.String())).
+			AND(table.Reservations.UserID.EQ(mysql.String(userId.String()))),
 	)
 
 	// Execute the query

@@ -25,9 +25,9 @@ type Controllers struct {
 	KeywordController    controllers.KeywordControllerI
 	UserRoleController   controllers.UserRoleControllerI
 	RoleController       controllers.RoleControllerI
-	ShelveTypeController controllers.ShelveTypeControllerI
 	SubjectController    controllers.SubjectControllerI
 	UserTypeController   controllers.UserTypeControllerI
+	ReservationController controllers.ReservationControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -57,10 +57,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	shelveRepo := &repositories.ShelveRepository{
-		DatabaseManagerI: databaseManager,
-	}
-
-	shelveTypeRepo := &repositories.ShelveTypeRepository{
 		DatabaseManagerI: databaseManager,
 	}
 
@@ -96,10 +92,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
-	itemStatusRepo := &repositories.ItemStatusRepository{
-		DatabaseManager: databaseManager,
-	}
-
 	userItemRepo := &repositories.UserItemRepository{
 		DatabaseManagerI: databaseManager,
 	}
@@ -109,6 +101,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	roleRepo := &repositories.RoleRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
+	reservationRepo := &repositories.ReservationRepository{
 		DatabaseManagerI: databaseManager,
 	}
 
@@ -122,12 +118,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ShelveController: &controllers.ShelveController{
 			ShelveRepo:     shelveRepo,
-			ShelveTypeRepo: shelveTypeRepo,
 		},
 		ItemController: &controllers.ItemController{
 			ItemRepo:         itemRepo,
 			ItemInShelveRepo: itemInShelveRepo,
-			ItemStatusRepo:   itemStatusRepo,
 			UserItemRepo:     userItemRepo,
 			KeywordRepo:      keywordRepo,
 			SubjectRepo:      subjectRepo,
@@ -144,9 +138,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		RoleController: &controllers.RoleController{
 			RoleRepo: roleRepo,
 		},
-		ShelveTypeController: &controllers.ShelveTypeController{
-			ShelveTypeRepo: shelveTypeRepo,
-		},
 		SubjectController: &controllers.SubjectController{
 			SubjectRepo: subjectRepo,
 		},
@@ -155,6 +146,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		UserTypeController: &controllers.UserTypeController{
 			UserTypeRepo: userTypeRepo,
+		},
+		ReservationController: &controllers.ReservationController{
+			ReservationRepo: reservationRepo,
 		},
 	}
 
@@ -193,17 +187,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
 	publicRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
 
-	// ShelveType routes
-	adminRoutes.Handle(http.MethodGet, "/shelve-types", handlers.GetShelveTypesHandler(controller.ShelveTypeController))
-	publicRoutes.Handle(http.MethodPost, "/shelve-types", handlers.CreateShelveTypeHandler(controller.ShelveTypeController))
-	adminRoutes.Handle(http.MethodPut, "/shelve-types", handlers.UpdateShelveTypeHandler(controller.ShelveTypeController))
-	adminRoutes.Handle(http.MethodDelete, "/shelve-types/:id", handlers.DeleteShelveTypeHandler(controller.ShelveTypeController))
-
 	// Items routes
 	publicRoutes.Handle(http.MethodGet, "/items", handlers.GetItemsHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	// Picture for item
 	publicRoutes.Handle(http.MethodPost, "/items-picture", handlers.UploadImageForItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodGet, "/items-picture/:id", handlers.GetImagePathForItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodDelete, "/items-picture/:id", handlers.RemoveImageForItemHandler(controller.ItemController))
@@ -213,6 +202,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Subject for item
 	publicRoutes.Handle(http.MethodPost, "/items/addsubject", handlers.AddSubjectToItemHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
+	// Item reserve
+	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ReservationController))
+	securedRoutes.Handle(http.MethodDelete, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ReservationController))
+	// Item move
+	securedRoutes.Handle(http.MethodPost, "/items/borrow", handlers.BorrowItemHandler(controller.ItemController))
+	securedRoutes.Handle(http.MethodPost, "/items/return/:id", handlers.ReturnReserveItemHandler(controller.ItemController))
 
 	// Subject Routes
 	publicRoutes.Handle(http.MethodGet, "/subjects", handlers.GetSubjectsHandler(controller.SubjectController))
@@ -226,14 +221,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPut, "/keywords", handlers.UpdateKeywordHandler(controller.KeywordController))
 	publicRoutes.Handle(http.MethodDelete, "/keywords/:id", handlers.DeleteKeywordHandler(controller.KeywordController))
 
-	// Item reserve
-	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ItemController))
-	securedRoutes.Handle(http.MethodDelete, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ItemController))
-
-	// Item move
-	securedRoutes.Handle(http.MethodPost, "/items/borrow", handlers.BorrowItemHandler(controller.ItemController))
-	securedRoutes.Handle(http.MethodPost, "/items/return/:id", handlers.ReturnReserveItemHandler(controller.ItemController))
-
+	
 	// Roles routes
 	adminRoutes.Handle(http.MethodGet, "/roles", handlers.GetRolesHandler(controller.RoleController))
 	adminRoutes.Handle(http.MethodPost, "/roles", handlers.CreateRoleHandler(controller.RoleController))
