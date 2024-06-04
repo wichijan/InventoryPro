@@ -543,7 +543,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/addkeyword": {
+        "/items/add-keyword": {
             "post": {
                 "description": "Add keyword to item",
                 "consumes": [
@@ -586,7 +586,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/addsubject": {
+        "/items/add-subject": {
             "post": {
                 "description": "Add Subject to item",
                 "consumes": [
@@ -666,7 +666,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/removekeyword": {
+        "/items/remove-keyword": {
             "post": {
                 "description": "Remove keyword to item",
                 "consumes": [
@@ -709,7 +709,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/removesubject": {
+        "/items/remove-subject": {
             "post": {
                 "description": "Remove Subject to item",
                 "consumes": [
@@ -1299,12 +1299,12 @@ const docTemplate = `{
                 "summary": "Create Room",
                 "parameters": [
                     {
-                        "description": "Room model",
-                        "name": "room",
+                        "description": "RoomsODT model",
+                        "name": "RoomsODT",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Rooms"
+                            "$ref": "#/definitions/models.RoomsODT"
                         }
                     }
                 ],
@@ -1330,57 +1330,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/rooms/{id}": {
-            "get": {
-                "description": "Get room by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Rooms"
-                ],
-                "summary": "Get room by id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Room id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Rooms"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/roomswithshelves": {
+        "/rooms-with-shelves": {
             "get": {
                 "description": "Get rooms with shelves",
                 "consumes": [
@@ -1430,7 +1380,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/roomswithshelves/{id}": {
+        "/rooms-with-shelves/{id}": {
             "get": {
                 "description": "Get room by id with shelves",
                 "consumes": [
@@ -1457,6 +1407,56 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.RoomWithShelves"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/rooms/{id}": {
+            "get": {
+                "description": "Get room by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Get room by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Room id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Rooms"
                         }
                     },
                     "400": {
@@ -1600,57 +1600,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/shelves/{id}": {
-            "get": {
-                "description": "Get shelve by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Shelves"
-                ],
-                "summary": "Get shelve by id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Shelve id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Shelves"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/shelveswithitems": {
+        "/shelves-with-items": {
             "get": {
                 "description": "Get shelves with items",
                 "consumes": [
@@ -1694,7 +1644,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/shelveswithitems/{id}": {
+        "/shelves-with-items/{id}": {
             "get": {
                 "description": "Get shelve by id with items",
                 "consumes": [
@@ -1721,6 +1671,56 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.ShelveWithItems"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/shelves/{id}": {
+            "get": {
+                "description": "Get shelve by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shelves"
+                ],
+                "summary": "Get shelve by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Shelve id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Shelves"
                         }
                     },
                     "400": {
@@ -2248,18 +2248,20 @@ const docTemplate = `{
                 "summary": "Create warehouse",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Warehouse name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
+                        "description": "WarehousesODT model",
+                        "name": "WarehousesODT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.WarehousesODT"
+                        }
                     }
                 ],
                 "responses": {
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/model.Warehouses"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -2791,6 +2793,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.RoomsODT": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "warehouseID": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ShelveWithItems": {
             "type": "object",
             "properties": {
@@ -2921,6 +2934,17 @@ const docTemplate = `{
                             }
                         }
                     }
+                }
+            }
+        },
+        "models.WarehousesODT": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         }

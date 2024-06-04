@@ -297,6 +297,13 @@ definitions:
       warehouseID:
         type: string
     type: object
+  models.RoomsODT:
+    properties:
+      name:
+        type: string
+      warehouseID:
+        type: string
+    type: object
   models.ShelveWithItems:
     properties:
       id:
@@ -383,6 +390,13 @@ definitions:
               type: string
           type: object
         type: array
+    type: object
+  models.WarehousesODT:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
     type: object
 info:
   contact: {}
@@ -734,7 +748,7 @@ paths:
       summary: Get item by id
       tags:
       - Items
-  /items/addkeyword:
+  /items/add-keyword:
     post:
       consumes:
       - application/json
@@ -762,7 +776,7 @@ paths:
       summary: Add keyword to item
       tags:
       - Items
-  /items/addsubject:
+  /items/add-subject:
     post:
       consumes:
       - application/json
@@ -814,7 +828,7 @@ paths:
       summary: Borrow Item
       tags:
       - Items
-  /items/removekeyword:
+  /items/remove-keyword:
     post:
       consumes:
       - application/json
@@ -842,7 +856,7 @@ paths:
       summary: Remove keyword to item
       tags:
       - Items
-  /items/removesubject:
+  /items/remove-subject:
     post:
       consumes:
       - application/json
@@ -1198,12 +1212,12 @@ paths:
       - application/json
       description: Create Room
       parameters:
-      - description: Room model
+      - description: RoomsODT model
         in: body
-        name: room
+        name: RoomsODT
         required: true
         schema:
-          $ref: '#/definitions/model.Rooms'
+          $ref: '#/definitions/models.RoomsODT'
       produces:
       - application/json
       responses:
@@ -1251,40 +1265,7 @@ paths:
       summary: Update room
       tags:
       - Rooms
-  /rooms/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get room by id
-      parameters:
-      - description: Room id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Rooms'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Get room by id
-      tags:
-      - Rooms
-  /roomswithshelves:
+  /rooms-with-shelves:
     get:
       consumes:
       - application/json
@@ -1317,7 +1298,7 @@ paths:
       summary: Get rooms with shelves
       tags:
       - Rooms
-  /roomswithshelves/{id}:
+  /rooms-with-shelves/{id}:
     get:
       consumes:
       - application/json
@@ -1348,6 +1329,39 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get room by id with shelves
+      tags:
+      - Rooms
+  /rooms/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get room by id
+      parameters:
+      - description: Room id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Rooms'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get room by id
       tags:
       - Rooms
   /shelves:
@@ -1429,6 +1443,68 @@ paths:
       summary: Update shelve
       tags:
       - Shelves
+  /shelves-with-items:
+    get:
+      consumes:
+      - application/json
+      description: Get shelves with items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ShelveWithItems'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get shelves with items
+      tags:
+      - Shelves
+  /shelves-with-items/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get shelve by id with items
+      parameters:
+      - description: shelve id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ShelveWithItems'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get shelve by id with items
+      tags:
+      - Shelves
   /shelves/{id}:
     get:
       consumes:
@@ -1460,68 +1536,6 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get shelve by id
-      tags:
-      - Shelves
-  /shelveswithitems:
-    get:
-      consumes:
-      - application/json
-      description: Get shelves with items
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.ShelveWithItems'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Get shelves with items
-      tags:
-      - Shelves
-  /shelveswithitems/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get shelve by id with items
-      parameters:
-      - description: shelve id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ShelveWithItems'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Get shelve by id with items
       tags:
       - Shelves
   /subjects:
@@ -1823,18 +1837,19 @@ paths:
       - application/json
       description: Create warehouse
       parameters:
-      - description: Warehouse name
-        in: path
-        name: name
+      - description: WarehousesODT model
+        in: body
+        name: WarehousesODT
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.WarehousesODT'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.Warehouses'
+            type: string
         "400":
           description: Bad Request
           schema:
