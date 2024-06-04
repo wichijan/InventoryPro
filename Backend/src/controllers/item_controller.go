@@ -33,16 +33,16 @@ type ItemControllerI interface {
 }
 
 type ItemController struct {
-	ItemRepo         repositories.ItemRepositoryI
-	ItemInShelveRepo repositories.ItemInShelveRepositoryI
-	UserItemRepo     repositories.UserItemRepositoryI
-	KeywordRepo      repositories.KeywordRepositoryI
-	SubjectRepo      repositories.SubjectRepositoryI
-	ItemKeywordRepo  repositories.ItemKeywordRepositoryI
-	ItemSubjectRepo  repositories.ItemSubjectRepositoryI
-	ReservationRepo repositories.ReservationRepositoryI
-	ItemTypeRepo    repositories.ItemTypeRepositoryI
-	TransactionRepo repositories.TransactionRepositoryI
+	ItemRepo            repositories.ItemRepositoryI
+	ItemInShelveRepo    repositories.ItemInShelveRepositoryI
+	UserItemRepo        repositories.UserItemRepositoryI
+	KeywordRepo         repositories.KeywordRepositoryI
+	SubjectRepo         repositories.SubjectRepositoryI
+	ItemKeywordRepo     repositories.ItemKeywordRepositoryI
+	ItemSubjectRepo     repositories.ItemSubjectRepositoryI
+	ReservationRepo     repositories.ReservationRepositoryI
+	ItemTypeRepo        repositories.ItemTypeRepositoryI
+	TransactionRepo     repositories.TransactionRepositoryI
 	TransferRequestRepo repositories.TransferRequestRepositoryI
 }
 
@@ -266,7 +266,6 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 	return nil
 }
 
-
 func (ic *ItemController) UploadImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
@@ -325,7 +324,6 @@ func (ic *ItemController) RemoveImageIdFromItem(itemId *uuid.UUID) *models.INVEr
 	return nil
 }
 
-
 func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *models.INVError {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
@@ -356,7 +354,7 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *model
 	pureItemBorrow.Quantity = itemReserve.Quantity
 	pureItemBorrow.TransactionDate = time.Now()
 
-	inv_error = ic.UserItemRepo.BorrowItem(tx, &pureItemBorrow)
+	inv_error = ic.UserItemRepo.InsertUserItem(tx, &pureItemBorrow)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -388,13 +386,13 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 	}
 
 	// Get quantity from user_items
-	quantityReservedItem, inv_error := ic.UserItemRepo.GetQuantityFromReservedItem(itemId)
+	quantityReservedItem, inv_error := ic.UserItemRepo.GetQuantityFromUserItem(itemId)
 	if inv_error != nil {
 		return inv_error
 	}
 
 	// Update user_items
-	inv_error = ic.UserItemRepo.ReturnItem(tx, userId, itemId)
+	inv_error = ic.UserItemRepo.DeleteItemUser(tx, userId, itemId)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -413,7 +411,6 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 
 	return nil
 }
-
 
 func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVError {
 	tx, err := ic.UserItemRepo.NewTransaction()
@@ -465,7 +462,6 @@ func (ic *ItemController) MoveItemAccepted(itemMove models.ItemMove) *models.INV
 	}
 	defer tx.Rollback()
 
-
 	inv_error := ic.UserItemRepo.MoveItemToNewUser(tx, &itemMove.UserID, &itemMove.NewUserID, &itemMove.ItemID)
 	if inv_error != nil {
 		return inv_error
@@ -488,7 +484,6 @@ func (ic *ItemController) MoveItemAccepted(itemMove models.ItemMove) *models.INV
 	if inv_error != nil {
 		return inv_error
 	}
-
 
 	if err = tx.Commit(); err != nil {
 		return inv_errors.INV_INTERNAL_ERROR

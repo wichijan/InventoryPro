@@ -13,6 +13,7 @@ func UseSchema(schema string) {
 	Books = Books.FromSchema(schema)
 	Items = Items.FromSchema(schema)
 	ItemsInShelf = ItemsInShelf.FromSchema(schema)
+	ItemQuickShelf = ItemQuickShelf.FromSchema(schema)
 	ItemSubjects = ItemSubjects.FromSchema(schema)
 	ItemTypes = ItemTypes.FromSchema(schema)
 	Keywords = Keywords.FromSchema(schema)

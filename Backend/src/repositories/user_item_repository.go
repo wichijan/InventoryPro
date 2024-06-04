@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
@@ -16,10 +17,11 @@ type UserItemRepositoryI interface {
 	GetUserItemByUserIdAndItemId(userId *uuid.UUID, itemId *uuid.UUID) (*model.UserItems, *models.INVError)
 	MoveItemToNewUser(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, newUserId *uuid.UUID) *models.INVError
 
-	BorrowItem(tx *sql.Tx, itemBorrow *models.ItemBorrow) *models.INVError
-	ReturnItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
+	InsertUserItem(tx *sql.Tx, itemBorrow *models.ItemBorrow) *models.INVError
+	DeleteItemUser(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
+	ReduceQuantityOfUserItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, newQuantity *int32) *models.INVError
 
-	GetQuantityFromReservedItem(itemId *uuid.UUID) (*int32, *models.INVError)
+	GetQuantityFromUserItem(itemId *uuid.UUID) (*int32, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -53,9 +55,7 @@ func (uir *UserItemRepository) GetUserItemByUserIdAndItemId(userId *uuid.UUID, i
 	return &userItem, nil
 }
 
-
-
-func (uir *UserItemRepository) GetQuantityFromReservedItem(itemId *uuid.UUID) (*int32, *models.INVError) {
+func (uir *UserItemRepository) GetQuantityFromUserItem(itemId *uuid.UUID) (*int32, *models.INVError) {
 	var quantity models.GetQuantityReserved
 
 	// Create the query
@@ -79,7 +79,7 @@ func (uir *UserItemRepository) GetQuantityFromReservedItem(itemId *uuid.UUID) (*
 	return &quantity.Quantity, nil
 }
 
-func (uir *UserItemRepository) BorrowItem(tx *sql.Tx, itemBorrow *models.ItemBorrow) *models.INVError {
+func (uir *UserItemRepository) InsertUserItem(tx *sql.Tx, itemBorrow *models.ItemBorrow) *models.INVError {
 	// Create the insert statement
 	insertQuery := table.UserItems.INSERT(
 		table.UserItems.UserID,
@@ -102,7 +102,7 @@ func (uir *UserItemRepository) BorrowItem(tx *sql.Tx, itemBorrow *models.ItemBor
 	return nil
 }
 
-func (uir *UserItemRepository) ReturnItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID) *models.INVError {
+func (uir *UserItemRepository) DeleteItemUser(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID) *models.INVError {
 	// Create the delete statement
 	deleteQuery := table.UserItems.DELETE().WHERE(
 		table.UserItems.UserID.EQ(mysql.String(userId.String())).
@@ -124,6 +124,27 @@ func (uir *UserItemRepository) MoveItemToNewUser(tx *sql.Tx, userId *uuid.UUID, 
 		table.UserItems.UserID,
 	).SET(
 		newUserId,
+	).WHERE(
+		table.UserItems.UserID.EQ(mysql.String(userId.String())).
+			AND(table.UserItems.ItemID.EQ(mysql.String(itemId.String()))),
+	)
+
+	// Execute the query
+	_, err := updateQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return nil
+}
+func (uir *UserItemRepository) ReduceQuantityOfUserItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, newQuantity *int32) *models.INVError {
+	// Create the update statement
+	updateQuery := table.UserItems.UPDATE(
+		table.UserItems.Quantity,
+		table.UserItems.TransactionDate,
+	).SET(
+		newQuantity,
+		time.Now(),
 	).WHERE(
 		table.UserItems.UserID.EQ(mysql.String(userId.String())).
 			AND(table.UserItems.ItemID.EQ(mysql.String(itemId.String()))),

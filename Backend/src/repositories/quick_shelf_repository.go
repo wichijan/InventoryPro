@@ -14,7 +14,6 @@ import (
 type QuickShelfRepositoryI interface {
 	GetQuickShelves() (*model.QuickShelves, *models.INVError)
 	CreateQuickShelf(tx *sql.Tx, book *model.QuickShelves) (*string, *models.INVError)
-	UpdateQuickShelf(tx *sql.Tx, book *model.QuickShelves) *models.INVError
 	DeleteQuickShelf(tx *sql.Tx, shelfId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
@@ -46,13 +45,9 @@ func (qsr *QuickShelfRepository) CreateQuickShelf(tx *sql.Tx, shelf *model.Quick
 	// Create the query
 	stmt := table.QuickShelves.INSERT(
 		table.QuickShelves.QuickShelfID,
-		table.QuickShelves.UserID,
-		table.QuickShelves.ItemID,
 		table.QuickShelves.RoomID,
 	).VALUES(
 		shelf.QuickShelfID,
-		shelf.UserID,
-		shelf.ItemID,
 		shelf.RoomID,
 	)
 
@@ -63,29 +58,6 @@ func (qsr *QuickShelfRepository) CreateQuickShelf(tx *sql.Tx, shelf *model.Quick
 	}
 
 	return &shelf.QuickShelfID, nil
-}
-
-func (qsr *QuickShelfRepository) UpdateQuickShelf(tx *sql.Tx, shelf *model.QuickShelves) *models.INVError {
-	// Create the query
-	stmt := table.QuickShelves.UPDATE(
-		table.QuickShelves.UserID,
-		table.QuickShelves.ItemID,
-		table.QuickShelves.RoomID,
-	).SET(
-		shelf.UserID,
-		shelf.ItemID,
-		shelf.RoomID,
-	).WHERE(
-		table.QuickShelves.QuickShelfID.EQ(mysql.String(shelf.QuickShelfID)),
-	)
-
-	// Execute the query
-	_, err := stmt.Exec(tx)
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	return nil
 }
 
 func (qsr *QuickShelfRepository) DeleteQuickShelf(tx *sql.Tx, shelfId *uuid.UUID) *models.INVError {

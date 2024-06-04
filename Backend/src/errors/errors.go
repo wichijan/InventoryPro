@@ -35,6 +35,13 @@ var (
 	INV_NOT_ENOUGH_QUANTITY = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "NOT_ENOUGH_QUANTITY"}, Status: 409}
 	// INV_NO_ROLES is used to indicate that the requested role is not available
 	INV_NO_ROLES = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "NO_ROLES"}, Status: 409}
+
+	// INV_QUICK_SHELF_FULL is used to indicate that the quick shelf is full
+	INV_QUICK_SHELF_FULL = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "QUICK_SHELF_FULL"}, Status: 409}
+
+	// INV_QUICK_SHELF_USER_LIMIT_FULL is used to indicate that the user has reached the limit of items in the quick shelf
+	INV_QUICK_SHELF_USER_LIMIT_FULL = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "QUICK_SHELF_USER_LIMIT_FULL"}, Status: 409}
+
 	// INV_UPSTREAM_ERROR is used to indicate an error in 3rd party services
 	INV_UPSTREAM_ERROR = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "UPSTREAM_ERROR"}, Status: 500}
 	// INV_INTERNAL_ERROR is used to indicate an internal, unclassified error

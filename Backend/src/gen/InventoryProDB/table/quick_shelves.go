@@ -18,8 +18,6 @@ type quickShelvesTable struct {
 
 	// Columns
 	QuickShelfID mysql.ColumnString
-	ItemID       mysql.ColumnString
-	UserID       mysql.ColumnString
 	RoomID       mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
@@ -62,11 +60,9 @@ func newQuickShelvesTable(schemaName, tableName, alias string) *QuickShelvesTabl
 func newQuickShelvesTableImpl(schemaName, tableName, alias string) quickShelvesTable {
 	var (
 		QuickShelfIDColumn = mysql.StringColumn("quick_shelf_id")
-		ItemIDColumn       = mysql.StringColumn("item_id")
-		UserIDColumn       = mysql.StringColumn("user_id")
 		RoomIDColumn       = mysql.StringColumn("room_id")
-		allColumns         = mysql.ColumnList{QuickShelfIDColumn, ItemIDColumn, UserIDColumn, RoomIDColumn}
-		mutableColumns     = mysql.ColumnList{ItemIDColumn, UserIDColumn, RoomIDColumn}
+		allColumns         = mysql.ColumnList{QuickShelfIDColumn, RoomIDColumn}
+		mutableColumns     = mysql.ColumnList{RoomIDColumn}
 	)
 
 	return quickShelvesTable{
@@ -74,8 +70,6 @@ func newQuickShelvesTableImpl(schemaName, tableName, alias string) quickShelvesT
 
 		//Columns
 		QuickShelfID: QuickShelfIDColumn,
-		ItemID:       ItemIDColumn,
-		UserID:       UserIDColumn,
 		RoomID:       RoomIDColumn,
 
 		AllColumns:     allColumns,

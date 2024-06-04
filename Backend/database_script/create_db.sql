@@ -156,12 +156,19 @@ create table user_roles(
 
 CREATE TABLE quick_shelves (
     quick_shelf_id VARCHAR(36) PRIMARY KEY,
-    item_id VARCHAR(36), 
-    user_id VARCHAR(36), /* So we know how many items a user has places into quick shelf */
     room_id VARCHAR(36), /* So we know where shelf is */
-    FOREIGN KEY (item_id) REFERENCES items(id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (room_id) REFERENCES rooms(id)
+);
+
+Create table item_quick_shelf(
+    item_id VARCHAR(36),
+    user_id VARCHAR(36),
+    quick_shelf_id VARCHAR(36),
+    quantity INT,
+    PRIMARY KEY (item_id, user_id, quick_shelf_id),
+    Foreign KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (quick_shelf_id) REFERENCES quick_shelves(quick_shelf_id)
 );
 
 CREATE TABLE points (
