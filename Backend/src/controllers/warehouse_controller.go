@@ -13,7 +13,7 @@ type WarehouseControllerI interface {
 	GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError)
 	GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError)
 	GetWarehouseByIdWithRooms(id *uuid.UUID) (*models.WarehouseWithRooms, *models.INVError)
-	CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
+	CreateWarehouse(warehouse *models.WarehousesODT) (*uuid.UUID, *models.INVError)
 	UpdateWarehouse(warehouse *model.Warehouses) *models.INVError
 	DeleteWarehouse(warehouse_id *uuid.UUID) *models.INVError
 }
@@ -30,7 +30,7 @@ func (mc *WarehouseController) GetWarehouses() (*[]model.Warehouses, *models.INV
 	return warehouses, nil
 }
 
-func (mc *WarehouseController) CreateWarehouse(warehouse *model.Warehouses) (*uuid.UUID, *models.INVError) {
+func (mc *WarehouseController) CreateWarehouse(warehouse *models.WarehousesODT) (*uuid.UUID, *models.INVError) {
 	tx, err := mc.WarehouseRepo.NewTransaction()
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
@@ -60,10 +60,15 @@ func (mc *WarehouseController) UpdateWarehouse(warehouse *model.Warehouses) *mod
 	}
 	defer tx.Rollback()
 
-	inv_errors := mc.WarehouseRepo.UpdateWarehouse(tx, warehouse)
-	if inv_errors != nil {
-		return inv_errors
+	inv_error := mc.WarehouseRepo.UpdateWarehouse(tx, warehouse)
+	if inv_error != nil {
+		return inv_error
 	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }
 

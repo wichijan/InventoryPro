@@ -9,3 +9,8 @@ type WarehouseWithRooms struct {
 		model.Rooms
 	}
 }
+
+type WarehousesODT struct {
+	Name        *string
+	Description *string
+}

@@ -9,3 +9,8 @@ type RoomWithShelves struct {
 		model.Shelves
 	}
 }
+
+type RoomsODT struct {
+	Name        *string
+	WarehouseID *string
+}

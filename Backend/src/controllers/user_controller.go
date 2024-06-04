@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -54,28 +55,37 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		}
 	}
 
+	registrationDate := time.Now()
+	registrationDateString := registrationDate.String()
+	isTrue := true
+
 	userForResponse := models.UserWithTypeName{
-		ID:           userId.String(),
-		Username:     &registrationData.Username,
-		Email:        &registrationData.Email,
-		Password:     &hash,
-		FirstName:    &registrationData.FirstName,
-		LastName:     &registrationData.LastName,
-		JobTitle:     &registrationData.JobTitle,
-		PhoneNumber:  &registrationData.PhoneNumber,
-		UserTypeName: &registrationData.UserTypeName,
+		ID:               userId.String(),
+		Username:         &registrationData.Username,
+		Email:            &registrationData.Email,
+		Password:         &hash,
+		FirstName:        &registrationData.FirstName,
+		LastName:         &registrationData.LastName,
+		JobTitle:         &registrationData.JobTitle,
+		PhoneNumber:      &registrationData.PhoneNumber,
+		UserTypeName:     &registrationData.UserTypeName,
+		RegistrationTime: &registrationDateString,
+		IsActive:         &isTrue,
 	}
 
 	user := model.Users{
-		ID:          userId.String(),
-		Username:    &registrationData.Username,
-		Email:       &registrationData.Email,
-		Password:    &hash,
-		FirstName:   &registrationData.FirstName,
-		LastName:    &registrationData.LastName,
-		JobTitle:    &registrationData.JobTitle,
-		PhoneNumber: &registrationData.PhoneNumber,
-		UserTypeID:  userTypeId,
+		ID:               userId.String(),
+		Username:         &registrationData.Username,
+		Email:            &registrationData.Email,
+		Password:         &hash,
+		FirstName:        &registrationData.FirstName,
+		LastName:         &registrationData.LastName,
+		JobTitle:         &registrationData.JobTitle,
+		PhoneNumber:      &registrationData.PhoneNumber,
+		UserTypeID:       userTypeId,
+		RegistrationTime: &registrationDate,
+		IsActive:         &isTrue,
+		// TODO RegistrationAccepted
 	}
 
 	inv_err = uc.UserRepo.CreateUser(tx, user)

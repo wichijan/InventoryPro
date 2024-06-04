@@ -13,7 +13,7 @@ type RoomControllerI interface {
 	GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INVError)
 	GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError)
 	GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWithShelves, *models.INVError)
-	CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError)
+	CreateRoom(room *models.RoomsODT) (*uuid.UUID, *models.INVError)
 	UpdateRoom(room *model.Rooms) *models.INVError
 	DeleteRoom(roomId *uuid.UUID) *models.INVError
 }
@@ -30,7 +30,7 @@ func (rc *RoomController) GetRooms() (*[]model.Rooms, *models.INVError) {
 	return rooms, nil
 }
 
-func (rc *RoomController) CreateRoom(room *model.Rooms) (*uuid.UUID, *models.INVError) {
+func (rc *RoomController) CreateRoom(room *models.RoomsODT) (*uuid.UUID, *models.INVError) {
 	tx, err := rc.RoomRepo.NewTransaction()
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR

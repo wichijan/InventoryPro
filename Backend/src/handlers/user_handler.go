@@ -72,7 +72,7 @@ func GetUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 
 func LogoutUserHandler(c *gin.Context) {
 	utils.SetJWTCookies(c, "", "", true)
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, nil)
 }
 
 // @Summary Login user
@@ -129,7 +129,7 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.Status(http.StatusOK)
+		c.JSON(http.StatusOK, nil)
 	}
 }
 
@@ -156,7 +156,7 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 			return
 		}
 
-		c.Status(http.StatusOK)
+		c.JSON(http.StatusOK, nil)
 	}
 }
 
@@ -196,14 +196,4 @@ func LoggedInHandler(c *gin.Context) {
 		LoggedIn: true,
 		Id:       id,
 	})
-}
-
-func IsAdminHandler(c *gin.Context) {
-	userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
-	if !ok {
-		utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
-		return
-	}
-	adminId := uuid.MustParse("dddddddd-dddd-dddd-dddd-dddddddddddd")
-	c.JSON(http.StatusOK, *userId == adminId)
 }

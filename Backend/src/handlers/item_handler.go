@@ -124,7 +124,7 @@ func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/addkeyword [post]
+// @Router /items/add-keyword [post]
 func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithKeywordName
@@ -153,7 +153,7 @@ func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/removekeyword [post]
+// @Router /items/remove-keyword [post]
 func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithKeywordName
@@ -182,7 +182,7 @@ func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/addsubject [post]
+// @Router /items/add-subject [post]
 func AddSubjectToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithSubjectName
@@ -211,7 +211,7 @@ func AddSubjectToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/removesubject [post]
+// @Router /items/remove-subject [post]
 func RemoveSubjectFromItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithSubjectName

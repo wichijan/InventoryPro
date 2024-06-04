@@ -18,7 +18,7 @@ type WarehouseRepositoryI interface {
 	GetWarehouseById(id *uuid.UUID) (*model.Warehouses, *models.INVError)
 	GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError)
 	GetWarehouseByIdWithRooms(id *uuid.UUID) (*models.WarehouseWithRooms, *models.INVError)
-	CreateWarehouse(tx *sql.Tx, warehouse *model.Warehouses) (*uuid.UUID, *models.INVError)
+	CreateWarehouse(tx *sql.Tx, warehouse *models.WarehousesODT) (*uuid.UUID, *models.INVError)
 	UpdateWarehouse(tx *sql.Tx, Warehouse *model.Warehouses) *models.INVError
 	DeleteWarehouse(tx *sql.Tx, warehouseId *uuid.UUID) *models.INVError
 
@@ -76,7 +76,7 @@ func (wr *WarehouseRepository) GetWarehouseById(id *uuid.UUID) (*model.Warehouse
 	return &warehouse, nil
 }
 
-func (wr *WarehouseRepository) CreateWarehouse(tx *sql.Tx, warehouse *model.Warehouses) (*uuid.UUID, *models.INVError) {
+func (wr *WarehouseRepository) CreateWarehouse(tx *sql.Tx, warehouse *models.WarehousesODT) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement
