@@ -117,7 +117,7 @@ func ClearQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControl
 // @Accept  json
 // @Produce  json
 // @Param id path string true "quick shelf id"
-// @Success 200 {object} []models.ItemQuickShelfInsert
+// @Success 200 {array} models.ItemQuickShelfInsert
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /quick-shelf/:id [get]
 func GetItemsInQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {

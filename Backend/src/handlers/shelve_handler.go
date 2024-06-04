@@ -17,7 +17,7 @@ import (
 // @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} models.OwnShelve
+// @Success 200 {array} model.Shelves
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /shelves [get]
 func GetShelvesHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
@@ -37,7 +37,7 @@ func GetShelvesHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Shelve id"
-// @Success 200 {object} models.OwnShelve
+// @Success 200 {object} model.Shelves
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
@@ -64,7 +64,7 @@ func GetShelveByIdHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerF
 // @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} models.ShelveWithItems
+// @Success 200 {array} models.ShelveWithItems
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage

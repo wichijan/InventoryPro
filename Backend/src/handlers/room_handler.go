@@ -68,7 +68,7 @@ func GetRoomsByIdHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms/{id} [get]
+// @Router /roomswithshelves [get]
 func GetRoomsWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rooms, inv_err := roomCtrl.GetRoomsWithShelves()
@@ -90,7 +90,7 @@ func GetRoomsWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.Handler
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms/{id} [get]
+// @Router /roomswithshelves/{id} [get]
 func GetRoomsByIdWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
