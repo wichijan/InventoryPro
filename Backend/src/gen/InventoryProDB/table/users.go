@@ -17,15 +17,19 @@ type usersTable struct {
 	mysql.Table
 
 	// Columns
-	ID          mysql.ColumnString
-	FirstName   mysql.ColumnString
-	LastName    mysql.ColumnString
-	Username    mysql.ColumnString
-	Email       mysql.ColumnString
-	Password    mysql.ColumnString
-	JobTitle    mysql.ColumnString
-	PhoneNumber mysql.ColumnString
-	UserTypeID  mysql.ColumnString
+	ID                   mysql.ColumnString
+	FirstName            mysql.ColumnString
+	LastName             mysql.ColumnString
+	Username             mysql.ColumnString
+	Email                mysql.ColumnString
+	Password             mysql.ColumnString
+	JobTitle             mysql.ColumnString
+	PhoneNumber          mysql.ColumnString
+	UserTypeID           mysql.ColumnString
+	ProfilePicture       mysql.ColumnString
+	RegistrationTime     mysql.ColumnTimestamp
+	RegistrationAccepted mysql.ColumnBool
+	IsActive             mysql.ColumnBool
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -66,32 +70,40 @@ func newUsersTable(schemaName, tableName, alias string) *UsersTable {
 
 func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 	var (
-		IDColumn          = mysql.StringColumn("id")
-		FirstNameColumn   = mysql.StringColumn("first_name")
-		LastNameColumn    = mysql.StringColumn("last_name")
-		UsernameColumn    = mysql.StringColumn("username")
-		EmailColumn       = mysql.StringColumn("email")
-		PasswordColumn    = mysql.StringColumn("password")
-		JobTitleColumn    = mysql.StringColumn("job_title")
-		PhoneNumberColumn = mysql.StringColumn("phone_number")
-		UserTypeIDColumn  = mysql.StringColumn("user_type_id")
-		allColumns        = mysql.ColumnList{IDColumn, FirstNameColumn, LastNameColumn, UsernameColumn, EmailColumn, PasswordColumn, JobTitleColumn, PhoneNumberColumn, UserTypeIDColumn}
-		mutableColumns    = mysql.ColumnList{FirstNameColumn, LastNameColumn, UsernameColumn, EmailColumn, PasswordColumn, JobTitleColumn, PhoneNumberColumn, UserTypeIDColumn}
+		IDColumn                   = mysql.StringColumn("id")
+		FirstNameColumn            = mysql.StringColumn("first_name")
+		LastNameColumn             = mysql.StringColumn("last_name")
+		UsernameColumn             = mysql.StringColumn("username")
+		EmailColumn                = mysql.StringColumn("email")
+		PasswordColumn             = mysql.StringColumn("password")
+		JobTitleColumn             = mysql.StringColumn("job_title")
+		PhoneNumberColumn          = mysql.StringColumn("phone_number")
+		UserTypeIDColumn           = mysql.StringColumn("user_type_id")
+		ProfilePictureColumn       = mysql.StringColumn("profile_picture")
+		RegistrationTimeColumn     = mysql.TimestampColumn("registration_time")
+		RegistrationAcceptedColumn = mysql.BoolColumn("registration_accepted")
+		IsActiveColumn             = mysql.BoolColumn("is_active")
+		allColumns                 = mysql.ColumnList{IDColumn, FirstNameColumn, LastNameColumn, UsernameColumn, EmailColumn, PasswordColumn, JobTitleColumn, PhoneNumberColumn, UserTypeIDColumn, ProfilePictureColumn, RegistrationTimeColumn, RegistrationAcceptedColumn, IsActiveColumn}
+		mutableColumns             = mysql.ColumnList{FirstNameColumn, LastNameColumn, UsernameColumn, EmailColumn, PasswordColumn, JobTitleColumn, PhoneNumberColumn, UserTypeIDColumn, ProfilePictureColumn, RegistrationTimeColumn, RegistrationAcceptedColumn, IsActiveColumn}
 	)
 
 	return usersTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:          IDColumn,
-		FirstName:   FirstNameColumn,
-		LastName:    LastNameColumn,
-		Username:    UsernameColumn,
-		Email:       EmailColumn,
-		Password:    PasswordColumn,
-		JobTitle:    JobTitleColumn,
-		PhoneNumber: PhoneNumberColumn,
-		UserTypeID:  UserTypeIDColumn,
+		ID:                   IDColumn,
+		FirstName:            FirstNameColumn,
+		LastName:             LastNameColumn,
+		Username:             UsernameColumn,
+		Email:                EmailColumn,
+		Password:             PasswordColumn,
+		JobTitle:             JobTitleColumn,
+		PhoneNumber:          PhoneNumberColumn,
+		UserTypeID:           UserTypeIDColumn,
+		ProfilePicture:       ProfilePictureColumn,
+		RegistrationTime:     RegistrationTimeColumn,
+		RegistrationAccepted: RegistrationAcceptedColumn,
+		IsActive:             IsActiveColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

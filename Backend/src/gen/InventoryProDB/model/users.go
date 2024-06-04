@@ -7,14 +7,22 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Users struct {
-	ID          string `sql:"primary_key"`
-	FirstName   *string
-	LastName    *string
-	Username    *string
-	Email       *string
-	Password    *string `json:"-"`
-	JobTitle    *string
-	PhoneNumber *string
-	UserTypeID  *string
+	ID                   string `sql:"primary_key"`
+	FirstName            *string
+	LastName             *string
+	Username             *string
+	Email                *string
+	Password             *string `json:"-"`
+	JobTitle             *string
+	PhoneNumber          *string
+	UserTypeID           *string
+	ProfilePicture       *string
+	RegistrationTime     *time.Time
+	RegistrationAccepted *bool
+	IsActive             *bool
 }

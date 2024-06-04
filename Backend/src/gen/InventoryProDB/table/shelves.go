@@ -17,9 +17,8 @@ type shelvesTable struct {
 	mysql.Table
 
 	// Columns
-	ID           mysql.ColumnString
-	ShelveTypeID mysql.ColumnString
-	RoomID       mysql.ColumnString
+	ID     mysql.ColumnString
+	RoomID mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -60,20 +59,18 @@ func newShelvesTable(schemaName, tableName, alias string) *ShelvesTable {
 
 func newShelvesTableImpl(schemaName, tableName, alias string) shelvesTable {
 	var (
-		IDColumn           = mysql.StringColumn("id")
-		ShelveTypeIDColumn = mysql.StringColumn("shelve_type_id")
-		RoomIDColumn       = mysql.StringColumn("room_id")
-		allColumns         = mysql.ColumnList{IDColumn, ShelveTypeIDColumn, RoomIDColumn}
-		mutableColumns     = mysql.ColumnList{ShelveTypeIDColumn, RoomIDColumn}
+		IDColumn       = mysql.StringColumn("id")
+		RoomIDColumn   = mysql.StringColumn("room_id")
+		allColumns     = mysql.ColumnList{IDColumn, RoomIDColumn}
+		mutableColumns = mysql.ColumnList{RoomIDColumn}
 	)
 
 	return shelvesTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:           IDColumn,
-		ShelveTypeID: ShelveTypeIDColumn,
-		RoomID:       RoomIDColumn,
+		ID:     IDColumn,
+		RoomID: RoomIDColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

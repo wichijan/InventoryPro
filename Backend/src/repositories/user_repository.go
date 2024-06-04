@@ -20,6 +20,8 @@ type UserRepositoryI interface {
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
 
+	// TODO implement upload profile picture
+
 	managers.DatabaseManagerI
 }
 
@@ -39,6 +41,11 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, 
 		table.Users.JobTitle,
 		table.Users.PhoneNumber,
 		table.UserTypes.TypeName,
+
+		table.Users.ProfilePicture,
+		table.Users.RegistrationTime,
+		table.Users.RegistrationAccepted,
+		table.Users.IsActive,
 	).FROM(
 		table.Users.
 			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
@@ -68,6 +75,11 @@ func (ur *UserRepository) GetUserByUsername(username string) (*models.UserWithTy
 		table.Users.JobTitle,
 		table.Users.PhoneNumber,
 		table.UserTypes.TypeName,
+
+		table.Users.ProfilePicture,
+		table.Users.RegistrationTime,
+		table.Users.RegistrationAccepted,
+		table.Users.IsActive,
 	).FROM(
 		table.Users.
 			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
@@ -96,6 +108,11 @@ func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVEr
 		table.Users.JobTitle,
 		table.Users.PhoneNumber,
 		table.Users.UserTypeID,
+
+		table.Users.ProfilePicture,
+		table.Users.RegistrationTime,
+		table.Users.RegistrationAccepted,
+		table.Users.IsActive,
 	).VALUES(
 		user.ID,
 		user.FirstName,
@@ -106,6 +123,10 @@ func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVEr
 		user.JobTitle,
 		user.PhoneNumber,
 		user.UserTypeID,
+		user.ProfilePicture,
+		user.RegistrationTime,
+		user.RegistrationAccepted,
+		user.IsActive,
 	)
 
 	_, err := stmt.Exec(tx)

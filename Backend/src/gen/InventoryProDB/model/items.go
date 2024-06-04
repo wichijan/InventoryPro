@@ -9,8 +9,10 @@ package model
 
 type Items struct {
 	ID                 string `sql:"primary_key"`
+	ItemTypeID         *string
 	Name               *string
 	Description        *string
+	RegularShelfID     *string
 	ClassOne           *bool
 	ClassTwo           *bool
 	ClassThree         *bool
@@ -18,4 +20,5 @@ type Items struct {
 	Damaged            *bool
 	DamagedDescription *string
 	Picture            *string
+	HintText           *string
 }

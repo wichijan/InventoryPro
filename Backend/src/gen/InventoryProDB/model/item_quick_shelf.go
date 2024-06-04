@@ -7,7 +7,9 @@
 
 package model
 
-type ItemStatus struct {
-	ID         string `sql:"primary_key"`
-	StatusName *string
+type ItemQuickShelf struct {
+	ItemID       string `sql:"primary_key"`
+	UserID       string `sql:"primary_key"`
+	QuickShelfID string `sql:"primary_key"`
+	Quantity     *int32
 }

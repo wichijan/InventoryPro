@@ -8,7 +8,6 @@
 package model
 
 type Shelves struct {
-	ID           string `sql:"primary_key"`
-	ShelveTypeID *string
-	RoomID       *string
+	ID     string `sql:"primary_key"`
+	RoomID *string
 }

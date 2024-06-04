@@ -7,7 +7,11 @@
 
 package model
 
-type ShelveTypes struct {
-	ID       string `sql:"primary_key"`
-	TypeName *string
+import (
+	"time"
+)
+
+type RegistrationRequests struct {
+	UserID      string `sql:"primary_key"`
+	RequestTime *time.Time
 }
