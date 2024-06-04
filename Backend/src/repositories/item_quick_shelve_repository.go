@@ -14,12 +14,12 @@ import (
 )
 
 type ItemQuickShelfRepositoryI interface {
-	GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]model.ItemQuickShelf, *models.INVError)
+	GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.ItemQuickShelfInsert, *models.INVError)
 	InsertNewItemInQuickShelf(tx *sql.Tx, itemQuickShelf *model.ItemQuickShelf) *models.INVError
 	UpdateQuantityOfItemInQuickShelf(tx *sql.Tx, itemQuickShelf *model.ItemQuickShelf) *models.INVError
-	MoveItemOutOfQuickShelf(tx *sql.Tx, itemId *uuid.UUID, quickShelfId *uuid.UUID) *models.INVError
+	RemoveItemFromQuickShelf(tx *sql.Tx, itemId *uuid.UUID, quickShelfId *uuid.UUID) *models.INVError
 
-	ClearQuickShelf(tx *sql.Tx) *models.INVError
+	ClearQuickShelf(tx *sql.Tx, quickShelfId *uuid.UUID) *models.INVError
 
 	GetItemsFromUserInQuickShelf(userId *uuid.UUID) (*[]model.ItemQuickShelf, *models.INVError)
 	GetQuantityOfItemInQuickShelf(itemId *uuid.UUID, quickShelfId *uuid.UUID) (*int32, *models.INVError)
@@ -33,7 +33,7 @@ type ItemQuickShelfRepository struct {
 	managers.DatabaseManagerI
 }
 
-func (qsr *ItemQuickShelfRepository) GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]model.ItemQuickShelf, *models.INVError) {
+func (qsr *ItemQuickShelfRepository) GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.ItemQuickShelfInsert, *models.INVError) {
 	// Create the query
 	stmt := mysql.SELECT(
 		table.ItemQuickShelf.AllColumns,
@@ -44,7 +44,7 @@ func (qsr *ItemQuickShelfRepository) GetItemsInQuickShelf(quickShelfId *uuid.UUI
 	)
 
 	// Execute the query
-	var items []model.ItemQuickShelf
+	var items []models.ItemQuickShelfInsert
 	err := stmt.Query(qsr.GetDatabaseConnection(), &items)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
@@ -98,7 +98,7 @@ func (qsr *ItemQuickShelfRepository) UpdateQuantityOfItemInQuickShelf(tx *sql.Tx
 	return nil
 }
 
-func (qsr *ItemQuickShelfRepository) MoveItemOutOfQuickShelf(tx *sql.Tx, itemId *uuid.UUID, quickShelfId *uuid.UUID) *models.INVError {
+func (qsr *ItemQuickShelfRepository) RemoveItemFromQuickShelf(tx *sql.Tx, itemId *uuid.UUID, quickShelfId *uuid.UUID) *models.INVError {
 	// Create the query
 	stmt := table.ItemQuickShelf.DELETE().WHERE(
 		table.ItemQuickShelf.ItemID.EQ(mysql.String(itemId.String())).
@@ -114,9 +114,9 @@ func (qsr *ItemQuickShelfRepository) MoveItemOutOfQuickShelf(tx *sql.Tx, itemId 
 	return nil
 }
 
-func (qsr *ItemQuickShelfRepository) ClearQuickShelf(tx *sql.Tx) *models.INVError {
+func (qsr *ItemQuickShelfRepository) ClearQuickShelf(tx *sql.Tx, quickShelfId *uuid.UUID) *models.INVError {
 	// Create the query
-	stmt := table.ItemQuickShelf.DELETE()
+	stmt := table.ItemQuickShelf.DELETE().WHERE(table.ItemQuickShelf.QuickShelfID.EQ(mysql.String(quickShelfId.String())))
 
 	// Execute the query
 	_, err := stmt.Exec(tx)

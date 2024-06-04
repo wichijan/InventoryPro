@@ -17,17 +17,18 @@ import (
 )
 
 type Controllers struct {
-	WarehouseController  controllers.WarehouseControllerI
-	RoomController       controllers.RoomControllerI
-	ShelveController     controllers.ShelveControllerI
-	ItemController       controllers.ItemControllerI
-	UserController       controllers.UserControllerI
-	KeywordController    controllers.KeywordControllerI
-	UserRoleController   controllers.UserRoleControllerI
-	RoleController       controllers.RoleControllerI
-	SubjectController    controllers.SubjectControllerI
-	UserTypeController   controllers.UserTypeControllerI
+	WarehouseController   controllers.WarehouseControllerI
+	RoomController        controllers.RoomControllerI
+	ShelveController      controllers.ShelveControllerI
+	ItemController        controllers.ItemControllerI
+	UserController        controllers.UserControllerI
+	KeywordController     controllers.KeywordControllerI
+	UserRoleController    controllers.UserRoleControllerI
+	RoleController        controllers.RoleControllerI
+	SubjectController     controllers.SubjectControllerI
+	UserTypeController    controllers.UserTypeControllerI
 	ReservationController controllers.ReservationControllerI
+	QuickShelfController  controllers.ItemQuickShelfControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -108,6 +109,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
+	quickShelfRepo := &repositories.ItemQuickShelfRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -117,7 +122,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			RoomRepo: roomRepo,
 		},
 		ShelveController: &controllers.ShelveController{
-			ShelveRepo:     shelveRepo,
+			ShelveRepo: shelveRepo,
 		},
 		ItemController: &controllers.ItemController{
 			ItemRepo:         itemRepo,
@@ -149,6 +154,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ReservationController: &controllers.ReservationController{
 			ReservationRepo: reservationRepo,
+		},
+		QuickShelfController : &controllers.ItemQuickShelfController{
+			ItemQuickShelfRepo: quickShelfRepo,
+			UserItemRepo: userItemRepo,
 		},
 	}
 
@@ -208,6 +217,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Item move
 	securedRoutes.Handle(http.MethodPost, "/items/borrow", handlers.BorrowItemHandler(controller.ItemController))
 	securedRoutes.Handle(http.MethodPost, "/items/return/:id", handlers.ReturnReserveItemHandler(controller.ItemController))
+	// Item quick shelf
+	securedRoutes.Handle(http.MethodPost, "/items/add-item-to-quick-shelf", handlers.AddToQuickShelfHandler(controller.QuickShelfController))
+	securedRoutes.Handle(http.MethodPost, "/items/remove-item-to-quick-shelf", handlers.RemoveItemFromQuickShelfHandler(controller.QuickShelfController))
+	securedRoutes.Handle(http.MethodDelete, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.QuickShelfController))
+	securedRoutes.Handle(http.MethodGet, "/items/quick-shelf/:id", handlers.GetItemsInQuickShelfHandler(controller.QuickShelfController))
 
 	// Subject Routes
 	publicRoutes.Handle(http.MethodGet, "/subjects", handlers.GetSubjectsHandler(controller.SubjectController))
@@ -221,7 +235,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPut, "/keywords", handlers.UpdateKeywordHandler(controller.KeywordController))
 	publicRoutes.Handle(http.MethodDelete, "/keywords/:id", handlers.DeleteKeywordHandler(controller.KeywordController))
 
-	
 	// Roles routes
 	adminRoutes.Handle(http.MethodGet, "/roles", handlers.GetRolesHandler(controller.RoleController))
 	adminRoutes.Handle(http.MethodPost, "/roles", handlers.CreateRoleHandler(controller.RoleController))

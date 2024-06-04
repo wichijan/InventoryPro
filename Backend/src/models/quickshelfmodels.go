@@ -20,3 +20,8 @@ type ItemQuickShelfInsertODT struct {
 type GetQuantity struct {
 	Quantity *int32 `json:"quantity"`
 }
+
+type ItemQuickShelfRemoveSingleItem struct {
+	QuickShelfID uuid.UUID `json:"quickShelfId"`
+	ItemID       uuid.UUID `json:"itemId"`
+}
