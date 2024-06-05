@@ -3,14 +3,15 @@ package repositories
 import (
 	"github.com/go-jet/jet/v2/mysql"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
+	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
+	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
-	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 )
 
 type ItemTypeRepositoryI interface {
 	GetItemTypes() (*[]models.ItemTypes, *models.INVError)
-	GetItemTypesByName(typeName *string) (*models.ItemTypes, *models.INVError)
+	GetItemTypesByName(typeName *string) (*model.ItemTypes, *models.INVError)
 }
 
 type ItemTypeRepository struct {
@@ -40,12 +41,12 @@ func (itr *ItemTypeRepository) GetItemTypes() (*[]models.ItemTypes, *models.INVE
 	return &itemTypes, nil
 }
 
-func (itr *ItemTypeRepository) GetItemTypesByName(typeName *string) (*models.ItemTypes, *models.INVError) {
-	var itemType models.ItemTypes
+func (itr *ItemTypeRepository) GetItemTypesByName(typeName *string) (*model.ItemTypes, *models.INVError) {
+	var itemType model.ItemTypes
 
 	// Create the query
 	stmt := mysql.SELECT(
-		table.ItemTypes.TypeName,
+		table.ItemTypes.AllColumns,
 	).FROM(
 		table.ItemTypes,
 	).WHERE(table.ItemTypes.TypeName.EQ(mysql.String(*typeName)))
@@ -56,7 +57,7 @@ func (itr *ItemTypeRepository) GetItemTypesByName(typeName *string) (*models.Ite
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
-	if itemType.TypeName == "" {
+	if itemType.TypeName == nil {
 		return nil, inv_errors.INV_NOT_FOUND
 	}
 

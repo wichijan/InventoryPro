@@ -62,14 +62,14 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param room body models.ItemWThin true "ItemWThin model"
-// @Success 201 {object} models.ItemWThin
+// @Param item body models.ItemCreate true "ItemCreate model"
+// @Success 201 {object} uuid.UUID
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items [post]
 func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var item models.ItemWThin
+		var item models.ItemCreate
 		err := c.ShouldBindJSON(&item)
 		if err != nil || item.Name == "" {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)

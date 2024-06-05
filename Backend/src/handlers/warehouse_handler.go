@@ -69,7 +69,7 @@ func GetWarehouseByIdHandler(warehouseCtrl controllers.WarehouseControllerI) gin
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /warehouses/{id} [get]
+// @Router /warehouses-with-rooms [get]
 func GetWarehousesWithRoomsHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		warehouses, inv_err := warehouseCtrl.GetWarehousesWithRooms()
@@ -91,7 +91,7 @@ func GetWarehousesWithRoomsHandler(warehouseCtrl controllers.WarehouseController
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /warehouses/{id} [get]
+// @Router /warehouses-with-rooms/{id} [get]
 func GetWarehouseByIdWithRoomsHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))

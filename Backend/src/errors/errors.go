@@ -19,6 +19,8 @@ var (
 	INV_USER_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "USER_EXISTS"}, Status: 409}
 	// INV_EMAIL_EXISTS is used to indicate that the email already exists
 	INV_EMAIL_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "EMAIL_EXISTS"}, Status: 409}
+	// INV_SHELVE_DOES_NOT_EXISTS is used to indicate that the shelve does not exists
+	INV_SHELVE_DOES_NOT_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "SHELVE_DOES_NOT_EXISTS"}, Status: 409}
 	// INV_USERNAME_EXISTS is used to indicate that the username already exists
 	INV_USERNAME_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "USERNAME_EXISTS"}, Status: 409}
 	// INV_KEYWORDS_ITEM_COMBI_EXISTS is used to indicate that the username already exists

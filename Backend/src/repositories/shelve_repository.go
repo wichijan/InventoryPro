@@ -10,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type ShelveRepositoryI interface {
@@ -20,6 +21,7 @@ type ShelveRepositoryI interface {
 	CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uuid.UUID, *models.INVError)
 	UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *models.INVError
 	DeleteShelve(tx *sql.Tx, shelveId *uuid.UUID) *models.INVError
+	CheckIfShelveExists(shelveId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -143,6 +145,7 @@ func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *m
 		table.Shelves.ID,
 		table.Shelves.RoomID,
 		table.Items.AllColumns,
+		table.ItemsInShelf.Quantity,
 	).FROM(
 		table.Shelves.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ShelfID.EQ(table.Shelves.ID)).
@@ -181,4 +184,15 @@ func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.Shelv
 	}
 
 	return &shelveWithItems, nil
+}
+
+func (sr *ShelveRepository) CheckIfShelveExists(shelveId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.Shelves, table.Shelves.ID.EQ(mysql.String(shelveId.String())), sr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+	if count <= 0 {
+		return inv_errors.INV_SHELVE_DOES_NOT_EXISTS
+	}
+	return nil
 }
