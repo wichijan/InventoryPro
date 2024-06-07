@@ -53,6 +53,7 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.Users.ID,
 		table.Users.Username,
 		table.ItemTypes.TypeName,
+		table.Reservations.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
@@ -60,7 +61,8 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
+			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)).
+			LEFT_JOIN(table.Reservations, table.Reservations.ItemID.EQ(table.Items.ID)),
 	)
 
 	// Execute the query
@@ -98,13 +100,15 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 		table.Users.Username,
 		table.ItemSubjects.AllColumns,
 		table.KeywordsForItems.AllColumns,
+		table.Reservations.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
+			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)).
+			LEFT_JOIN(table.Reservations, table.Reservations.ItemID.EQ(table.Items.ID)),
 	).WHERE(
 		table.Items.ID.EQ(mysql.String(itemId.String())),
 	)

@@ -368,12 +368,7 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *model
 	defer tx.Rollback()
 
 	// Check items_in_shelve quantity
-	itemId, inv_err := uuid.Parse(itemReserve.ItemID)
-	if inv_err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(&itemId)
+	quantityInShelve, inv_error := ic.ItemInShelveRepo.GetQuantityInShelve(&itemReserve.ItemID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -385,8 +380,8 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *model
 
 	// insert into user_items
 	var pureItemBorrow models.ItemBorrow
-	pureItemBorrow.ItemID = itemReserve.ItemID
-	pureItemBorrow.UserID = itemReserve.UserID
+	pureItemBorrow.ItemID = itemReserve.ItemID.String()
+	pureItemBorrow.UserID = itemReserve.UserID.String()
 	pureItemBorrow.Quantity = itemReserve.Quantity
 	pureItemBorrow.TransactionDate = time.Now()
 
@@ -397,6 +392,20 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *model
 
 	// update items_in_shelve quantity
 	inv_error = ic.ItemInShelveRepo.UpdateQuantityInShelve(tx, &pureItemBorrow.ItemID, &newQuantityInShelve)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Transaction Logging
+	var transaction model.Transactions
+	transaction.ItemID = itemReserve.ItemID.String()
+	transaction.UserID = itemReserve.UserID.String()
+	transaction.TransactionType = "borrow"
+	transaction.TargetUserID = nil
+	transaction.OriginUserID = nil
+
+	// Add Transaction
+	inv_error = ic.TransactionRepo.CreateTransaction(tx, &transaction)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -441,6 +450,20 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 		return inv_error
 	}
 
+	// Transaction Logging
+	var transaction model.Transactions
+	transaction.ItemID = itemId.String()
+	transaction.UserID = userId.String()
+	transaction.TransactionType = "return"
+	transaction.TargetUserID = nil
+	transaction.OriginUserID = nil
+
+	// Add Transaction
+	inv_error = ic.TransactionRepo.CreateTransaction(tx, &transaction)
+	if inv_error != nil {
+		return inv_error
+	}
+
 	if err = tx.Commit(); err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
@@ -466,7 +489,6 @@ func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVE
 	}
 
 	// Transaction Logging
-	transactionDate := time.Now()
 	targetUserId := itemMove.NewUserID.String()
 	originUserId := itemMove.UserID.String()
 
@@ -474,7 +496,6 @@ func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVE
 	transaction.ItemID = itemMove.ItemID.String()
 	transaction.UserID = itemMove.UserID.String()
 	transaction.TransactionType = "transfer_request"
-	transaction.TransactionDate = &transactionDate
 	transaction.TargetUserID = &targetUserId
 	transaction.OriginUserID = &originUserId
 

@@ -53,6 +53,10 @@ type ItemWithEverything struct {
 	Subject []struct {
 		model.ItemSubjects
 	}
+
+	Reservations []struct {
+		model.Reservations
+	}
 }
 
 type ItemCreate struct {
@@ -115,8 +119,8 @@ type ItemWithUser struct {
 }
 
 type ItemReserveODT struct {
-	ItemID   string `json:"itemId"`
-	Quantity int32  `json:"quantity"`
+	ItemID   uuid.UUID `binding:"required"`
+	Quantity int32     `binding:"required"`
 }
 
 type ItemBorrow struct {
@@ -127,8 +131,8 @@ type ItemBorrow struct {
 }
 
 type ItemBorrowCreate struct {
-	ItemID   string
-	UserID   string
+	ItemID   uuid.UUID
+	UserID   uuid.UUID
 	Quantity int32
 }
 

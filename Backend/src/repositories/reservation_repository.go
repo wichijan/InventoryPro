@@ -16,8 +16,9 @@ import (
 type ReservationRepositoryI interface {
 	GetReservationByUserId(userId *uuid.UUID) (*[]model.Reservations, *models.INVError)
 	GetReservationByItemId(itemId *uuid.UUID) (*[]model.Reservations, *models.INVError)
+	GetReservationById(reservationId *uuid.UUID) (*model.Reservations, *models.INVError)
 	GetReservationByItemIdAndUserId(itemId *uuid.UUID, userId *uuid.UUID) (*model.Reservations, *models.INVError)
-	CreateReservation(tx *sql.Tx, reservation *models.ReservationCreate) (*string, *models.INVError)
+	CreateReservation(tx *sql.Tx, reservation *models.ReservationCreate) (*uuid.UUID, *models.INVError)
 	DeleteReservation(tx *sql.Tx, userId *uuid.UUID, reservationID *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
@@ -45,6 +46,27 @@ func (rr *ReservationRepository) GetReservationByUserId(userId *uuid.UUID) (*[]m
 	}
 
 	return &reservations, nil
+}
+
+
+func (rr *ReservationRepository) GetReservationById(reservationId *uuid.UUID) (*model.Reservations, *models.INVError) {
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Reservations.AllColumns,
+	).FROM(
+		table.Reservations,
+	).WHERE(
+		table.Reservations.ReservationID.EQ(mysql.String(reservationId.String())),
+	)
+
+	// Execute the query
+	var reservation model.Reservations
+	err := stmt.Query(rr.GetDatabaseConnection(), &reservation)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &reservation, nil
 }
 
 func (rr *ReservationRepository) GetReservationByItemId(itemId *uuid.UUID) (*[]model.Reservations, *models.INVError) {
@@ -88,7 +110,7 @@ func (rr *ReservationRepository) GetReservationByItemIdAndUserId(itemId *uuid.UU
 	return &reservation, nil
 }
 
-func (rr *ReservationRepository) CreateReservation(tx *sql.Tx, reservation *models.ReservationCreate) (*string, *models.INVError) {
+func (rr *ReservationRepository) CreateReservation(tx *sql.Tx, reservation *models.ReservationCreate) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 	
 	// Create the query
@@ -114,7 +136,7 @@ func (rr *ReservationRepository) CreateReservation(tx *sql.Tx, reservation *mode
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 
-	return nil, nil
+	return &uuid, nil
 }
 
 func (rr *ReservationRepository) DeleteReservation(tx *sql.Tx, userId *uuid.UUID, reservationID *uuid.UUID) *models.INVError {

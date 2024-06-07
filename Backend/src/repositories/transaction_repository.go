@@ -10,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type TransactionRepositoryI interface {
@@ -66,7 +67,7 @@ func (trr *TransactionRepository) GetTransactionByItemId(itemId *uuid.UUID) (*[]
 
 func (trr *TransactionRepository) CreateTransaction(tx *sql.Tx, transaction *model.Transactions) *models.INVError {
 	newUUID := uuid.New().String()
-	
+
 	// Create the query
 	stmt := table.Transactions.INSERT(
 		table.Transactions.TransactionID,
@@ -84,7 +85,7 @@ func (trr *TransactionRepository) CreateTransaction(tx *sql.Tx, transaction *mod
 		transaction.TransactionType,
 		transaction.TargetUserID,
 		transaction.OriginUserID,
-		transaction.TransactionDate,
+		utils.MysqlTimeNow(),
 		transaction.Note,
 	)
 
@@ -96,6 +97,3 @@ func (trr *TransactionRepository) CreateTransaction(tx *sql.Tx, transaction *mod
 
 	return nil
 }
-
-
-

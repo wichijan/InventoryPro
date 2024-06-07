@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -251,7 +252,19 @@ func ReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.
 
 		var itemReserveODT models.ReservationCreateODT
 		err := c.ShouldBindJSON(&itemReserveODT)
-		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) {
+		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) || itemReserveODT.Quantity <= 0 {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		newTimeFrom, inv_error := time.Parse("2006-01-02", itemReserveODT.TimeFrom)
+		if inv_error != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		newTimeTo, inv_error := time.Parse("2006-01-02", itemReserveODT.TimeTo)
+		if inv_error != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
@@ -260,8 +273,8 @@ func ReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.
 			ItemID:   itemReserveODT.ItemID,
 			UserID:   userId.String(),
 			Quantity: itemReserveODT.Quantity,
-			TimeFrom: itemReserveODT.TimeFrom,
-			TimeTo:   itemReserveODT.TimeTo,
+			TimeFrom: newTimeFrom,
+			TimeTo:   newTimeTo,
 		}
 
 		reservationId, inv_err := reservationCtrl.CreateReservation(&itemReserve)
@@ -328,14 +341,14 @@ func BorrowItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 
 		var itemReserveODT models.ItemReserveODT
 		err := c.ShouldBindJSON(&itemReserveODT)
-		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) {
+		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
 		itemReserve := models.ItemBorrowCreate{
 			ItemID:   itemReserveODT.ItemID,
-			UserID:   userId.String(),
+			UserID:   *userId,
 			Quantity: itemReserveODT.Quantity,
 		}
 
