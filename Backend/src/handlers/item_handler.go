@@ -93,7 +93,7 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Accept  json
 // @Produce  json
 // @Param item body models.ItemUpdate true "ItemUpdate model"
-// @Success 200 {object}
+// @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items [put]

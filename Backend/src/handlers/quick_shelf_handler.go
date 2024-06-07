@@ -17,7 +17,7 @@ import (
 // @Tags Quick Shelf
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} models.QuickShelves
+// @Success 200 {array} models.QuickShelfWithItems
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /quick-shelves [get]
 func GetQuickShelvesHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
@@ -217,7 +217,7 @@ func ClearQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControl
 // @Accept  json
 // @Produce  json
 // @Param id path string true "quick shelf id"
-// @Success 200 {array} models.ItemQuickShelfInsert
+// @Success 200 {array} models.GetQuickShelf
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /quick-shelf/:id [get]
 func GetItemsInQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
