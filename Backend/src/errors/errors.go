@@ -42,9 +42,13 @@ var (
 
 	// INV_QUICK_SHELF_FULL is used to indicate that the quick shelf is full
 	INV_QUICK_SHELF_FULL = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "QUICK_SHELF_FULL"}, Status: 409}
-
+	
 	// INV_QUICK_SHELF_USER_LIMIT_FULL is used to indicate that the user has reached the limit of items in the quick shelf
 	INV_QUICK_SHELF_USER_LIMIT_FULL = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "QUICK_SHELF_USER_LIMIT_FULL"}, Status: 409}
+
+
+	// INV_ITEM_NOT_BORROWED_FROM_USER is used to indicate that the user has not borrowed that item
+	INV_ITEM_NOT_BORROWED_FROM_USER = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "ITEM_NOT_BORROWED_FROM_USER"}, Status: 409}
 
 	// INV_UPSTREAM_ERROR is used to indicate an error in 3rd party services
 	INV_UPSTREAM_ERROR = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "UPSTREAM_ERROR"}, Status: 500}

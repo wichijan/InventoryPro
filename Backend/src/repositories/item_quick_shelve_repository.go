@@ -14,7 +14,12 @@ import (
 )
 
 type ItemQuickShelfRepositoryI interface {
-	GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.ItemQuickShelfInsert, *models.INVError)
+	GetQuickShelves() (*[]models.QuickShelfWithItems, *models.INVError)
+	CreateQuickShelf(tx *sql.Tx, quickShelf *models.QuickShelfCreate) (*uuid.UUID, *models.INVError)
+	UpdateQuickShelf(tx *sql.Tx, quickShelf *model.QuickShelves) *models.INVError
+	DeleteQuickShelf(tx *sql.Tx, quickShelfId *uuid.UUID) *models.INVError
+
+	GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.GetQuickShelf, *models.INVError)
 	InsertNewItemInQuickShelf(tx *sql.Tx, itemQuickShelf *model.ItemQuickShelf) *models.INVError
 	UpdateQuantityOfItemInQuickShelf(tx *sql.Tx, itemQuickShelf *model.ItemQuickShelf) *models.INVError
 	RemoveItemFromQuickShelf(tx *sql.Tx, itemId *uuid.UUID, quickShelfId *uuid.UUID) *models.INVError
@@ -33,18 +38,98 @@ type ItemQuickShelfRepository struct {
 	managers.DatabaseManagerI
 }
 
-func (qsr *ItemQuickShelfRepository) GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.ItemQuickShelfInsert, *models.INVError) {
+func (qsr *ItemQuickShelfRepository) GetQuickShelves() (*[]models.QuickShelfWithItems, *models.INVError) {
 	// Create the query
 	stmt := mysql.SELECT(
-		table.ItemQuickShelf.AllColumns,
+		table.QuickShelves.AllColumns,
+		table.Items.AllColumns,
 	).FROM(
-		table.ItemQuickShelf,
-	).WHERE(
-		table.ItemQuickShelf.QuickShelfID.EQ(mysql.String(quickShelfId.String())),
+		table.QuickShelves.
+			LEFT_JOIN(table.ItemQuickShelf, table.ItemQuickShelf.QuickShelfID.EQ(table.QuickShelves.QuickShelfID)).
+			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemQuickShelf.ItemID)),
 	)
 
 	// Execute the query
-	var items []models.ItemQuickShelfInsert
+	var quickShelves []models.QuickShelfWithItems
+	err := stmt.Query(qsr.GetDatabaseConnection(), &quickShelves)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &quickShelves, nil
+}
+
+func (qsr *ItemQuickShelfRepository) CreateQuickShelf(tx *sql.Tx, quickShelf *models.QuickShelfCreate) (*uuid.UUID, *models.INVError) {
+	uuid := uuid.New()
+
+	// Create the query
+	stmt := table.QuickShelves.INSERT(
+		table.QuickShelves.QuickShelfID,
+		table.QuickShelves.RoomID,
+	).VALUES(
+		uuid,
+		quickShelf.RoomId,
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &uuid, nil
+}
+
+func (qsr *ItemQuickShelfRepository) UpdateQuickShelf(tx *sql.Tx, quickShelf *model.QuickShelves) *models.INVError {
+	// Create the query
+	stmt := table.QuickShelves.UPDATE(
+		table.QuickShelves.RoomID,
+	).SET(
+		quickShelf.RoomID,
+	).WHERE(
+		table.QuickShelves.QuickShelfID.EQ(mysql.String(quickShelf.QuickShelfID)),
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return nil
+}
+
+func (qsr *ItemQuickShelfRepository) DeleteQuickShelf(tx *sql.Tx, quickShelfId *uuid.UUID) *models.INVError {
+	// Create the query
+	stmt := table.QuickShelves.DELETE().WHERE(
+		table.QuickShelves.QuickShelfID.EQ(mysql.String(quickShelfId.String())),
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return nil
+}
+
+func (qsr *ItemQuickShelfRepository) GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.GetQuickShelf, *models.INVError) {
+	// Create the query
+	stmt := mysql.SELECT(
+		table.ItemQuickShelf.AllColumns,
+		table.Items.AllColumns,
+		table.Users.AllColumns,
+	).FROM(
+		table.ItemQuickShelf.
+			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemQuickShelf.ItemID)).
+			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.ItemQuickShelf.UserID)),
+	).WHERE(
+		table.ItemQuickShelf.QuickShelfID.EQ(mysql.String(quickShelfId.String())),
+	)// TODO
+
+	// Execute the query
+	var items []models.GetQuickShelf
 	err := stmt.Query(qsr.GetDatabaseConnection(), &items)
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR
@@ -177,7 +262,7 @@ func (qsr *ItemQuickShelfRepository) CheckIfItemAlreadyInQuickShelf(itemId *uuid
 		return nil, inv_errors.INV_INTERNAL_ERROR
 	}
 	if count > 0 {
-		return &varTrue, inv_errors.INV_USERNAME_EXISTS
+		return &varTrue, nil
 	}
 	return &varFalse, nil
 }

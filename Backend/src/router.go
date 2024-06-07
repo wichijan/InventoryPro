@@ -170,6 +170,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		QuickShelfController: &controllers.ItemQuickShelfController{
 			ItemQuickShelfRepo: quickShelfRepo,
 			UserItemRepo:       userItemRepo,
+			ItemRepo:           itemRepo,
+			ItemsInShelfRepo:   itemInShelveRepo,
 		},
 	}
 
@@ -211,6 +213,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	adminRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
 	adminRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
 
+	// Quick Shelf routes
+	publicRoutes.Handle(http.MethodGet, "/quick-shelves", handlers.GetQuickShelvesHandler(controller.QuickShelfController))
+	adminRoutes.Handle(http.MethodPost, "/quick-shelves", handlers.CreateQuickShelfHandler(controller.QuickShelfController))
+	adminRoutes.Handle(http.MethodPut, "/quick-shelves", handlers.UpdateQuickShelfHandler(controller.QuickShelfController))
+	adminRoutes.Handle(http.MethodDelete, "/quick-shelves/:id", handlers.DeleteQuickShelfHandler(controller.QuickShelfController))
+
 	// Items routes
 	publicRoutes.Handle(http.MethodGet, "/items", handlers.GetItemsHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
@@ -235,7 +243,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Item quick shelf
 	securedRoutes.Handle(http.MethodPost, "/items/add-item-to-quick-shelf", handlers.AddToQuickShelfHandler(controller.QuickShelfController))
 	securedRoutes.Handle(http.MethodPost, "/items/remove-item-to-quick-shelf", handlers.RemoveItemFromQuickShelfHandler(controller.QuickShelfController))
-	securedRoutes.Handle(http.MethodDelete, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.QuickShelfController))
+	securedRoutes.Handle(http.MethodPost, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.QuickShelfController))
 	securedRoutes.Handle(http.MethodGet, "/items/quick-shelf/:id", handlers.GetItemsInQuickShelfHandler(controller.QuickShelfController))
 
 	// Subject Routes
