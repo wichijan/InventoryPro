@@ -9,6 +9,6 @@ type UserRoleWithName struct {
 }
 
 type RoleIdODT struct {
-	UserID string `json:"user_id"`
-	RoleID string `json:"role_id"`
+	UserID string `binding:"required"`
+	RoleID string `binding:"required"`
 }

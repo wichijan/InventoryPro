@@ -29,6 +29,8 @@ var (
 	INV_SUBJECT_ITEM_COMBI_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "SUBJECT_ITEM_COMBI_EXISTS"}, Status: 409}
 	// INV_KEYWORD_EXISTS is used to indicate that the keyword already exists
 	INV_KEYWORD_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "KEYWORD_EXISTS"}, Status: 409}
+	// INV_ROLE_EXISTS is used to indicate that the role already exists
+	INV_ROLE_EXISTS = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "ROLE_EXISTS"}, Status: 409}
 	// INV_USER_TYPE_NOT_FOUND is used to indicate that the user type was not found
 	INV_USER_TYPE_NOT_FOUND = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "USER_TYPE_NOT_FOUND"}, Status: 409}
 	// INV_CONFLICT is used to indicate that the request could not be processed due to a conflict

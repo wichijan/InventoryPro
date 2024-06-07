@@ -17,7 +17,7 @@ type ItemControllerI interface {
 	GetItems() (*[]models.ItemWithEverything, *models.INVError)
 	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
 	CreateItem(item *models.ItemCreate) (*uuid.UUID, *models.INVError)
-	UpdateItem(item *models.ItemWThin) *models.INVError
+	UpdateItem(item *models.ItemUpdate) *models.INVError
 	AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError
 	RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError
 	AddSubjectToItem(itemSubject models.ItemWithSubjectName) *models.INVError
@@ -122,7 +122,7 @@ func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *mode
 	return id, nil
 }
 
-func (ic *ItemController) UpdateItem(item *models.ItemWThin) *models.INVError {
+func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 	tx, err := ic.ItemRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
@@ -156,6 +156,15 @@ func (ic *ItemController) UpdateItem(item *models.ItemWThin) *models.INVError {
 	pureItem.DamagedDescription = &item.DamagedDesc
 
 	inv_error = ic.ItemRepo.UpdateItem(tx, &pureItem)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	inv_error = ic.ItemInShelveRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
+		ItemID:   item.ID,
+		ShelfID:  item.RegularShelfId.String(),
+		Quantity: &item.QuantityInShelf,
+	})
 	if inv_error != nil {
 		return inv_error
 	}

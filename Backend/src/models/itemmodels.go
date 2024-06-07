@@ -32,7 +32,7 @@ type ItemWithEverything struct {
 	Name            string `alias:"items.name"`
 	Description     string `alias:"items.description"`
 	ItemTypeName    string `alias:"item_types.type_name"`
-	RegularShelfId  string `alias:"items_in_shelf.shelf_id"`
+	RegularShelfId  string `alias:"items.regular_shelf_id"`
 	QuantityInShelf int32  `alias:"items_in_shelf.quantity"`
 	ClassOne        bool   `alias:"items.class_one"`
 	ClassTwo        bool   `alias:"items.class_two"`
@@ -103,7 +103,7 @@ type ItemWithSubject struct {
 
 type ItemWithSubjectName struct {
 	ItemID      string `json:"itemId"`
-	SubjectName string `json:"keywordName"`
+	SubjectName string `json:"subjectName"`
 }
 
 type ItemWithUser struct {

@@ -94,7 +94,7 @@ func UpdateKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.Handle
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /keywords [delete]
+// @Router /keywords/:id [delete]
 func DeleteKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
