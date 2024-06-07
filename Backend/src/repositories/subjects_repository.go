@@ -135,6 +135,23 @@ func (sr *SubjectRepository) UpdateSubject(tx *sql.Tx, subject *model.Subjects) 
 }
 
 func (sr *SubjectRepository) DeleteSubject(tx *sql.Tx, subjectId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
+	// Create the delete statement
+	deleteQuery := table.Subjects.DELETE().WHERE(table.Subjects.ID.EQ(mysql.String(subjectId.String())))
+
+	// Execute the query
+	rows, err := deleteQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND
+	}
+
 	return nil
 }

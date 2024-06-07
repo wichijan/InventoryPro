@@ -8,6 +8,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
+	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/utils"
 )
 
@@ -68,7 +69,7 @@ func GetWarehouseByIdHandler(warehouseCtrl controllers.WarehouseControllerI) gin
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /warehouses/{id} [get]
+// @Router /warehouses-with-rooms [get]
 func GetWarehousesWithRoomsHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		warehouses, inv_err := warehouseCtrl.GetWarehousesWithRooms()
@@ -90,7 +91,7 @@ func GetWarehousesWithRoomsHandler(warehouseCtrl controllers.WarehouseController
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /warehouses/{id} [get]
+// @Router /warehouses-with-rooms/{id} [get]
 func GetWarehouseByIdWithRoomsHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
@@ -113,14 +114,14 @@ func GetWarehouseByIdWithRoomsHandler(warehouseCtrl controllers.WarehouseControl
 // @Tags Warehouses
 // @Accept  json
 // @Produce  json
-// @Param name path string true "Warehouse name"
-// @Success 201 {object} model.Warehouses
+// @Param WarehousesODT body models.WarehousesODT true "WarehousesODT model"
+// @Success 201 {object} uuid.UUID
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /warehouses [post]
 func CreateWarehouseHandler(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var warehouse model.Warehouses
+		var warehouse models.WarehousesODT
 		err := c.ShouldBindJSON(&warehouse)
 		if err != nil || utils.ContainsEmptyString(*warehouse.Name) {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)

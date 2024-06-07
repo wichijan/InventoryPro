@@ -133,7 +133,7 @@ func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVEr
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
 	}
-	
+
 	return nil
 }
 

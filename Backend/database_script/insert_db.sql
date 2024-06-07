@@ -1,6 +1,13 @@
 use InventoryProDB;
 
 Insert into
+    item_types(id, type_name)
+values
+    ("af7c1fe6-d669-414e-b066-e9733f0de7a8", 'book'),
+    ("1ad1fccc-d279-46a0-8980-1d91afd6ba67", 'single-object'),
+    (UUID(), 'sets-of-objects');
+
+Insert into
     roles(id, role_name)
 values
     (
@@ -134,7 +141,9 @@ Insert into
         class_three,
         class_four,
         damaged,
-        damaged_description
+        damaged_description,
+        regular_shelf_id,
+        item_type_id
     )
 values
     (
@@ -147,7 +156,9 @@ values
         0,
         0,
         /* false */
-        Null
+        Null,
+        "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        "af7c1fe6-d669-414e-b066-e9733f0de7a8"
     ),
     (
         "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
@@ -158,7 +169,9 @@ values
         0,
         0,
         0,
-        NULL
+        NULL,
+        "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        "1ad1fccc-d279-46a0-8980-1d91afd6ba67"
     ),
     (
         "7791a294-94de-4cbf-9243-3f7210664f92",
@@ -169,7 +182,9 @@ values
         1,
         0,
         0,
-        NULL
+        NULL,
+        "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        "1ad1fccc-d279-46a0-8980-1d91afd6ba67"
     ),
     (
         "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
@@ -180,30 +195,36 @@ values
         0,
         1,
         0,
-        NULL
+        NULL,
+        "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        "1ad1fccc-d279-46a0-8980-1d91afd6ba67"
     );
 
 Insert into
-    items_in_shelf(item_id, shelf_id)
+    items_in_shelf(item_id, shelf_id, quantity)
 values
     (
         "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
-        "0a75123a-9736-4c60-a10c-16e76aced3d2"
+        "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        5
         /* Small Shelve */
     ),
     (
         "7791a294-94de-4cbf-9243-3f7210664f92",
-        "0a75123a-9736-4c60-a10c-16e76aced3d2"
+        "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        2
         /* Small Shelve */
     ),
     (
         "d2b6b0f5-a9b9-4ab5-9644-75407c9e9dfb",
-        "0a75123a-9736-4c60-a10c-16e76aced3d2"
+        "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        2
         /* Small Shelve */
     ),
     (
         "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
-        "0a75123a-9736-4c60-a10c-16e76aced3d2"
+        "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        3
         /* Small Shelve */
     );
 

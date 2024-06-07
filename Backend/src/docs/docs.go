@@ -236,7 +236,7 @@ const docTemplate = `{
             }
         },
         "/clear-quick-shelf/:id": {
-            "delete": {
+            "post": {
                 "description": "Remove all items from quick shelf",
                 "consumes": [
                     "application/json"
@@ -315,21 +315,18 @@ const docTemplate = `{
                 "summary": "Update Item",
                 "parameters": [
                     {
-                        "description": "ItemWThin model",
+                        "description": "ItemUpdate model",
                         "name": "item",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ItemWThin"
+                            "$ref": "#/definitions/models.ItemUpdate"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.ItemWThin"
-                        }
+                    "200": {
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -359,12 +356,12 @@ const docTemplate = `{
                 "summary": "Create Item",
                 "parameters": [
                     {
-                        "description": "ItemWThin model",
-                        "name": "room",
+                        "description": "ItemCreate model",
+                        "name": "item",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ItemWThin"
+                            "$ref": "#/definitions/models.ItemCreate"
                         }
                     }
                 ],
@@ -372,7 +369,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.ItemWThin"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -543,7 +540,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/addkeyword": {
+        "/items/add-keyword": {
             "post": {
                 "description": "Add keyword to item",
                 "consumes": [
@@ -586,7 +583,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/addsubject": {
+        "/items/add-subject": {
             "post": {
                 "description": "Add Subject to item",
                 "consumes": [
@@ -666,7 +663,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/removekeyword": {
+        "/items/remove-keyword": {
             "post": {
                 "description": "Remove keyword to item",
                 "consumes": [
@@ -709,8 +706,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/removesubject": {
-            "post": {
+        "/items/remove-subject": {
+            "delete": {
                 "description": "Remove Subject to item",
                 "consumes": [
                     "application/json"
@@ -974,7 +971,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/keywords/:id": {
             "delete": {
                 "description": "Delete Keyword",
                 "consumes": [
@@ -1043,9 +1042,149 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ItemQuickShelfInsert"
+                                "$ref": "#/definitions/models.GetQuickShelf"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/quick-shelves": {
+            "get": {
+                "description": "Get all Quick Shelves",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Get all Quick Shelves",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.QuickShelfWithItems"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Quick Shelf",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Update Quick Shelf",
+                "parameters": [
+                    {
+                        "description": "QuickShelves model",
+                        "name": "QuickShelfUpdate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.QuickShelves"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Quick Shelf",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Create Quick Shelf",
+                "parameters": [
+                    {
+                        "description": "QuickShelfCreate model",
+                        "name": "QuickShelfCreate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.QuickShelfCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/quick-shelves/:id": {
+            "delete": {
+                "description": "Delete Quick Shelf",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Delete Quick Shelf",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "quick shelf id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1299,12 +1438,12 @@ const docTemplate = `{
                 "summary": "Create Room",
                 "parameters": [
                     {
-                        "description": "Room model",
-                        "name": "room",
+                        "description": "RoomsODT model",
+                        "name": "RoomsODT",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Rooms"
+                            "$ref": "#/definitions/models.RoomsODT"
                         }
                     }
                 ],
@@ -1330,57 +1469,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/rooms/{id}": {
-            "get": {
-                "description": "Get room by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Rooms"
-                ],
-                "summary": "Get room by id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Room id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Rooms"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/roomswithshelves": {
+        "/rooms-with-shelves": {
             "get": {
                 "description": "Get rooms with shelves",
                 "consumes": [
@@ -1430,7 +1519,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/roomswithshelves/{id}": {
+        "/rooms-with-shelves/{id}": {
             "get": {
                 "description": "Get room by id with shelves",
                 "consumes": [
@@ -1457,6 +1546,56 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.RoomWithShelves"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/rooms/{id}": {
+            "get": {
+                "description": "Get room by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Get room by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Room id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Rooms"
                         }
                     },
                     "400": {
@@ -1600,57 +1739,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/shelves/{id}": {
-            "get": {
-                "description": "Get shelve by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Shelves"
-                ],
-                "summary": "Get shelve by id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Shelve id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Shelves"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/shelveswithitems": {
+        "/shelves-with-items": {
             "get": {
                 "description": "Get shelves with items",
                 "consumes": [
@@ -1694,7 +1783,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/shelveswithitems/{id}": {
+        "/shelves-with-items/{id}": {
             "get": {
                 "description": "Get shelve by id with items",
                 "consumes": [
@@ -1721,6 +1810,56 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.ShelveWithItems"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/shelves/{id}": {
+            "get": {
+                "description": "Get shelve by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shelves"
+                ],
+                "summary": "Get shelve by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Shelve id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Shelves"
                         }
                     },
                     "400": {
@@ -2248,18 +2387,20 @@ const docTemplate = `{
                 "summary": "Create warehouse",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Warehouse name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
+                        "description": "WarehousesODT model",
+                        "name": "WarehousesODT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.WarehousesODT"
+                        }
                     }
                 ],
                 "responses": {
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/model.Warehouses"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -2277,7 +2418,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/warehouses/{id}": {
+        "/warehouses-with-rooms": {
             "get": {
                 "description": "Get warehouse by id",
                 "consumes": [
@@ -2326,6 +2467,106 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/warehouses-with-rooms/{id}": {
+            "get": {
+                "description": "Get warehouse by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "Get warehouse by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Warehouse id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.WarehouseWithRooms"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/warehouses/{id}": {
+            "get": {
+                "description": "Get warehouse by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "Get warehouse by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Warehouse id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Warehouses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2336,6 +2577,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "keyword": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.QuickShelves": {
+            "type": "object",
+            "properties": {
+                "quickShelfID": {
+                    "type": "string"
+                },
+                "roomID": {
                     "type": "string"
                 }
             }
@@ -2437,10 +2689,153 @@ const docTemplate = `{
                 }
             }
         },
+        "models.GetQuickShelf": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "classFour": {
+                            "type": "boolean"
+                        },
+                        "classOne": {
+                            "type": "boolean"
+                        },
+                        "classThree": {
+                            "type": "boolean"
+                        },
+                        "classTwo": {
+                            "type": "boolean"
+                        },
+                        "damaged": {
+                            "type": "boolean"
+                        },
+                        "damagedDescription": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "hintText": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "itemTypeID": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "picture": {
+                            "type": "string"
+                        },
+                        "regularShelfID": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "quickShelfID": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string"
+                        },
+                        "firstName": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "isActive": {
+                            "type": "boolean"
+                        },
+                        "jobTitle": {
+                            "type": "string"
+                        },
+                        "lastName": {
+                            "type": "string"
+                        },
+                        "phoneNumber": {
+                            "type": "string"
+                        },
+                        "profilePicture": {
+                            "type": "string"
+                        },
+                        "registrationAccepted": {
+                            "type": "boolean"
+                        },
+                        "registrationTime": {
+                            "type": "string"
+                        },
+                        "userTypeID": {
+                            "type": "string"
+                        },
+                        "username": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "models.INVErrorMessage": {
             "type": "object",
             "properties": {
                 "errorMessage": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemCreate": {
+            "type": "object",
+            "required": [
+                "BaseQuantityInShelf",
+                "itemTypeName",
+                "name",
+                "regularShelfId"
+            ],
+            "properties": {
+                "BaseQuantityInShelf": {
+                    "type": "integer"
+                },
+                "classFour": {
+                    "type": "boolean"
+                },
+                "classOne": {
+                    "type": "boolean"
+                },
+                "classThree": {
+                    "type": "boolean"
+                },
+                "classTwo": {
+                    "type": "boolean"
+                },
+                "damaged": {
+                    "type": "boolean"
+                },
+                "damagedDesc": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "hintText": {
+                    "type": "string"
+                },
+                "itemTypeName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "regularShelfId": {
                     "type": "string"
                 }
             }
@@ -2453,33 +2848,21 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ItemQuickShelfInsert": {
-            "type": "object",
-            "properties": {
-                "itemId": {
-                    "type": "string"
-                },
-                "quantity": {
-                    "type": "integer"
-                },
-                "quickShelfId": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "string"
-                }
-            }
-        },
         "models.ItemQuickShelfInsertODT": {
             "type": "object",
+            "required": [
+                "itemID",
+                "quantity",
+                "quickShelfID"
+            ],
             "properties": {
-                "itemId": {
+                "itemID": {
                     "type": "string"
                 },
                 "quantity": {
                     "type": "integer"
                 },
-                "quickShelfId": {
+                "quickShelfID": {
                     "type": "string"
                 }
             }
@@ -2497,8 +2880,12 @@ const docTemplate = `{
         },
         "models.ItemReserveODT": {
             "type": "object",
+            "required": [
+                "itemID",
+                "quantity"
+            ],
             "properties": {
-                "itemId": {
+                "itemID": {
                     "type": "string"
                 },
                 "quantity": {
@@ -2506,14 +2893,16 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ItemWThin": {
+        "models.ItemUpdate": {
             "type": "object",
+            "required": [
+                "itemTypeName",
+                "name",
+                "regularShelfId"
+            ],
             "properties": {
-                "borrowedByUserID": {
-                    "type": "string"
-                },
-                "borrowedByUserName": {
-                    "type": "string"
+                "QuantityInShelf": {
+                    "type": "integer"
                 },
                 "classFour": {
                     "type": "boolean"
@@ -2547,12 +2936,6 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
-                },
-                "picture": {
-                    "type": "string"
-                },
-                "quantityInShelf": {
-                    "type": "integer"
                 },
                 "regularShelfId": {
                     "type": "string"
@@ -2624,6 +3007,38 @@ const docTemplate = `{
                 "regularShelfId": {
                     "type": "string"
                 },
+                "reservations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "isCancelled": {
+                                "type": "boolean"
+                            },
+                            "itemID": {
+                                "type": "string"
+                            },
+                            "quantity": {
+                                "type": "integer"
+                            },
+                            "reservationDate": {
+                                "type": "string"
+                            },
+                            "reservationID": {
+                                "type": "string"
+                            },
+                            "timeFrom": {
+                                "type": "string"
+                            },
+                            "timeTo": {
+                                "type": "string"
+                            },
+                            "userID": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
                 "subject": {
                     "type": "array",
                     "items": {
@@ -2657,7 +3072,7 @@ const docTemplate = `{
                 "itemId": {
                     "type": "string"
                 },
-                "keywordName": {
+                "subjectName": {
                     "type": "string"
                 }
             }
@@ -2698,6 +3113,72 @@ const docTemplate = `{
                 }
             }
         },
+        "models.QuickShelfCreate": {
+            "type": "object",
+            "properties": {
+                "roomId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.QuickShelfWithItems": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "classFour": {
+                                "type": "boolean"
+                            },
+                            "classOne": {
+                                "type": "boolean"
+                            },
+                            "classThree": {
+                                "type": "boolean"
+                            },
+                            "classTwo": {
+                                "type": "boolean"
+                            },
+                            "damaged": {
+                                "type": "boolean"
+                            },
+                            "damagedDescription": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "hintText": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "itemTypeID": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "picture": {
+                                "type": "string"
+                            },
+                            "regularShelfID": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "quickShelfId": {
+                    "type": "string"
+                },
+                "roomId": {
+                    "type": "string"
+                }
+            }
+        },
         "models.RegistrationRequest": {
             "type": "object",
             "properties": {
@@ -2729,6 +3210,12 @@ const docTemplate = `{
         },
         "models.ReservationCreateODT": {
             "type": "object",
+            "required": [
+                "itemID",
+                "quantity",
+                "timeFrom",
+                "timeTo"
+            ],
             "properties": {
                 "itemID": {
                     "type": "string"
@@ -2746,19 +3233,26 @@ const docTemplate = `{
         },
         "models.RoleIdODT": {
             "type": "object",
+            "required": [
+                "roleID",
+                "userID"
+            ],
             "properties": {
-                "role_id": {
+                "roleID": {
                     "type": "string"
                 },
-                "user_id": {
+                "userID": {
                     "type": "string"
                 }
             }
         },
         "models.RoleODT": {
             "type": "object",
+            "required": [
+                "roleName"
+            ],
             "properties": {
-                "role_name": {
+                "roleName": {
                     "type": "string"
                 }
             }
@@ -2785,6 +3279,17 @@ const docTemplate = `{
                             }
                         }
                     }
+                },
+                "warehouseID": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RoomsODT": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
                 },
                 "warehouseID": {
                     "type": "string"
@@ -2837,6 +3342,9 @@ const docTemplate = `{
                             },
                             "picture": {
                                 "type": "string"
+                            },
+                            "quantity": {
+                                "type": "integer"
                             },
                             "regularShelfID": {
                                 "type": "string"
@@ -2921,6 +3429,17 @@ const docTemplate = `{
                             }
                         }
                     }
+                }
+            }
+        },
+        "models.WarehousesODT": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         }

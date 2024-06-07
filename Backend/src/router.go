@@ -113,6 +113,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
+	itemTypeRepo := &repositories.ItemTypeRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
+	tranactionRepo := &repositories.TransactionRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -132,6 +140,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			SubjectRepo:      subjectRepo,
 			ItemKeywordRepo:  itemKeywordRepo,
 			ItemSubjectRepo:  itemSubjectRepo,
+			ItemTypeRepo:     itemTypeRepo,
+			ShelveRepo:       shelveRepo,
+			TransactionRepo:  tranactionRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:     userRepo,
@@ -154,63 +165,75 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ReservationController: &controllers.ReservationController{
 			ReservationRepo: reservationRepo,
+			TransactionRepo: tranactionRepo,
 		},
-		QuickShelfController : &controllers.ItemQuickShelfController{
+		QuickShelfController: &controllers.ItemQuickShelfController{
 			ItemQuickShelfRepo: quickShelfRepo,
-			UserItemRepo: userItemRepo,
+			UserItemRepo:       userItemRepo,
+			ItemRepo:           itemRepo,
+			ItemsInShelfRepo:   itemInShelveRepo,
 		},
 	}
 
 	// user routes
+	// TODO Add route to request registration
+	// TODO Add route to accept registration request
+	// TODO Add route to reset password
+	// TODO Add route to upload Picture
 	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/logout", handlers.LogoutUserHandler)
 	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
-	securedRoutes.Handle(http.MethodGet, "/auth/is-admin", handlers.IsAdminHandler)
 
 	securedRoutes.Handle(http.MethodGet, "/users/get-me", handlers.GetUserHandler(controller.UserController))
 
 	// Warehouse routes
 	publicRoutes.Handle(http.MethodGet, "/warehouses", handlers.GetWarehousesHandler(controller.WarehouseController))
-	publicRoutes.Handle(http.MethodGet, "/warehousesWithRooms", handlers.GetWarehousesWithRoomsHandler(controller.WarehouseController))
-	publicRoutes.Handle(http.MethodGet, "/warehousesWithRooms/:id", handlers.GetWarehouseByIdWithRoomsHandler(controller.WarehouseController))
+	publicRoutes.Handle(http.MethodGet, "/warehouses-with-rooms", handlers.GetWarehousesWithRoomsHandler(controller.WarehouseController))
+	publicRoutes.Handle(http.MethodGet, "/warehouses-with-rooms/:id", handlers.GetWarehouseByIdWithRoomsHandler(controller.WarehouseController))
 	publicRoutes.Handle(http.MethodGet, "/warehouses/:id", handlers.GetWarehouseByIdHandler(controller.WarehouseController))
 	adminRoutes.Handle(http.MethodPost, "/warehouses", handlers.CreateWarehouseHandler(controller.WarehouseController))
 	adminRoutes.Handle(http.MethodPut, "/warehouses", handlers.UpdateWarehouseHandler(controller.WarehouseController))
 
 	// Room routes
 	publicRoutes.Handle(http.MethodGet, "/rooms", handlers.GetRoomsHandler(controller.RoomController))
-	publicRoutes.Handle(http.MethodGet, "/roomswithshelves", handlers.GetRoomsWithShelvesHandle(controller.RoomController))
-	publicRoutes.Handle(http.MethodGet, "/roomswithshelves/:id", handlers.GetRoomsByIdWithShelvesHandle(controller.RoomController))
+	publicRoutes.Handle(http.MethodGet, "/rooms-with-shelves", handlers.GetRoomsWithShelvesHandle(controller.RoomController))
+	publicRoutes.Handle(http.MethodGet, "/rooms-with-shelves/:id", handlers.GetRoomsByIdWithShelvesHandle(controller.RoomController))
 	publicRoutes.Handle(http.MethodGet, "/rooms/:id", handlers.GetRoomsByIdHandle(controller.RoomController))
 	adminRoutes.Handle(http.MethodPost, "/rooms", handlers.CreateRoomHandle(controller.RoomController))
 	adminRoutes.Handle(http.MethodPut, "/rooms", handlers.UpdateRoomHandle(controller.RoomController))
 
 	// Shelve routes
 	publicRoutes.Handle(http.MethodGet, "/shelves", handlers.GetShelvesHandler(controller.ShelveController))
-	publicRoutes.Handle(http.MethodGet, "/shelveswithitems", handlers.GetShelvesWithItemsHandler(controller.ShelveController))
-	publicRoutes.Handle(http.MethodGet, "/shelveswithitems/:id", handlers.GetShelveByIdWithItemsHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodGet, "/shelves-with-items", handlers.GetShelvesWithItemsHandler(controller.ShelveController))
+	publicRoutes.Handle(http.MethodGet, "/shelves-with-items/:id", handlers.GetShelveByIdWithItemsHandler(controller.ShelveController))
 	publicRoutes.Handle(http.MethodGet, "/shelves/:id", handlers.GetShelveByIdHandler(controller.ShelveController))
-	publicRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
-	publicRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
+	adminRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
+	adminRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
+
+	// Quick Shelf routes
+	publicRoutes.Handle(http.MethodGet, "/quick-shelves", handlers.GetQuickShelvesHandler(controller.QuickShelfController))
+	adminRoutes.Handle(http.MethodPost, "/quick-shelves", handlers.CreateQuickShelfHandler(controller.QuickShelfController))
+	adminRoutes.Handle(http.MethodPut, "/quick-shelves", handlers.UpdateQuickShelfHandler(controller.QuickShelfController))
+	adminRoutes.Handle(http.MethodDelete, "/quick-shelves/:id", handlers.DeleteQuickShelfHandler(controller.QuickShelfController))
 
 	// Items routes
 	publicRoutes.Handle(http.MethodGet, "/items", handlers.GetItemsHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
-	publicRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
-	publicRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
 	// Picture for item
-	publicRoutes.Handle(http.MethodPost, "/items-picture", handlers.UploadImageForItemHandler(controller.ItemController))
-	publicRoutes.Handle(http.MethodGet, "/items-picture/:id", handlers.GetImagePathForItemHandler(controller.ItemController))
-	publicRoutes.Handle(http.MethodDelete, "/items-picture/:id", handlers.RemoveImageForItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPost, "/items-picture", handlers.UploadImageForItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodGet, "/items-picture/:id", handlers.GetImagePathForItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodDelete, "/items-picture/:id", handlers.RemoveImageForItemHandler(controller.ItemController))
 	// Keyword for item
-	publicRoutes.Handle(http.MethodPost, "/items/addkeyword", handlers.AddKeywordToItemHandler(controller.ItemController))
-	publicRoutes.Handle(http.MethodPost, "/items/removekeyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPost, "/items/add-keyword", handlers.AddKeywordToItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPost, "/items/remove-keyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
 	// Subject for item
-	publicRoutes.Handle(http.MethodPost, "/items/addsubject", handlers.AddSubjectToItemHandler(controller.ItemController))
-	publicRoutes.Handle(http.MethodPost, "/items/removesubject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPost, "/items/add-subject", handlers.AddSubjectToItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodDelete, "/items/remove-subject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
 	// Item reserve
 	securedRoutes.Handle(http.MethodPost, "/items/reserve", handlers.ReserveItemHandler(controller.ReservationController))
 	securedRoutes.Handle(http.MethodDelete, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ReservationController))
@@ -220,20 +243,20 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Item quick shelf
 	securedRoutes.Handle(http.MethodPost, "/items/add-item-to-quick-shelf", handlers.AddToQuickShelfHandler(controller.QuickShelfController))
 	securedRoutes.Handle(http.MethodPost, "/items/remove-item-to-quick-shelf", handlers.RemoveItemFromQuickShelfHandler(controller.QuickShelfController))
-	securedRoutes.Handle(http.MethodDelete, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.QuickShelfController))
+	securedRoutes.Handle(http.MethodPost, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.QuickShelfController))
 	securedRoutes.Handle(http.MethodGet, "/items/quick-shelf/:id", handlers.GetItemsInQuickShelfHandler(controller.QuickShelfController))
 
 	// Subject Routes
 	publicRoutes.Handle(http.MethodGet, "/subjects", handlers.GetSubjectsHandler(controller.SubjectController))
-	publicRoutes.Handle(http.MethodPost, "/subjects", handlers.CreateSubjectHandler(controller.SubjectController))
-	publicRoutes.Handle(http.MethodPut, "/subjects", handlers.UpdateSubjectHandler(controller.SubjectController))
-	publicRoutes.Handle(http.MethodDelete, "/subjects/:id", handlers.DeleteSubjectHandler(controller.SubjectController))
+	adminRoutes.Handle(http.MethodPost, "/subjects", handlers.CreateSubjectHandler(controller.SubjectController))
+	adminRoutes.Handle(http.MethodPut, "/subjects", handlers.UpdateSubjectHandler(controller.SubjectController))
+	adminRoutes.Handle(http.MethodDelete, "/subjects/:id", handlers.DeleteSubjectHandler(controller.SubjectController))
 
 	// Keyword routes
 	publicRoutes.Handle(http.MethodGet, "/keywords", handlers.GetKeywordsHandler(controller.KeywordController))
-	publicRoutes.Handle(http.MethodPost, "/keywords", handlers.CreateKeywordHandler(controller.KeywordController))
-	publicRoutes.Handle(http.MethodPut, "/keywords", handlers.UpdateKeywordHandler(controller.KeywordController))
-	publicRoutes.Handle(http.MethodDelete, "/keywords/:id", handlers.DeleteKeywordHandler(controller.KeywordController))
+	adminRoutes.Handle(http.MethodPost, "/keywords", handlers.CreateKeywordHandler(controller.KeywordController))
+	adminRoutes.Handle(http.MethodPut, "/keywords", handlers.UpdateKeywordHandler(controller.KeywordController))
+	adminRoutes.Handle(http.MethodDelete, "/keywords/:id", handlers.DeleteKeywordHandler(controller.KeywordController))
 
 	// Roles routes
 	adminRoutes.Handle(http.MethodGet, "/roles", handlers.GetRolesHandler(controller.RoleController))

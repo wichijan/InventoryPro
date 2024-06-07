@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -62,14 +63,14 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param room body models.ItemWThin true "ItemWThin model"
-// @Success 201 {object} models.ItemWThin
+// @Param item body models.ItemCreate true "ItemCreate model"
+// @Success 201 {object} uuid.UUID
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items [post]
 func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var item models.ItemWThin
+		var item models.ItemCreate
 		err := c.ShouldBindJSON(&item)
 		if err != nil || item.Name == "" {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
@@ -91,14 +92,14 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param item body models.ItemWThin true "ItemWThin model"
-// @Success 201 {object} models.ItemWThin
+// @Param item body models.ItemUpdate true "ItemUpdate model"
+// @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items [put]
 func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var item models.ItemWThin
+		var item models.ItemUpdate
 		err := c.ShouldBindJSON(&item)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
@@ -124,7 +125,7 @@ func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/addkeyword [post]
+// @Router /items/add-keyword [post]
 func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithKeywordName
@@ -153,7 +154,7 @@ func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/removekeyword [post]
+// @Router /items/remove-keyword [post]
 func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithKeywordName
@@ -182,7 +183,7 @@ func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/addsubject [post]
+// @Router /items/add-subject [post]
 func AddSubjectToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithSubjectName
@@ -211,17 +212,17 @@ func AddSubjectToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/removesubject [post]
+// @Router /items/remove-subject [delete]
 func RemoveSubjectFromItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var itemAndKeyword models.ItemWithSubjectName
-		err := c.ShouldBindJSON(&itemAndKeyword)
+		var itemAndSubject models.ItemWithSubjectName
+		err := c.ShouldBindJSON(&itemAndSubject)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
-		inv_err := itemCtrl.RemoveSubjectFromItem(itemAndKeyword)
+		inv_err := itemCtrl.RemoveSubjectFromItem(itemAndSubject)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -251,7 +252,19 @@ func ReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.
 
 		var itemReserveODT models.ReservationCreateODT
 		err := c.ShouldBindJSON(&itemReserveODT)
-		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) {
+		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) || itemReserveODT.Quantity <= 0 {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		newTimeFrom, inv_error := time.Parse("2006-01-02", itemReserveODT.TimeFrom)
+		if inv_error != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			return
+		}
+
+		newTimeTo, inv_error := time.Parse("2006-01-02", itemReserveODT.TimeTo)
+		if inv_error != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
@@ -260,8 +273,8 @@ func ReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.
 			ItemID:   itemReserveODT.ItemID,
 			UserID:   userId.String(),
 			Quantity: itemReserveODT.Quantity,
-			TimeFrom: itemReserveODT.TimeFrom,
-			TimeTo:  itemReserveODT.TimeTo,
+			TimeFrom: newTimeFrom,
+			TimeTo:   newTimeTo,
 		}
 
 		reservationId, inv_err := reservationCtrl.CreateReservation(&itemReserve)
@@ -328,14 +341,14 @@ func BorrowItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 
 		var itemReserveODT models.ItemReserveODT
 		err := c.ShouldBindJSON(&itemReserveODT)
-		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) {
+		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
 
 		itemReserve := models.ItemBorrowCreate{
 			ItemID:   itemReserveODT.ItemID,
-			UserID:   userId.String(),
+			UserID:   *userId,
 			Quantity: itemReserveODT.Quantity,
 		}
 
@@ -382,9 +395,6 @@ func ReturnReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerF
 		c.JSON(http.StatusOK, nil)
 	}
 }
-
-
-
 
 // @Summary Upload Img for Item
 // @Description Upload Img for Item. Form with enctype="multipart/form-data" <input type="file" name="file" /> & <input type="hidden" name="id" /> for item id

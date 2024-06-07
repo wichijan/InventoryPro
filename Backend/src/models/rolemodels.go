@@ -1,6 +1,5 @@
 package models
 
-
 type RoleODT struct {
-	RoleName string `json:"role_name"`
+	RoleName string `binding:"required"`
 }

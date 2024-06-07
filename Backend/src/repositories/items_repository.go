@@ -52,13 +52,17 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.KeywordsForItems.AllColumns,
 		table.Users.ID,
 		table.Users.Username,
+		table.ItemTypes.TypeName,
+		table.Reservations.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.ItemTypes, table.ItemTypes.ID.EQ(table.Items.ItemTypeID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
+			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)).
+			LEFT_JOIN(table.Reservations, table.Reservations.ItemID.EQ(table.Items.ID)),
 	)
 
 	// Execute the query
@@ -94,13 +98,17 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 		table.ItemsInShelf.Quantity,
 		table.Users.ID,
 		table.Users.Username,
+		table.ItemSubjects.AllColumns,
+		table.KeywordsForItems.AllColumns,
+		table.Reservations.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)),
+			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)).
+			LEFT_JOIN(table.Reservations, table.Reservations.ItemID.EQ(table.Items.ID)),
 	).WHERE(
 		table.Items.ID.EQ(mysql.String(itemId.String())),
 	)
@@ -170,7 +178,6 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 	// Create the update statement
 	updateQuery := table.Items.UPDATE(
 		table.Items.Name,
-		table.Items.ItemTypeID,
 		table.Items.Description,
 		table.Items.ClassOne,
 		table.Items.ClassTwo,
@@ -180,10 +187,10 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 		table.Items.DamagedDescription,
 		table.Items.Picture,
 		table.Items.HintText,
+		table.Items.ItemTypeID,
 		table.Items.RegularShelfID,
 	).SET(
 		item.Name,
-		item.ItemTypeID,
 		item.Description,
 		item.ClassOne,
 		item.ClassTwo,
@@ -193,22 +200,14 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 		item.DamagedDescription,
 		item.Picture,
 		item.HintText,
+		item.ItemTypeID,
 		item.RegularShelfID,
 	).WHERE(table.Items.ID.EQ(mysql.String(item.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(tx)
+	_, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
 	}
 
 	return nil

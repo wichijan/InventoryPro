@@ -68,7 +68,7 @@ func GetShelveByIdHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerF
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /shelveswithitems [get]
+// @Router /shelves-with-items [get]
 func GetShelvesWithItemsHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		shelvesWithItems, inv_err := shelveCtrl.GetShelvesWithItems()
@@ -90,7 +90,7 @@ func GetShelvesWithItemsHandler(shelveCtrl controllers.ShelveControllerI) gin.Ha
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /shelveswithitems/{id} [get]
+// @Router /shelves-with-items/{id} [get]
 func GetShelveByIdWithItemsHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))

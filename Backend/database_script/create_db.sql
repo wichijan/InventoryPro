@@ -32,7 +32,7 @@ Create table item_types(
 
 CREATE TABLE items(
     id VARCHAR(36) PRIMARY KEY,
-    item_type_id VARCHAR(20),
+    item_type_id VARCHAR(36),
     name VARCHAR(100),
     description TEXT,
     regular_shelf_id VARCHAR(36),

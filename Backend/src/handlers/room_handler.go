@@ -9,6 +9,7 @@ import (
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/utils"
+	"github.com/wichijan/InventoryPro/src/models"
 )
 
 // @Summary Get rooms
@@ -68,7 +69,7 @@ func GetRoomsByIdHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /roomswithshelves [get]
+// @Router /rooms-with-shelves [get]
 func GetRoomsWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rooms, inv_err := roomCtrl.GetRoomsWithShelves()
@@ -90,7 +91,7 @@ func GetRoomsWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.Handler
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 404 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /roomswithshelves/{id} [get]
+// @Router /rooms-with-shelves/{id} [get]
 func GetRoomsByIdWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
@@ -113,14 +114,14 @@ func GetRoomsByIdWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.Han
 // @Tags Rooms
 // @Accept  json
 // @Produce  json
-// @Param room body model.Rooms true "Room model"
+// @Param RoomsODT body models.RoomsODT true "RoomsODT model"
 // @Success 201 {object} model.Rooms
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /rooms [post]
 func CreateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var room model.Rooms
+		var room models.RoomsODT
 		err := c.ShouldBindJSON(&room)
 		if err != nil || utils.ContainsEmptyString(*room.Name) {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)

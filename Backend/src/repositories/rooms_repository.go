@@ -18,7 +18,7 @@ type RoomRepositoryI interface {
 	GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INVError)
 	GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError)
 	GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWithShelves, *models.INVError)
-	CreateRoom(tx *sql.Tx, room *model.Rooms) (*uuid.UUID, *models.INVError)
+	CreateRoom(tx *sql.Tx, room *models.RoomsODT) (*uuid.UUID, *models.INVError)
 	UpdateRoom(tx *sql.Tx, room *model.Rooms) *models.INVError
 	DeleteRoom(tx *sql.Tx, roomId *uuid.UUID) *models.INVError
 
@@ -76,7 +76,7 @@ func (wr *RoomRepository) GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INV
 	return &rooms, nil
 }
 
-func (ror *RoomRepository) CreateRoom(tx *sql.Tx, room *model.Rooms) (*uuid.UUID, *models.INVError) {
+func (ror *RoomRepository) CreateRoom(tx *sql.Tx, room *models.RoomsODT) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the insert statement

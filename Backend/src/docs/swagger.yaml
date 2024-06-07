@@ -6,6 +6,13 @@ definitions:
       keyword:
         type: string
     type: object
+  model.QuickShelves:
+    properties:
+      quickShelfID:
+        type: string
+      roomID:
+        type: string
+    type: object
   model.Roles:
     properties:
       id:
@@ -68,35 +75,123 @@ definitions:
     required:
     - username
     type: object
+  models.GetQuickShelf:
+    properties:
+      items:
+        properties:
+          classFour:
+            type: boolean
+          classOne:
+            type: boolean
+          classThree:
+            type: boolean
+          classTwo:
+            type: boolean
+          damaged:
+            type: boolean
+          damagedDescription:
+            type: string
+          description:
+            type: string
+          hintText:
+            type: string
+          id:
+            type: string
+          itemTypeID:
+            type: string
+          name:
+            type: string
+          picture:
+            type: string
+          regularShelfID:
+            type: string
+        type: object
+      quantity:
+        type: integer
+      quickShelfID:
+        type: string
+      users:
+        properties:
+          email:
+            type: string
+          firstName:
+            type: string
+          id:
+            type: string
+          isActive:
+            type: boolean
+          jobTitle:
+            type: string
+          lastName:
+            type: string
+          phoneNumber:
+            type: string
+          profilePicture:
+            type: string
+          registrationAccepted:
+            type: boolean
+          registrationTime:
+            type: string
+          userTypeID:
+            type: string
+          username:
+            type: string
+        type: object
+    type: object
   models.INVErrorMessage:
     properties:
       errorMessage:
         type: string
+    type: object
+  models.ItemCreate:
+    properties:
+      BaseQuantityInShelf:
+        type: integer
+      classFour:
+        type: boolean
+      classOne:
+        type: boolean
+      classThree:
+        type: boolean
+      classTwo:
+        type: boolean
+      damaged:
+        type: boolean
+      damagedDesc:
+        type: string
+      description:
+        type: string
+      hintText:
+        type: string
+      itemTypeName:
+        type: string
+      name:
+        type: string
+      regularShelfId:
+        type: string
+    required:
+    - BaseQuantityInShelf
+    - itemTypeName
+    - name
+    - regularShelfId
     type: object
   models.ItemPicturePath:
     properties:
       path:
         type: string
     type: object
-  models.ItemQuickShelfInsert:
-    properties:
-      itemId:
-        type: string
-      quantity:
-        type: integer
-      quickShelfId:
-        type: string
-      userId:
-        type: string
-    type: object
   models.ItemQuickShelfInsertODT:
     properties:
-      itemId:
+      itemID:
         type: string
       quantity:
         type: integer
-      quickShelfId:
+      quickShelfID:
         type: string
+    required:
+    - itemID
+    - quantity
+    - quickShelfID
     type: object
   models.ItemQuickShelfRemoveSingleItem:
     properties:
@@ -107,17 +202,18 @@ definitions:
     type: object
   models.ItemReserveODT:
     properties:
-      itemId:
+      itemID:
         type: string
       quantity:
         type: integer
+    required:
+    - itemID
+    - quantity
     type: object
-  models.ItemWThin:
+  models.ItemUpdate:
     properties:
-      borrowedByUserID:
-        type: string
-      borrowedByUserName:
-        type: string
+      QuantityInShelf:
+        type: integer
       classFour:
         type: boolean
       classOne:
@@ -140,12 +236,12 @@ definitions:
         type: string
       name:
         type: string
-      picture:
-        type: string
-      quantityInShelf:
-        type: integer
       regularShelfId:
         type: string
+    required:
+    - itemTypeName
+    - name
+    - regularShelfId
     type: object
   models.ItemWithEverything:
     properties:
@@ -190,6 +286,27 @@ definitions:
         type: integer
       regularShelfId:
         type: string
+      reservations:
+        items:
+          properties:
+            isCancelled:
+              type: boolean
+            itemID:
+              type: string
+            quantity:
+              type: integer
+            reservationDate:
+              type: string
+            reservationID:
+              type: string
+            timeFrom:
+              type: string
+            timeTo:
+              type: string
+            userID:
+              type: string
+          type: object
+        type: array
       subject:
         items:
           properties:
@@ -211,7 +328,7 @@ definitions:
     properties:
       itemId:
         type: string
-      keywordName:
+      subjectName:
         type: string
     type: object
   models.LoggedInResponse:
@@ -236,6 +353,49 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/models.UserWithTypeName'
+    type: object
+  models.QuickShelfCreate:
+    properties:
+      roomId:
+        type: string
+    type: object
+  models.QuickShelfWithItems:
+    properties:
+      items:
+        items:
+          properties:
+            classFour:
+              type: boolean
+            classOne:
+              type: boolean
+            classThree:
+              type: boolean
+            classTwo:
+              type: boolean
+            damaged:
+              type: boolean
+            damagedDescription:
+              type: string
+            description:
+              type: string
+            hintText:
+              type: string
+            id:
+              type: string
+            itemTypeID:
+              type: string
+            name:
+              type: string
+            picture:
+              type: string
+            regularShelfID:
+              type: string
+          type: object
+        type: array
+      quickShelfId:
+        type: string
+      roomId:
+        type: string
     type: object
   models.RegistrationRequest:
     properties:
@@ -266,18 +426,28 @@ definitions:
         type: string
       timeTo:
         type: string
+    required:
+    - itemID
+    - quantity
+    - timeFrom
+    - timeTo
     type: object
   models.RoleIdODT:
     properties:
-      role_id:
+      roleID:
         type: string
-      user_id:
+      userID:
         type: string
+    required:
+    - roleID
+    - userID
     type: object
   models.RoleODT:
     properties:
-      role_name:
+      roleName:
         type: string
+    required:
+    - roleName
     type: object
   models.RoomWithShelves:
     properties:
@@ -294,6 +464,13 @@ definitions:
               type: string
           type: object
         type: array
+      warehouseID:
+        type: string
+    type: object
+  models.RoomsODT:
+    properties:
+      name:
+        type: string
       warehouseID:
         type: string
     type: object
@@ -328,6 +505,8 @@ definitions:
               type: string
             picture:
               type: string
+            quantity:
+              type: integer
             regularShelfID:
               type: string
           type: object
@@ -383,6 +562,13 @@ definitions:
               type: string
           type: object
         type: array
+    type: object
+  models.WarehousesODT:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
     type: object
 info:
   contact: {}
@@ -531,7 +717,7 @@ paths:
       tags:
       - Users
   /clear-quick-shelf/:id:
-    delete:
+    post:
       consumes:
       - application/json
       description: Remove all items from quick shelf
@@ -579,19 +765,19 @@ paths:
       - application/json
       description: Create Item
       parameters:
-      - description: ItemWThin model
+      - description: ItemCreate model
         in: body
-        name: room
+        name: item
         required: true
         schema:
-          $ref: '#/definitions/models.ItemWThin'
+          $ref: '#/definitions/models.ItemCreate'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.ItemWThin'
+            type: string
         "400":
           description: Bad Request
           schema:
@@ -608,19 +794,17 @@ paths:
       - application/json
       description: Update Item
       parameters:
-      - description: ItemWThin model
+      - description: ItemUpdate model
         in: body
         name: item
         required: true
         schema:
-          $ref: '#/definitions/models.ItemWThin'
+          $ref: '#/definitions/models.ItemUpdate'
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.ItemWThin'
+        "200":
+          description: OK
         "400":
           description: Bad Request
           schema:
@@ -734,7 +918,7 @@ paths:
       summary: Get item by id
       tags:
       - Items
-  /items/addkeyword:
+  /items/add-keyword:
     post:
       consumes:
       - application/json
@@ -762,7 +946,7 @@ paths:
       summary: Add keyword to item
       tags:
       - Items
-  /items/addsubject:
+  /items/add-subject:
     post:
       consumes:
       - application/json
@@ -814,7 +998,7 @@ paths:
       summary: Borrow Item
       tags:
       - Items
-  /items/removekeyword:
+  /items/remove-keyword:
     post:
       consumes:
       - application/json
@@ -842,8 +1026,8 @@ paths:
       summary: Remove keyword to item
       tags:
       - Items
-  /items/removesubject:
-    post:
+  /items/remove-subject:
+    delete:
       consumes:
       - application/json
       description: Remove Subject to item
@@ -941,32 +1125,6 @@ paths:
       tags:
       - Items
   /keywords:
-    delete:
-      consumes:
-      - application/json
-      description: Delete Keyword
-      parameters:
-      - description: Keyword ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Delete Keyword
-      tags:
-      - Keywords
     get:
       consumes:
       - application/json
@@ -1043,6 +1201,33 @@ paths:
       summary: Update Keyword
       tags:
       - Keywords
+  /keywords/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Keyword
+      parameters:
+      - description: Keyword ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Keyword
+      tags:
+      - Keywords
   /quick-shelf/:id:
     get:
       consumes:
@@ -1061,13 +1246,105 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ItemQuickShelfInsert'
+              $ref: '#/definitions/models.GetQuickShelf'
             type: array
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get Items in Quick shelf
+      tags:
+      - Quick Shelf
+  /quick-shelves:
+    get:
+      consumes:
+      - application/json
+      description: Get all Quick Shelves
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.QuickShelfWithItems'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get all Quick Shelves
+      tags:
+      - Quick Shelf
+    post:
+      consumes:
+      - application/json
+      description: Create Quick Shelf
+      parameters:
+      - description: QuickShelfCreate model
+        in: body
+        name: QuickShelfCreate
+        required: true
+        schema:
+          $ref: '#/definitions/models.QuickShelfCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Quick Shelf
+      tags:
+      - Quick Shelf
+    put:
+      consumes:
+      - application/json
+      description: Update Quick Shelf
+      parameters:
+      - description: QuickShelves model
+        in: body
+        name: QuickShelfUpdate
+        required: true
+        schema:
+          $ref: '#/definitions/model.QuickShelves'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update Quick Shelf
+      tags:
+      - Quick Shelf
+  /quick-shelves/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Quick Shelf
+      parameters:
+      - description: quick shelf id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Quick Shelf
       tags:
       - Quick Shelf
   /remove-item-to-quick-shelf:
@@ -1198,12 +1475,12 @@ paths:
       - application/json
       description: Create Room
       parameters:
-      - description: Room model
+      - description: RoomsODT model
         in: body
-        name: room
+        name: RoomsODT
         required: true
         schema:
-          $ref: '#/definitions/model.Rooms'
+          $ref: '#/definitions/models.RoomsODT'
       produces:
       - application/json
       responses:
@@ -1251,40 +1528,7 @@ paths:
       summary: Update room
       tags:
       - Rooms
-  /rooms/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get room by id
-      parameters:
-      - description: Room id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Rooms'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Get room by id
-      tags:
-      - Rooms
-  /roomswithshelves:
+  /rooms-with-shelves:
     get:
       consumes:
       - application/json
@@ -1317,7 +1561,7 @@ paths:
       summary: Get rooms with shelves
       tags:
       - Rooms
-  /roomswithshelves/{id}:
+  /rooms-with-shelves/{id}:
     get:
       consumes:
       - application/json
@@ -1348,6 +1592,39 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get room by id with shelves
+      tags:
+      - Rooms
+  /rooms/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get room by id
+      parameters:
+      - description: Room id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Rooms'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get room by id
       tags:
       - Rooms
   /shelves:
@@ -1429,6 +1706,68 @@ paths:
       summary: Update shelve
       tags:
       - Shelves
+  /shelves-with-items:
+    get:
+      consumes:
+      - application/json
+      description: Get shelves with items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ShelveWithItems'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get shelves with items
+      tags:
+      - Shelves
+  /shelves-with-items/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get shelve by id with items
+      parameters:
+      - description: shelve id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ShelveWithItems'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get shelve by id with items
+      tags:
+      - Shelves
   /shelves/{id}:
     get:
       consumes:
@@ -1460,68 +1799,6 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get shelve by id
-      tags:
-      - Shelves
-  /shelveswithitems:
-    get:
-      consumes:
-      - application/json
-      description: Get shelves with items
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.ShelveWithItems'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Get shelves with items
-      tags:
-      - Shelves
-  /shelveswithitems/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get shelve by id with items
-      parameters:
-      - description: shelve id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ShelveWithItems'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Get shelve by id with items
       tags:
       - Shelves
   /subjects:
@@ -1823,18 +2100,19 @@ paths:
       - application/json
       description: Create warehouse
       parameters:
-      - description: Warehouse name
-        in: path
-        name: name
+      - description: WarehousesODT model
+        in: body
+        name: WarehousesODT
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.WarehousesODT'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.Warehouses'
+            type: string
         "400":
           description: Bad Request
           schema:
@@ -1875,7 +2153,7 @@ paths:
       summary: Update warehouse
       tags:
       - Warehouses
-  /warehouses/{id}:
+  /warehouses-with-rooms:
     get:
       consumes:
       - application/json
@@ -1893,6 +2171,72 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.WarehouseWithRooms'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get warehouse by id
+      tags:
+      - Warehouses
+  /warehouses-with-rooms/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get warehouse by id
+      parameters:
+      - description: Warehouse id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WarehouseWithRooms'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get warehouse by id
+      tags:
+      - Warehouses
+  /warehouses/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get warehouse by id
+      parameters:
+      - description: Warehouse id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Warehouses'
         "400":
           description: Bad Request
           schema:
