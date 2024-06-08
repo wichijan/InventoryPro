@@ -39,7 +39,7 @@ type Client struct {
 	IsAdmin bool
 	UserId  string
 	Conn    *websocket.Conn
-	send    chan Message
+	send    chan string
 	hub     *Hub
 }
 
@@ -53,7 +53,7 @@ func NewClient(roomId string, isAdmin bool, userId string, conn *websocket.Conn,
 		UserId:  userId,
 		IsAdmin: isAdmin,
 		Conn:    conn,
-		send:    make(chan Message, 256),
+		send:    make(chan string, 256),
 		hub:     hub,
 	}
 }

@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -15,9 +13,17 @@ import (
 	"github.com/wichijan/InventoryPro/src/managers"
 )
 
+// @Summary Websocket Handler - js -> new WebSocket("ws://localhost:8080/ws/:roomId")
+// @Description RoomId can be empty for public notifications. RoomId is required for chat functions if ever implemented. IMPORTANT: WebSocket has to be called / created after Login.
+// @Tags Websocket
+// @Success 200
+// @Router /ws/:roomId [get]
 func WebsocketHandler(databaseManager managers.DatabaseManagerI, hub *websocket.Hub) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		roomId := c.Param("roomId")
+		if roomId == "" {
+			roomId = utils.WEBSOCKET_DEFAULT_ROOM
+		}
 
 		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
 		if !ok {
@@ -41,7 +47,7 @@ func WebsocketHandler(databaseManager managers.DatabaseManagerI, hub *websocket.
 
 		// Execute the query
 		err := stmt.Query(databaseManager.GetDatabaseConnection(), &userRoles)
-		if err != nil && err.Error() != "qrm: no rows in result set"{
+		if err != nil && err.Error() != "qrm: no rows in result set" {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN)
 			return
 		}
@@ -53,8 +59,6 @@ func WebsocketHandler(databaseManager managers.DatabaseManagerI, hub *websocket.
 				continue
 			}
 		}
-		log.Printf("User %s is admin: %v", userId.String(), isAdmin)
-
 		websocket.ServeWS(c, roomId, userId.String(), isAdmin, hub)
 	}
 }

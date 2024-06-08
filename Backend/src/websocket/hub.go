@@ -20,12 +20,11 @@ type Hub struct {
 
 // Message struct to hold message data
 type Message struct {
-	Type      string `json:"type"`
-	ForAdmin  bool   `json:"forAdmin"`
-	Sender    string `json:"sender"`
-	Recipient string `json:"recipient"`
-	Content   string `json:"content"`
-	ID        string `json:"id"`
+	Type     string `json:"type"`
+	ForAdmin bool   `json:"forAdmin"`
+	Sender   string `json:"sender"`
+	Content  string `json:"content"`
+	ID       string `json:"id"`
 }
 
 func NewHub() *Hub {
@@ -86,11 +85,11 @@ func (h *Hub) RemoveClient(client *Client) {
 
 // Function to handle message based on type of message
 func (h *Hub) HandleMessage(message Message) {
+	h.broadcastToAdmins(message)
 	if message.ForAdmin {
-		h.broadcastToAdmins(message)
-	} else {
-		h.broadcastToRoom(message)
+		return
 	}
+	h.broadcastToRoom(message)
 }
 
 // Function to broadcast messages to all clients in a room
@@ -98,7 +97,7 @@ func (h *Hub) broadcastToRoom(message Message) {
 	clients := h.clients[message.ID]
 	for client := range clients {
 		select {
-		case client.send <- message:
+		case client.send <- message.Content:
 		default:
 			close(client.send)
 			delete(clients, client)
@@ -110,7 +109,7 @@ func (h *Hub) broadcastToRoom(message Message) {
 func (h *Hub) broadcastToAdmins(message Message) {
 	for client := range h.admins {
 		select {
-		case client.send <- message:
+		case client.send <- message.Content:
 		default:
 			close(client.send)
 			delete(h.admins, client)
