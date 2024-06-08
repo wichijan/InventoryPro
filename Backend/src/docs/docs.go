@@ -2567,6 +2567,20 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/ws/:roomId": {
+            "get": {
+                "description": "RoomId can be empty for public notifications. RoomId is required for chat functions if ever implemented. IMPORTANT: WebSocket has to be called / created after Login.",
+                "tags": [
+                    "Websocket"
+                ],
+                "summary": "Websocket Handler - js -\u003e new WebSocket(\"ws://localhost:8080/ws/:roomId\")",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
     },
     "definitions": {
