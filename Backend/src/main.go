@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/wichijan/InventoryPro/src/managers"
+	"github.com/wichijan/InventoryPro/src/websocket"
 )
 
 func main() {
@@ -20,7 +21,10 @@ func main() {
 	log.Println("Database initialized successfully")
 	defer dbConnection.Close()
 
-	router := createRouter(dbConnection)
+	hub := websocket.NewHub()
+	go hub.Run()
+
+	router := createRouter(dbConnection, hub)
 
 	const port = "8080"
 

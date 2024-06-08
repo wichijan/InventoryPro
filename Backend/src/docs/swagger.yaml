@@ -2252,4 +2252,20 @@ paths:
       summary: Get warehouse by id
       tags:
       - Warehouses
+  /ws/:roomId:
+    get:
+      description: 'RoomId can be empty for public notifications. RoomId is required
+        for chat functions if ever implemented. IMPORTANT: WebSocket has to be called
+        / created after Login.'
+      parameters:
+      - description: Room ID - leave empty for notifications
+        in: path
+        name: roomId
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Websocket Handler - js -> new WebSocket("ws://localhost:8080/ws/:roomId")
+      tags:
+      - Websocket
 swagger: "2.0"

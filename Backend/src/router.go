@@ -11,6 +11,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/middlewares"
 	"github.com/wichijan/InventoryPro/src/repositories"
+	"github.com/wichijan/InventoryPro/src/websocket"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -31,7 +32,7 @@ type Controllers struct {
 	QuickShelfController  controllers.ItemQuickShelfControllerI
 }
 
-func createRouter(dbConnection *sql.DB) *gin.Engine {
+func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	router := gin.Default()
 
 	// Attach Middleware
@@ -280,6 +281,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	securedRoutes.GET("/ws/:roomId", handlers.WebsocketHandler(databaseManager, hub))
 
 	return router
 }
