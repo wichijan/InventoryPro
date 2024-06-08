@@ -2575,6 +2575,14 @@ const docTemplate = `{
                     "Websocket"
                 ],
                 "summary": "Websocket Handler - js -\u003e new WebSocket(\"ws://localhost:8080/ws/:roomId\")",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Room ID - leave empty for notifications",
+                        "name": "roomId",
+                        "in": "path"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK"

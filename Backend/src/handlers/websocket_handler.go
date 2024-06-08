@@ -16,6 +16,7 @@ import (
 // @Summary Websocket Handler - js -> new WebSocket("ws://localhost:8080/ws/:roomId")
 // @Description RoomId can be empty for public notifications. RoomId is required for chat functions if ever implemented. IMPORTANT: WebSocket has to be called / created after Login.
 // @Tags Websocket
+// @Param roomId path string false "Room ID - leave empty for notifications"
 // @Success 200
 // @Router /ws/:roomId [get]
 func WebsocketHandler(databaseManager managers.DatabaseManagerI, hub *websocket.Hub) gin.HandlerFunc {
