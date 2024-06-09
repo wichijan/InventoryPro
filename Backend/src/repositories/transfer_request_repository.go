@@ -40,7 +40,7 @@ func (trr *TransferRequestRepository) CreateTransferRequest(tx *sql.Tx, request 
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transfer request")
 	}
 
 	return &newUUID, nil
@@ -65,7 +65,7 @@ func (trr *TransferRequestRepository) UpdateTransferRequest(tx *sql.Tx, request 
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating transfer request")
 	}
 
 	return nil

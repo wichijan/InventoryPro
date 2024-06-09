@@ -33,12 +33,12 @@ func (rc *RoomController) GetRooms() (*[]model.Rooms, *models.INVError) {
 func (rc *RoomController) CreateRoom(room *models.RoomsODT) (*uuid.UUID, *models.INVError) {
 	tx, err := rc.RoomRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	if room == nil {
-		return nil, inv_errors.INV_BAD_REQUEST
+		return nil, inv_errors.INV_BAD_REQUEST.WithDetails("invalid room data")
 	}
 
 	roomId, inv_error := rc.RoomRepo.CreateRoom(tx, room)
@@ -47,7 +47,7 @@ func (rc *RoomController) CreateRoom(room *models.RoomsODT) (*uuid.UUID, *models
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return roomId, nil
@@ -56,7 +56,7 @@ func (rc *RoomController) CreateRoom(room *models.RoomsODT) (*uuid.UUID, *models
 func (rc *RoomController) UpdateRoom(room *model.Rooms) *models.INVError {
 	tx, err := rc.RoomRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -66,7 +66,7 @@ func (rc *RoomController) UpdateRoom(room *model.Rooms) *models.INVError {
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -76,12 +76,12 @@ func (rc *RoomController) DeleteRoom(roomId *uuid.UUID) *models.INVError {
 	// TODO Needs to be implemented
 	tx, err := rc.RoomRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

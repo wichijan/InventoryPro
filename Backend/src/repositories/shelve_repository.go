@@ -44,11 +44,7 @@ func (sr *ShelveRepository) GetShelves() (*[]model.Shelves, *models.INVError) {
 	// Execute the query
 	err := stmt.Query(sr.GetDatabaseConnection(), &shelves)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(shelves) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading shelves")
 	}
 
 	return &shelves, nil
@@ -70,7 +66,7 @@ func (sr *ShelveRepository) GetShelveById(id *uuid.UUID) (*model.Shelves, *model
 	// Execute the query
 	err := stmt.Query(sr.GetDatabaseConnection(), &shelve)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading shelve")
 	}
 
 	return &shelve, nil
@@ -91,16 +87,16 @@ func (sr *ShelveRepository) CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uu
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating shelve")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating shelve")
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Shelve already exists")
 	}
 
 	return &uuid, nil
@@ -115,18 +111,9 @@ func (sr *ShelveRepository) UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *mod
 	).WHERE(table.Shelves.ID.EQ(mysql.String(shelve.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(tx)
+	_, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating shelve")
 	}
 
 	return nil
@@ -134,7 +121,7 @@ func (sr *ShelveRepository) UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *mod
 
 func (sr *ShelveRepository) DeleteShelve(tx *sql.Tx, shelveId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteShelve not implemented yet")
 }
 
 func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *models.INVError) {
@@ -155,7 +142,7 @@ func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *m
 	// Execute the query
 	err := stmt.Query(sr.GetDatabaseConnection(), &shelvesWithItems)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading shelves with items")
 	}
 
 	return &shelvesWithItems, nil
@@ -180,7 +167,7 @@ func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.Shelv
 	// Execute the query
 	err := stmt.Query(sr.GetDatabaseConnection(), &shelveWithItems)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading shelve with items")
 	}
 
 	return &shelveWithItems, nil
@@ -189,10 +176,10 @@ func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.Shelv
 func (sr *ShelveRepository) CheckIfShelveExists(shelveId *uuid.UUID) *models.INVError {
 	count, err := utils.CountStatement(table.Shelves, table.Shelves.ID.EQ(mysql.String(shelveId.String())), sr.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if shelve exists")
 	}
 	if count <= 0 {
-		return inv_errors.INV_SHELVE_DOES_NOT_EXISTS
+		return inv_errors.INV_SHELVE_DOES_NOT_EXISTS.WithDetails("Shelve does not exist")
 	}
 	return nil
 }

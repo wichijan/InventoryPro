@@ -47,9 +47,9 @@ func (uir *UserItemRepository) GetUserItemByUserIdAndItemId(userId *uuid.UUID, i
 	err := stmt.Query(uir.GetDatabaseConnection(), &userItem)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("User item not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading user item")
 	}
 
 	return &userItem, nil
@@ -71,9 +71,9 @@ func (uir *UserItemRepository) GetQuantityFromUserItem(itemId *uuid.UUID) (*int3
 	err := stmt.Query(uir.GetDatabaseConnection(), &quantity)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading quantity of item")
 	}
 
 	return &quantity.Quantity, nil
@@ -96,7 +96,7 @@ func (uir *UserItemRepository) InsertUserItem(tx *sql.Tx, itemBorrow *models.Ite
 	// Execute the query
 	_, err := insertQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error inserting user item")
 	}
 
 	return nil
@@ -112,7 +112,7 @@ func (uir *UserItemRepository) DeleteItemUser(tx *sql.Tx, userId *uuid.UUID, ite
 	// Execute the query
 	_, err := deleteQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting user item")
 	}
 
 	return nil
@@ -132,7 +132,7 @@ func (uir *UserItemRepository) MoveItemToNewUser(tx *sql.Tx, userId *uuid.UUID, 
 	// Execute the query
 	_, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error moving item to new user")
 	}
 
 	return nil
@@ -153,7 +153,7 @@ func (uir *UserItemRepository) ReduceQuantityOfUserItem(tx *sql.Tx, userId *uuid
 	// Execute the query
 	_, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reducing quantity of user item")
 	}
 
 	return nil

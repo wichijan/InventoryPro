@@ -38,7 +38,7 @@ func (sor *SetsOfObjectsRepository) GetSetsOfObjectsById(setsOfObjectsId *uuid.U
 	var setsOfObjects model.SetsOfObjects
 	err := stmt.Query(sor.GetDatabaseConnection(), &setsOfObjects)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading sets of objects")
 	}
 
 	return &setsOfObjects, nil
@@ -63,7 +63,7 @@ func (sor *SetsOfObjectsRepository) CreateSetsOfObjects(tx *sql.Tx, setsOfObject
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating sets of objects")
 	}
 
 	return nil, nil
@@ -86,24 +86,16 @@ func (sor *SetsOfObjectsRepository) UpdateSetsOfObjects(tx *sql.Tx, setsOfObject
 	)
 
 	// Execute the query
-	rows, err := stmt.Exec(tx)
+	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating sets of objects")
 	}
 
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
-	}
 
 	return nil
 }
 
 func (sor *SetsOfObjectsRepository) DeleteSetsOfObjects(tx *sql.Tx, setsOfObjectsId *uuid.UUID) *models.INVError {
 	// TODO Implement this function
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteSetsOfObjects not implemented")
 }

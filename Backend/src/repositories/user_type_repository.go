@@ -40,11 +40,7 @@ func (utr *UserTypeRepository) GetUserTypes() (*[]model.UserTypes, *models.INVEr
 	// Execute the query
 	err := stmt.Query(utr.GetDatabaseConnection(), &userTypes)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(userTypes) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading user types")
 	}
 
 	return &userTypes, nil
@@ -65,11 +61,11 @@ func (utr *UserTypeRepository) GetUserTypeById(id *string) (*string, *models.INV
 	// Execute the query
 	err := stmt.Query(utr.GetDatabaseConnection(), &userTypes)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading user type")
 	}
 
 	if userTypes.TypeName == nil {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("User type not found")
 	}
 
 	return userTypes.TypeName, nil
@@ -90,11 +86,11 @@ func (utr *UserTypeRepository) GetUserTypeByName(name *string) (*string, *models
 	// Execute the query
 	err := stmt.Query(utr.GetDatabaseConnection(), &userTypes)
 	if err != nil {
-		return nil, inv_errors.INV_USER_TYPE_NOT_FOUND
+		return nil, inv_errors.INV_USER_TYPE_NOT_FOUND.WithDetails("User type not found")
 	}
 
 	if userTypes.TypeName == nil {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("User type not found")
 	}
 
 	return &userTypes.ID, nil
@@ -115,16 +111,16 @@ func (utr *UserTypeRepository) CreateUserType(tx *sql.Tx, type_name *string) (*u
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating user type")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating user type")
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("User type already exists")
 	}
 
 	return &uuid, nil
@@ -141,16 +137,16 @@ func (utr *UserTypeRepository) UpdateUserType(tx *sql.Tx, userType *model.UserTy
 	// Execute the query
 	rows, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating user type")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating user type")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("User type not found")
 	}
 
 	return nil
@@ -158,5 +154,5 @@ func (utr *UserTypeRepository) UpdateUserType(tx *sql.Tx, userType *model.UserTy
 
 func (utr *UserTypeRepository) DeleteUserType(tx *sql.Tx, userTypeId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteUserType not implemented yet")
 }

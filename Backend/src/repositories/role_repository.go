@@ -38,11 +38,7 @@ func (rr *RoleRepository) GetRoles() (*[]model.Roles, *models.INVError) {
 	// Execute the query
 	err := stmt.Query(rr.GetDatabaseConnection(), &roles)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(roles) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading roles")
 	}
 
 	return &roles, nil
@@ -63,16 +59,16 @@ func (rr *RoleRepository) CreateRole(tx *sql.Tx, roleName *string) (*uuid.UUID, 
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating role")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating role")
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Role already exists")
 	}
 
 	return &uuid, nil
@@ -87,18 +83,9 @@ func (rr *RoleRepository) UpdateRole(tx *sql.Tx, role *model.Roles) *models.INVE
 	).WHERE(table.Roles.ID.EQ(mysql.String(role.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(tx)
+	_, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating role")
 	}
 
 	return nil
@@ -106,5 +93,5 @@ func (rr *RoleRepository) UpdateRole(tx *sql.Tx, role *model.Roles) *models.INVE
 
 func (rr *RoleRepository) DeleteRole(tx *sql.Tx, roleId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteRole not implemented")
 }

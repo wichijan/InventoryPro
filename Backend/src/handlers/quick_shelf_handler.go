@@ -46,7 +46,7 @@ func CreateQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfContro
 		var quickShelf models.QuickShelfCreate
 		err := c.ShouldBindJSON(&quickShelf)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
 
@@ -73,8 +73,16 @@ func UpdateQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfContro
 	return func(c *gin.Context) {
 		var quickShelf model.QuickShelves
 		err := c.ShouldBindJSON(&quickShelf)
-		if err != nil || quickShelf.QuickShelfID == "" || quickShelf.RoomID == nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if quickShelf.QuickShelfID == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid quick shelf id"))
+			return
+		}
+		if quickShelf.RoomID == nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room id"))
 			return
 		}
 
@@ -101,7 +109,7 @@ func DeleteQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfContro
 	return func(c *gin.Context) {
 		quickShelfId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid quick shelf id"))
 			return
 		}
 
@@ -136,7 +144,7 @@ func AddToQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControl
 		var itemQuickShelfODT models.ItemQuickShelfInsertODT
 		err := c.ShouldBindJSON(&itemQuickShelfODT)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
 
@@ -170,7 +178,7 @@ func RemoveItemFromQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShe
 		var itemQuick models.ItemQuickShelfRemoveSingleItem
 		err := c.ShouldBindJSON(&itemQuick)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
 
@@ -197,7 +205,7 @@ func ClearQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControl
 	return func(c *gin.Context) {
 		quickShelfId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid quick shelf id"))
 			return
 		}
 
@@ -224,7 +232,7 @@ func GetItemsInQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfCo
 	return func(c *gin.Context) {
 		quickShelfId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid quick shelf id"))
 			return
 		}
 

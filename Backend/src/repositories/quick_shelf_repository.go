@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -35,7 +36,7 @@ func (qsr *QuickShelfRepository) GetQuickShelves() (*model.QuickShelves, *models
 	var shelf model.QuickShelves
 	err := stmt.Query(qsr.GetDatabaseConnection(), &shelf)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading quick shelves")
 	}
 
 	return &shelf, nil
@@ -54,7 +55,7 @@ func (qsr *QuickShelfRepository) CreateQuickShelf(tx *sql.Tx, shelf *model.Quick
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating quick shelf")
 	}
 
 	return &shelf.QuickShelfID, nil
@@ -62,5 +63,5 @@ func (qsr *QuickShelfRepository) CreateQuickShelf(tx *sql.Tx, shelf *model.Quick
 
 func (qsr *QuickShelfRepository) DeleteQuickShelf(tx *sql.Tx, shelfId *uuid.UUID) *models.INVError {
 	// TODO implement delete quick shelf
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteQuickShelf not implemented")
 }

@@ -38,7 +38,7 @@ func (pr *PointRepository) GetPointsByUserId(userId *uuid.UUID) (*model.Points, 
 	var points model.Points
 	err := stmt.Query(pr.GetDatabaseConnection(), &points)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading points")
 	}
 
 	return &points, nil
@@ -57,7 +57,7 @@ func (pr *PointRepository) CreateBook(tx *sql.Tx, points *model.Points) *models.
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating points")
 	}
 
 	return nil
@@ -76,7 +76,7 @@ func (pr *PointRepository) AddPointsToUser(tx *sql.Tx, userId *uuid.UUID, points
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating points")
 	}
 
 	return nil
@@ -97,7 +97,7 @@ func (pr *PointRepository) SubtractPointsToUser(tx *sql.Tx, userId *uuid.UUID, p
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating points")
 	}
 
 	return nil

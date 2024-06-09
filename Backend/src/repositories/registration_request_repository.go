@@ -37,7 +37,7 @@ func (rr *RegistrationRequestRepository) GetRegistrationRequests() (*[]model.Reg
 	var requests []model.RegistrationRequests
 	err := stmt.Query(rr.GetDatabaseConnection(), &requests)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading registration requests")
 	}
 
 	return &requests, nil
@@ -57,7 +57,7 @@ func (rr *RegistrationRequestRepository) GetRequestByUserId(userId *uuid.UUID) (
 	var request model.RegistrationRequests
 	err := stmt.Query(rr.GetDatabaseConnection(), &request)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading registration request")
 	}
 
 	return &request, nil
@@ -76,7 +76,7 @@ func (rr *RegistrationRequestRepository) CreateRequest(tx *sql.Tx, request *mode
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating registration request")
 	}
 
 	return nil
@@ -91,7 +91,7 @@ func (rr *RegistrationRequestRepository) DeleteRequest(tx *sql.Tx, userId *uuid.
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting registration request")
 	}
 
 	return nil

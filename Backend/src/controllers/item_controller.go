@@ -70,7 +70,7 @@ func (ic *ItemController) GetItemById(itemId *uuid.UUID) (*models.ItemWithEveryt
 func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *models.INVError) {
 	tx, err := ic.ItemRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -116,7 +116,7 @@ func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *mode
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return id, nil
@@ -125,7 +125,7 @@ func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *mode
 func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 	tx, err := ic.ItemRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -170,7 +170,7 @@ func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -179,7 +179,7 @@ func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError {
 	tx, err := ic.ItemKeywordRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -204,7 +204,7 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -213,7 +213,7 @@ func (ic *ItemController) AddKeywordToItem(itemKeyword models.ItemWithKeywordNam
 func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError {
 	tx, err := ic.ItemKeywordRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -233,7 +233,7 @@ func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywo
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -242,7 +242,7 @@ func (ic *ItemController) RemoveKeywordFromItem(itemKeyword models.ItemWithKeywo
 func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectName) *models.INVError {
 	tx, err := ic.ItemSubjectRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -267,7 +267,7 @@ func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectNam
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -276,7 +276,7 @@ func (ic *ItemController) AddSubjectToItem(itemSubject models.ItemWithSubjectNam
 func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubjectName) *models.INVError {
 	tx, err := ic.ItemSubjectRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -296,7 +296,7 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -305,7 +305,7 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 func (ic *ItemController) UploadImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -315,7 +315,7 @@ func (ic *ItemController) UploadImage(itemId *uuid.UUID) (*uuid.UUID, *models.IN
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return pictureId, nil
@@ -333,7 +333,7 @@ func (ic *ItemController) GetImageIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *mo
 func (ic *ItemController) RemoveImageIdFromItem(itemId *uuid.UUID) *models.INVError {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -350,11 +350,11 @@ func (ic *ItemController) RemoveImageIdFromItem(itemId *uuid.UUID) *models.INVEr
 	imageName := "./../uploads/" + pictureId.String() + ".jpeg"
 	inv_err := os.Remove(imageName)
 	if inv_err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error removing image")
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -363,7 +363,7 @@ func (ic *ItemController) RemoveImageIdFromItem(itemId *uuid.UUID) *models.INVEr
 func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *models.INVError {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -375,7 +375,7 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *model
 
 	newQuantityInShelve := *quantityInShelve - itemReserve.Quantity
 	if newQuantityInShelve < 0 {
-		return inv_errors.INV_NOT_ENOUGH_QUANTITY
+		return inv_errors.INV_NOT_ENOUGH_QUANTITY.WithDetails("Not enough quantity in shelve")
 	}
 
 	// insert into user_items
@@ -411,7 +411,7 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *model
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -420,7 +420,7 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *model
 func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -465,7 +465,7 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -474,7 +474,7 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVError {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -506,7 +506,7 @@ func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVE
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -515,7 +515,7 @@ func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVE
 func (ic *ItemController) MoveItemAccepted(itemMove models.ItemMove) *models.INVError {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -543,7 +543,7 @@ func (ic *ItemController) MoveItemAccepted(itemMove models.ItemMove) *models.INV
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

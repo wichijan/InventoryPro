@@ -33,12 +33,12 @@ func (sc *ShelveController) GetShelves() (*[]model.Shelves, *models.INVError) {
 func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, *models.INVError) {
 	tx, err := sc.ShelveRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	if shelve == nil {
-		return nil, inv_errors.INV_BAD_REQUEST
+		return nil, inv_errors.INV_BAD_REQUEST.WithDetails("invalid shelve data")
 	}
 
 	var newShelve model.Shelves
@@ -50,7 +50,7 @@ func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, 
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return shelveId, nil
@@ -59,12 +59,12 @@ func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, 
 func (sc *ShelveController) UpdateShelve(shelve *model.Shelves) *models.INVError {
 	tx, err := sc.ShelveRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	if shelve == nil {
-		return inv_errors.INV_BAD_REQUEST
+		return inv_errors.INV_BAD_REQUEST.WithDetails("invalid shelve data")
 	}
 
 	inv_error := sc.ShelveRepo.UpdateShelve(tx, shelve)
@@ -73,21 +73,22 @@ func (sc *ShelveController) UpdateShelve(shelve *model.Shelves) *models.INVError
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
 }
 
 func (sc *ShelveController) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
+	// TODO needs to be implemented
 	tx, err := sc.ShelveRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

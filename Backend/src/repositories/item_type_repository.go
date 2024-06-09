@@ -31,11 +31,7 @@ func (itr *ItemTypeRepository) GetItemTypes() (*[]models.ItemTypes, *models.INVE
 	// Execute the query
 	err := stmt.Query(itr.GetDatabaseConnection(), &itemTypes)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(itemTypes) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading item types")
 	}
 
 	return &itemTypes, nil
@@ -54,11 +50,11 @@ func (itr *ItemTypeRepository) GetItemTypesByName(typeName *string) (*model.Item
 	// Execute the query
 	err := stmt.Query(itr.GetDatabaseConnection(), &itemType)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading item type")
 	}
 
 	if itemType.TypeName == nil {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Item type not found")
 	}
 
 	return &itemType, nil

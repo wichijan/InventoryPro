@@ -44,8 +44,12 @@ func GetKeywordsHandler(keywordCtrl controllers.KeywordControllerI) gin.HandlerF
 func CreateKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var keywordName models.KeywordODT
-		if err := c.ShouldBindJSON(&keywordName); err != nil || keywordName.Name == nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err := c.ShouldBindJSON(&keywordName); err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if keywordName.Name == nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid keyword name"))
 			return
 		}
 
@@ -71,8 +75,16 @@ func CreateKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.Handle
 func UpdateKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var keyword model.Keywords
-		if err := c.ShouldBindJSON(&keyword); err != nil || keyword.ID == "" || keyword.Keyword == nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err := c.ShouldBindJSON(&keyword); err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if keyword.ID == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid keyword id"))
+			return
+		}
+		if keyword.Keyword == nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid keyword name"))
 			return
 		}
 
@@ -99,7 +111,7 @@ func DeleteKeywordHandler(keywordCtrl controllers.KeywordControllerI) gin.Handle
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid keyword id"))
 			return
 		}
 

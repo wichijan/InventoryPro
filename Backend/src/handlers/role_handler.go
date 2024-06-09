@@ -44,8 +44,12 @@ func CreateRoleHandler(roleCtrl controllers.RoleControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var role models.RoleODT
 		err := c.ShouldBindJSON(&role)
-		if err != nil || role.RoleName == "" {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if role.RoleName == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid role name"))
 			return
 		}
 
@@ -73,8 +77,12 @@ func UpdateRoleHandler(roleCtrl controllers.RoleControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var role model.Roles
 		err := c.ShouldBindJSON(&role)
-		if err != nil || *role.RoleName == "" {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if role.RoleName == nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid role name"))
 			return
 		}
 

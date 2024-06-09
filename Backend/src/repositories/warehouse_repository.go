@@ -42,11 +42,7 @@ func (wr *WarehouseRepository) GetWarehouses() (*[]model.Warehouses, *models.INV
 	// Execute the query
 	err := stmt.Query(wr.GetDatabaseConnection(), &warehouses)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(warehouses) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading warehouses")
 	}
 
 	return &warehouses, nil
@@ -68,9 +64,9 @@ func (wr *WarehouseRepository) GetWarehouseById(id *uuid.UUID) (*model.Warehouse
 	err := stmt.Query(wr.GetDatabaseConnection(), &warehouse)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("Warehouse not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading warehouse")
 	}
 
 	return &warehouse, nil
@@ -94,16 +90,16 @@ func (wr *WarehouseRepository) CreateWarehouse(tx *sql.Tx, warehouse *models.War
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating warehouse")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating warehouse")
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Warehouse already exists")
 	}
 
 	return &uuid, nil
@@ -123,16 +119,16 @@ func (wr *WarehouseRepository) UpdateWarehouse(tx *sql.Tx, warehouse *model.Ware
 	// Execute the query
 	rows, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating warehouse")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating warehouse")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Warehouse not found")
 	}
 
 	return nil
@@ -140,7 +136,7 @@ func (wr *WarehouseRepository) UpdateWarehouse(tx *sql.Tx, warehouse *model.Ware
 
 func (wr *WarehouseRepository) DeleteWarehouse(tx *sql.Tx, warehouseId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteWarehouse not implemented")
 }
 
 func (wr *WarehouseRepository) GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError) {
@@ -160,9 +156,9 @@ func (wr *WarehouseRepository) GetWarehousesWithRooms() (*[]models.WarehouseWith
 	err := stmt.Query(wr.GetDatabaseConnection(), &warehouse)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("Warehouse not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading warehouse")
 	}
 
 	return &warehouse, nil
@@ -186,9 +182,9 @@ func (wr *WarehouseRepository) GetWarehouseByIdWithRooms(id *uuid.UUID) (*models
 	err := stmt.Query(wr.GetDatabaseConnection(), &warehouse)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("Warehouse not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading warehouse")
 	}
 
 	return &warehouse, nil

@@ -8,8 +8,8 @@ import (
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
-	"github.com/wichijan/InventoryPro/src/utils"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 // @Summary Get rooms
@@ -46,7 +46,7 @@ func GetRoomsByIdHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room id"))
 			return
 		}
 
@@ -96,7 +96,7 @@ func GetRoomsByIdWithShelvesHandle(roomCtrl controllers.RoomControllerI) gin.Han
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room id"))
 			return
 		}
 
@@ -123,8 +123,12 @@ func CreateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var room models.RoomsODT
 		err := c.ShouldBindJSON(&room)
-		if err != nil || utils.ContainsEmptyString(*room.Name) {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(*room.Name) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room name"))
 			return
 		}
 
@@ -152,8 +156,12 @@ func UpdateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var room model.Rooms
 		err := c.ShouldBindJSON(&room)
-		if err != nil || utils.ContainsEmptyString(*room.Name) {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(*room.Name) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room id"))
 			return
 		}
 

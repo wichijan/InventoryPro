@@ -46,7 +46,7 @@ func GetShelveByIdHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerF
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid shelve id"))
 			return
 		}
 
@@ -95,7 +95,7 @@ func GetShelveByIdWithItemsHandler(shelveCtrl controllers.ShelveControllerI) gin
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid shelve id"))
 			return
 		}
 
@@ -123,7 +123,7 @@ func CreateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFu
 		var shelve models.ShelveOTD
 		err := c.ShouldBindJSON(&shelve)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
 
@@ -152,7 +152,7 @@ func UpdateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFu
 		var shelve model.Shelves
 		err := c.ShouldBindJSON(&shelve)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
 

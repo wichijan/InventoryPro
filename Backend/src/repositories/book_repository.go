@@ -38,7 +38,7 @@ func (br *BookRepository) GetBookById(itemId *uuid.UUID) (*model.Books, *models.
 	var book model.Books
 	err := stmt.Query(br.GetDatabaseConnection(), &book)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading book")
 	}
 
 	return &book, nil
@@ -63,7 +63,7 @@ func (br *BookRepository) CreateBook(tx *sql.Tx, book *model.Books) (*string, *m
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating book")
 	}
 
 	return &book.ItemID, nil
@@ -88,16 +88,16 @@ func (br *BookRepository) UpdateBook(tx *sql.Tx, book *model.Books) *models.INVE
 	// Execute the query
 	rows, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating book")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error: No changes on entry")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Book Id not found")
 	}
 
 	return nil
@@ -105,5 +105,5 @@ func (br *BookRepository) UpdateBook(tx *sql.Tx, book *model.Books) *models.INVE
 
 func (br *BookRepository) DeleteBook(tx *sql.Tx, bookId *uuid.UUID) *models.INVError {
 	// TODO To be implemented
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("Not implemented yet")
 }

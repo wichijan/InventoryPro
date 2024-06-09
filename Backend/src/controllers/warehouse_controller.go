@@ -33,12 +33,12 @@ func (mc *WarehouseController) GetWarehouses() (*[]model.Warehouses, *models.INV
 func (mc *WarehouseController) CreateWarehouse(warehouse *models.WarehousesODT) (*uuid.UUID, *models.INVError) {
 	tx, err := mc.WarehouseRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	if warehouse == nil {
-		return nil, inv_errors.INV_BAD_REQUEST
+		return nil, inv_errors.INV_BAD_REQUEST.WithDetails("invalid warehouse data")
 	}
 
 	warehouseId, inv_error := mc.WarehouseRepo.CreateWarehouse(tx, warehouse)
@@ -47,7 +47,7 @@ func (mc *WarehouseController) CreateWarehouse(warehouse *models.WarehousesODT) 
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return warehouseId, nil
@@ -56,7 +56,7 @@ func (mc *WarehouseController) CreateWarehouse(warehouse *models.WarehousesODT) 
 func (mc *WarehouseController) UpdateWarehouse(warehouse *model.Warehouses) *models.INVError {
 	tx, err := mc.WarehouseRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -66,7 +66,7 @@ func (mc *WarehouseController) UpdateWarehouse(warehouse *model.Warehouses) *mod
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -76,9 +76,13 @@ func (mc *WarehouseController) DeleteWarehouse(warehouse_id *uuid.UUID) *models.
 	// TODO Needs to be implemented
 	tx, err := mc.WarehouseRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
 
 	return nil
 }

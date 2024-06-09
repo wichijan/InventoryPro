@@ -19,7 +19,7 @@ type UserRoleController struct {
 func (urc *UserRoleController) CreateUserRole(user_role *model.UserRoles) *models.INVError {
 	tx, err := urc.UserRoleRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -29,7 +29,7 @@ func (urc *UserRoleController) CreateUserRole(user_role *model.UserRoles) *model
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -38,7 +38,7 @@ func (urc *UserRoleController) CreateUserRole(user_role *model.UserRoles) *model
 func (urc *UserRoleController) DeleteUserRole(userRole *model.UserRoles) *models.INVError {
 	tx, err := urc.UserRoleRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -48,7 +48,7 @@ func (urc *UserRoleController) DeleteUserRole(userRole *model.UserRoles) *models
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

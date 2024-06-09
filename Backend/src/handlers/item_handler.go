@@ -45,7 +45,7 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
 			return
 		}
 
@@ -73,7 +73,15 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 		var item models.ItemCreate
 		err := c.ShouldBindJSON(&item)
 		if err != nil || item.Name == "" {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
+			return
+		}
+		if item.BaseQuantityInShelf < 0 {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid quantity"))
+			return
+		}
+		if item.Name == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid name"))
 			return
 		}
 
@@ -102,7 +110,7 @@ func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 		var item models.ItemUpdate
 		err := c.ShouldBindJSON(&item)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
 			return
 		}
 
@@ -131,7 +139,7 @@ func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 		var itemAndKeyword models.ItemWithKeywordName
 		err := c.ShouldBindJSON(&itemAndKeyword)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid keyword object"))
 			return
 		}
 
@@ -160,7 +168,7 @@ func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 		var itemAndKeyword models.ItemWithKeywordName
 		err := c.ShouldBindJSON(&itemAndKeyword)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid keyword object"))
 			return
 		}
 
@@ -189,7 +197,7 @@ func AddSubjectToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 		var itemAndKeyword models.ItemWithSubjectName
 		err := c.ShouldBindJSON(&itemAndKeyword)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid subject object"))
 			return
 		}
 
@@ -218,7 +226,7 @@ func RemoveSubjectFromItemHandler(itemCtrl controllers.ItemControllerI) gin.Hand
 		var itemAndSubject models.ItemWithSubjectName
 		err := c.ShouldBindJSON(&itemAndSubject)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid subject object"))
 			return
 		}
 
@@ -253,19 +261,19 @@ func ReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.
 		var itemReserveODT models.ReservationCreateODT
 		err := c.ShouldBindJSON(&itemReserveODT)
 		if err != nil || utils.ContainsEmptyString(itemReserveODT.ItemID) || itemReserveODT.Quantity <= 0 {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid reservation object"))
 			return
 		}
 
 		newTimeFrom, inv_error := time.Parse("2006-01-02", itemReserveODT.TimeFrom)
 		if inv_error != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid time from"))
 			return
 		}
 
 		newTimeTo, inv_error := time.Parse("2006-01-02", itemReserveODT.TimeTo)
 		if inv_error != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid time to"))
 			return
 		}
 
@@ -307,7 +315,7 @@ func CancelReserveItemHandler(reservationCtrl controllers.ReservationControllerI
 
 		reservationId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid reservation id"))
 			return
 		}
 
@@ -342,7 +350,7 @@ func BorrowItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 		var itemReserveODT models.ItemReserveODT
 		err := c.ShouldBindJSON(&itemReserveODT)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid reservation object"))
 			return
 		}
 
@@ -382,7 +390,7 @@ func ReturnReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerF
 
 		itemId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item id"))
 			return
 		}
 
@@ -410,13 +418,13 @@ func UploadImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 		// single file
 		form, err := c.MultipartForm()
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Unable to read the form data"})
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Unable to read the form data"))
 			return
 		}
 		file := form.File["file"][0]
 		itemId, err := uuid.Parse(form.Value["id"][0])
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item id"))
 			return
 		}
 
@@ -449,7 +457,7 @@ func GetImagePathForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handle
 		// single file
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
 			return
 		}
 		log.Print("ID: ", id.String())
@@ -481,7 +489,7 @@ func RemoveImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 		// single file
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
 			return
 		}
 		log.Print("ID: ", id.String())

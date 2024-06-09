@@ -49,7 +49,7 @@ func WebsocketHandler(databaseManager managers.DatabaseManagerI, hub *websocket.
 		// Execute the query
 		err := stmt.Query(databaseManager.GetDatabaseConnection(), &userRoles)
 		if err != nil && err.Error() != "qrm: no rows in result set" {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error getting user roles"))
 			return
 		}
 

@@ -38,11 +38,7 @@ func (isjr *ItemSubjectRepository) GetItemsForSubject(subjectId *string) (*[]mod
 	// Execute the query
 	err := stmt.Query(isjr.GetDatabaseConnection(), &itemsForSubject)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(itemsForSubject) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading items for subject")
 	}
 
 	return &itemsForSubject, nil
@@ -62,16 +58,16 @@ func (isjr *ItemSubjectRepository) CreateSubjectForItem(tx *sql.Tx, keyword *mod
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating keyword for item")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating keyword for item")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Combination already exists")
 	}
 
 	return nil
@@ -86,16 +82,16 @@ func (isjr *ItemSubjectRepository) DeleteSubjectForItem(tx *sql.Tx, keyword *mod
 	// Execute the query
 	rows, err := deleteQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting keyword for item")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting keyword for item")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Combination not found")
 	}
 
 	return nil
@@ -104,10 +100,10 @@ func (isjr *ItemSubjectRepository) DeleteSubjectForItem(tx *sql.Tx, keyword *mod
 func (isjr *ItemSubjectRepository) CheckIfSubjectAndItemExists(subjectAndItem models.ItemWithSubject) *models.INVError {
 	count, err := utils.CountStatement(table.ItemSubjects, table.ItemSubjects.SubjectID.EQ(mysql.String(subjectAndItem.SubjectID)).AND(table.ItemSubjects.ItemID.EQ(mysql.String(subjectAndItem.ItemID))), isjr.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if subject and item exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_SUBJECT_ITEM_COMBI_EXISTS
+		return inv_errors.INV_SUBJECT_ITEM_COMBI_EXISTS.WithDetails("Subject and item combination already exists")
 	}
 	return nil
 }

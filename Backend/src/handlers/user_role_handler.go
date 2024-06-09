@@ -25,7 +25,7 @@ func AddRoleToUserHandler(userRoleCtrl controllers.UserRoleControllerI) gin.Hand
 		var roleName models.RoleIdODT
 		err := c.ShouldBindJSON(&roleName)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
 
@@ -58,7 +58,7 @@ func RemoveRoleFromUserHandler(userRoleCtrl controllers.UserRoleControllerI) gin
 		var roleName models.RoleIdODT
 		err := c.ShouldBindJSON(&roleName)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
 

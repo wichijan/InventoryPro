@@ -44,8 +44,12 @@ func GetUserTypesHandler(userTypeCtrl controllers.UserTypeControllerI) gin.Handl
 func CreateUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var userTypeName models.UserTypeODT
-		if err := c.ShouldBindJSON(&userTypeName); err != nil || userTypeName.Name == nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err := c.ShouldBindJSON(&userTypeName); err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if userTypeName.Name == nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid user type name"))
 			return
 		}
 
@@ -73,7 +77,7 @@ func UpdateUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.Han
 		var userType model.UserTypes
 		err := c.ShouldBindJSON(&userType)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
 
@@ -100,7 +104,7 @@ func DeleteUserTypeHandler(userTypeCtrl controllers.UserTypeControllerI) gin.Han
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid user type id"))
 			return
 		}
 

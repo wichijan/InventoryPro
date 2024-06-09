@@ -26,7 +26,7 @@ func (utc *UserTypeController) GetUserTypes() (*[]model.UserTypes, *models.INVEr
 func (utc *UserTypeController) CreateUserType(type_name *string) (*uuid.UUID, *models.INVError) {
 	tx, err := utc.UserTypeRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -36,7 +36,7 @@ func (utc *UserTypeController) CreateUserType(type_name *string) (*uuid.UUID, *m
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return userTypeId, nil
@@ -45,7 +45,7 @@ func (utc *UserTypeController) CreateUserType(type_name *string) (*uuid.UUID, *m
 func (utc *UserTypeController) UpdateUserType(userType *model.UserTypes) *models.INVError {
 	tx, err := utc.UserTypeRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -55,7 +55,7 @@ func (utc *UserTypeController) UpdateUserType(userType *model.UserTypes) *models
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -64,7 +64,7 @@ func (utc *UserTypeController) UpdateUserType(userType *model.UserTypes) *models
 func (utc *UserTypeController) DeleteUserType(userTypeId *uuid.UUID) *models.INVError {
 	tx, err := utc.UserTypeRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -74,7 +74,7 @@ func (utc *UserTypeController) DeleteUserType(userTypeId *uuid.UUID) *models.INV
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

@@ -53,7 +53,7 @@ func (qsr *ItemQuickShelfRepository) GetQuickShelves() (*[]models.QuickShelfWith
 	var quickShelves []models.QuickShelfWithItems
 	err := stmt.Query(qsr.GetDatabaseConnection(), &quickShelves)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading quick shelves")
 	}
 
 	return &quickShelves, nil
@@ -74,7 +74,7 @@ func (qsr *ItemQuickShelfRepository) CreateQuickShelf(tx *sql.Tx, quickShelf *mo
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating quick shelf")
 	}
 
 	return &uuid, nil
@@ -93,7 +93,7 @@ func (qsr *ItemQuickShelfRepository) UpdateQuickShelf(tx *sql.Tx, quickShelf *mo
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating quick shelf")
 	}
 
 	return nil
@@ -108,7 +108,7 @@ func (qsr *ItemQuickShelfRepository) DeleteQuickShelf(tx *sql.Tx, quickShelfId *
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting quick shelf")
 	}
 
 	return nil
@@ -126,13 +126,13 @@ func (qsr *ItemQuickShelfRepository) GetItemsInQuickShelf(quickShelfId *uuid.UUI
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.ItemQuickShelf.UserID)),
 	).WHERE(
 		table.ItemQuickShelf.QuickShelfID.EQ(mysql.String(quickShelfId.String())),
-	)// TODO
+	)
 
 	// Execute the query
 	var items []models.GetQuickShelf
 	err := stmt.Query(qsr.GetDatabaseConnection(), &items)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading items in quick shelf")
 	}
 
 	return &items, nil
@@ -155,7 +155,7 @@ func (qsr *ItemQuickShelfRepository) InsertNewItemInQuickShelf(tx *sql.Tx, itemQ
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error inserting item in quick shelf")
 	}
 
 	return nil
@@ -177,7 +177,7 @@ func (qsr *ItemQuickShelfRepository) UpdateQuantityOfItemInQuickShelf(tx *sql.Tx
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating quantity of item in quick shelf")
 	}
 
 	return nil
@@ -193,7 +193,7 @@ func (qsr *ItemQuickShelfRepository) RemoveItemFromQuickShelf(tx *sql.Tx, itemId
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error removing item from quick shelf")
 	}
 
 	return nil
@@ -206,7 +206,7 @@ func (qsr *ItemQuickShelfRepository) ClearQuickShelf(tx *sql.Tx, quickShelfId *u
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error clearing quick shelf")
 	}
 
 	return nil
@@ -226,7 +226,7 @@ func (qsr *ItemQuickShelfRepository) GetItemsFromUserInQuickShelf(userId *uuid.U
 	var item []model.ItemQuickShelf
 	err := stmt.Query(qsr.GetDatabaseConnection(), &item)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading items in quick shelf")
 	}
 
 	return &item, nil
@@ -247,7 +247,7 @@ func (qsr *ItemQuickShelfRepository) GetQuantityOfItemInQuickShelf(itemId *uuid.
 	var quantity models.GetQuantity
 	err := stmt.Query(qsr.GetDatabaseConnection(), &quantity)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading quantity of item in quick shelf")
 	}
 
 	return quantity.Quantity, nil
@@ -259,7 +259,7 @@ func (qsr *ItemQuickShelfRepository) CheckIfItemAlreadyInQuickShelf(itemId *uuid
 
 	count, err := utils.CountStatement(table.ItemQuickShelf, table.ItemQuickShelf.ItemID.EQ(mysql.String(itemId.String())).AND(table.ItemQuickShelf.QuickShelfID.EQ(mysql.String(quickShelfId.String()))), qsr.GetDatabaseConnection())
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if item is already in quick shelf")
 	}
 	if count > 0 {
 		return &varTrue, nil
