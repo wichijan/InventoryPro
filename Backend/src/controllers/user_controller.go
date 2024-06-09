@@ -24,6 +24,7 @@ type UserControllerI interface {
 	ValidateRegistrationCode(code *string) (*bool, *models.INVError)
 	RegisterUserAndCode(registrationData models.RegistrationRequest) (*models.RegistrationCodeResponse, *models.INVError)
 	UpdateUserPassword(username *string, password string) *models.INVError
+	DeleteRegistrationCode(code *string) *models.INVError
 }
 
 type UserController struct {
@@ -252,6 +253,9 @@ func (uc *UserController) RegisterUserAndCode(registrationData models.Registrati
 		UserID: userId.String(),
 		Code:   &code,
 	})
+	if inv_err != nil {
+		return nil, inv_err
+	}
 
 	if err = tx.Commit(); err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
@@ -283,6 +287,24 @@ func (uc *UserController) UpdateUserPassword(username *string, password string) 
 	inv_error := uc.UserRepo.UpdateUser(tx, user)
 	if inv_error != nil {
 		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+	return nil
+}
+
+func (uc *UserController) DeleteRegistrationCode(code *string) *models.INVError {
+	tx, err := uc.UserRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	inv_err := uc.RegistrationCodeRepo.DeleteRegistrationCode(tx, code)
+	if inv_err != nil {
+		return inv_err
 	}
 
 	if err = tx.Commit(); err != nil {

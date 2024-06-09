@@ -126,6 +126,10 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
+	registrationCodeRepo := &repositories.RegistrationCodeRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -153,6 +157,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			UserRepo:                userRepo,
 			UserTypeRepo:            userTypeRepo,
 			RegistrationRequestRepo: registrationRequestRepo,
+			RegistrationCodeRepo:    registrationCodeRepo,
 		},
 		UserRoleController: &controllers.UserRoleController{
 			UserRoleRepo: userRoleRepo,
