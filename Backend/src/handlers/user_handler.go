@@ -25,14 +25,19 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 	return func(c *gin.Context) {
 		var registrationData models.RegistrationRequest
 		err := c.ShouldBind(&registrationData)
-		if err != nil ||
-			utils.ContainsEmptyString(
-				registrationData.Username, registrationData.Email, registrationData.Password,
-				registrationData.FirstName, registrationData.LastName,
-			) {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
+		if utils.ContainsEmptyString(
+			registrationData.Username, registrationData.Email, registrationData.Password,
+			registrationData.FirstName, registrationData.LastName,
+		) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username, email, password, first name or last name"))
+			return
+		}
+
+
 		// user is logged in after registration
 		inv_err := userCtrl.RegisterUser(registrationData)
 		if inv_err != nil {
@@ -123,13 +128,15 @@ func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var loginData models.LoginRequest
 		err := c.ShouldBind(&loginData)
-		if err != nil ||
-			utils.ContainsEmptyString(
-				loginData.Username, loginData.Password,
-			) {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
+		if utils.ContainsEmptyString(loginData.Username, loginData.Password)  {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
+			return
+		}
+
 		loginResponse, inv_error := userCtrl.LoginUser(loginData)
 		if inv_error != nil {
 			utils.HandleErrorAndAbort(c, inv_error)
@@ -181,7 +188,7 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 	return func(c *gin.Context) {
 		var requestData models.CheckUsernameRequest
 		if err := c.ShouldBindJSON(&requestData); err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Username is empty"))
 			return
 		}
 

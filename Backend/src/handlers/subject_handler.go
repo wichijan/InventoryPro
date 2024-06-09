@@ -44,8 +44,16 @@ func GetSubjectsHandler(subjectCtrl controllers.SubjectControllerI) gin.HandlerF
 func CreateSubjectHandler(subjectCtrl controllers.SubjectControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var subjectName models.SubjectODT
-		if err := c.ShouldBindJSON(&subjectName); err != nil || subjectName.Name == nil || subjectName.Description == nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err := c.ShouldBindJSON(&subjectName); err != nil  {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if subjectName.Name == nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid subject name"))
+			return
+		}
+		if subjectName.Description == nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid subject description"))
 			return
 		}
 
@@ -71,8 +79,12 @@ func CreateSubjectHandler(subjectCtrl controllers.SubjectControllerI) gin.Handle
 func UpdateSubjectHandler(subjectCtrl controllers.SubjectControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var subject model.Subjects
-		if err := c.ShouldBindJSON(&subject); err != nil || subject.Name == nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err := c.ShouldBindJSON(&subject); err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if subject.Name == nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid subject name"))
 			return
 		}
 
@@ -99,7 +111,7 @@ func DeleteSubjectHandler(subjectCtrl controllers.SubjectControllerI) gin.Handle
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid subject id"))
 			return
 		}
 

@@ -46,7 +46,7 @@ func GetWarehouseByIdHandler(warehouseCtrl controllers.WarehouseControllerI) gin
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid warehouse id"))
 			return
 		}
 
@@ -96,7 +96,7 @@ func GetWarehouseByIdWithRoomsHandler(warehouseCtrl controllers.WarehouseControl
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid warehouse id"))
 			return
 		}
 
@@ -123,8 +123,12 @@ func CreateWarehouseHandler(warehouseCtrl controllers.WarehouseControllerI) gin.
 	return func(c *gin.Context) {
 		var warehouse models.WarehousesODT
 		err := c.ShouldBindJSON(&warehouse)
-		if err != nil || utils.ContainsEmptyString(*warehouse.Name) {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(*warehouse.Name) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid warehouse name"))
 			return
 		}
 
@@ -152,8 +156,12 @@ func UpdateWarehouseHandler(warehouseCtrl controllers.WarehouseControllerI) gin.
 	return func(c *gin.Context) {
 		var warehouse model.Warehouses
 		err := c.ShouldBindJSON(&warehouse)
-		if err != nil || utils.ContainsEmptyString(*warehouse.Name) {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(*warehouse.Name) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid warehouse name"))
 			return
 		}
 
