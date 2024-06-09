@@ -31,7 +31,7 @@ type UserController struct {
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) *models.INVError {
 	tx, err := uc.UserRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -39,7 +39,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 
 	hash, err := utils.HashPassword(registrationData.Password)
 	if err != nil {
-		return inv_errors.INV_UPSTREAM_ERROR
+		return inv_errors.INV_UPSTREAM_ERROR.WithDetails("Invalid password")
 	}
 
 	inv_err := uc.UserRepo.CheckIfEmailExists(registrationData.Email)
@@ -89,7 +89,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -104,24 +104,24 @@ func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.Logi
 
 	// check if password is correct
 	if ok := utils.ComparePasswordHash(loginData.Password, *user.Password); !ok {
-		return nil, inv_errors.INV_CREDENTIALS_INVALID
+		return nil, inv_errors.INV_CREDENTIALS_INVALID.WithDetails("Invalid username or password")
 	}
 
 	// Check if user registration request has been accepted
 	if !*user.RegistrationAccepted {
-		return nil, inv_errors.INV_USER_NOT_ACCEPTED
+		return nil, inv_errors.INV_USER_NOT_ACCEPTED.WithDetails("User registration request has not been accepted")
 	}
 
 	// Convert string to UUID
 	userID, err := uuid.Parse(user.ID)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error parsing user ID")
 	}
 
 	// generate JWT token
 	token, refreshToken, err := utils.GenerateJWT(&userID)
 	if err != nil {
-		return nil, inv_errors.INV_UPSTREAM_ERROR
+		return nil, inv_errors.INV_UPSTREAM_ERROR.WithDetails("Error generating JWT token")
 	}
 
 	return &models.LoginResponse{
@@ -146,7 +146,7 @@ func (uc *UserController) GetUserById(userId *uuid.UUID) (*models.UserWithTypeNa
 func (uc *UserController) AcceptUserRegistrationRequest(userIdString *string) *models.INVError {
 	tx, err := uc.UserRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -174,7 +174,7 @@ func (uc *UserController) AcceptUserRegistrationRequest(userIdString *string) *m
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

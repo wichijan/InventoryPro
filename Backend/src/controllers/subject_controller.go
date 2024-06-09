@@ -39,7 +39,7 @@ func (sc *SubjectController) GetSubjectByName(subjectName *string) (*model.Subje
 func (sc *SubjectController) CreateSubject(subject *models.SubjectODT) (*uuid.UUID, *models.INVError) {
 	tx, err := sc.SubjectRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -49,7 +49,7 @@ func (sc *SubjectController) CreateSubject(subject *models.SubjectODT) (*uuid.UU
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return subjectId, nil
@@ -58,7 +58,7 @@ func (sc *SubjectController) CreateSubject(subject *models.SubjectODT) (*uuid.UU
 func (sc *SubjectController) UpdateSubject(subject *model.Subjects) *models.INVError {
 	tx, err := sc.SubjectRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -68,7 +68,7 @@ func (sc *SubjectController) UpdateSubject(subject *model.Subjects) *models.INVE
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -77,7 +77,7 @@ func (sc *SubjectController) UpdateSubject(subject *model.Subjects) *models.INVE
 func (sc *SubjectController) DeleteSubject(subjectId *uuid.UUID) *models.INVError {
 	tx, err := sc.SubjectRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -87,7 +87,7 @@ func (sc *SubjectController) DeleteSubject(subjectId *uuid.UUID) *models.INVErro
 	}
 	
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

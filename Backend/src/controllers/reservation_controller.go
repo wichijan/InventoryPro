@@ -48,12 +48,12 @@ func (rc *ReservationController) GetReservationByItemIdAndUserId(itemId *uuid.UU
 func (rc *ReservationController) CreateReservation(reservation *models.ReservationCreate) (*uuid.UUID, *models.INVError) {
 	tx, err := rc.ReservationRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	if reservation == nil {
-		return nil, inv_errors.INV_BAD_REQUEST
+		return nil, inv_errors.INV_BAD_REQUEST.WithDetails("invalid reservation data")
 	}
 
 	reservationID, inv_error := rc.ReservationRepo.CreateReservation(tx, reservation)
@@ -76,7 +76,7 @@ func (rc *ReservationController) CreateReservation(reservation *models.Reservati
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return reservationID, nil
@@ -85,7 +85,7 @@ func (rc *ReservationController) CreateReservation(reservation *models.Reservati
 func (rc *ReservationController) DeleteReservation(userId *uuid.UUID, reservationID *uuid.UUID) *models.INVError {
 	tx, err := rc.ReservationRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -114,7 +114,7 @@ func (rc *ReservationController) DeleteReservation(userId *uuid.UUID, reservatio
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

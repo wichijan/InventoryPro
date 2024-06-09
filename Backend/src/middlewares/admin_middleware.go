@@ -35,7 +35,7 @@ func AdminMiddleware(databaseManager managers.DatabaseManagerI) gin.HandlerFunc 
 		// Execute the query
 		err := stmt.Query(databaseManager.GetDatabaseConnection(), &userRoles)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN.WithDetails("User not found"))
 		}
 
 		for _, a := range userRoles.UserNames {
@@ -45,6 +45,6 @@ func AdminMiddleware(databaseManager managers.DatabaseManagerI) gin.HandlerFunc 
 			}
 		}
 
-		utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN)
+		utils.HandleErrorAndAbort(c, inv_errors.INV_FORBIDDEN.WithDetails("User has not the correct role"))
 	}
 }

@@ -25,7 +25,7 @@ func (rc *RoleController) GetRoles() (*[]model.Roles, *models.INVError) {
 func (rc *RoleController) CreateRole(roleName *string) (*uuid.UUID, *models.INVError) {
 	tx, err := rc.RoleRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -45,7 +45,7 @@ func (rc *RoleController) CreateRole(roleName *string) (*uuid.UUID, *models.INVE
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return roleId, nil
@@ -54,12 +54,12 @@ func (rc *RoleController) CreateRole(roleName *string) (*uuid.UUID, *models.INVE
 func (rc *RoleController) UpdateRole(role *model.Roles) *models.INVError {
 	tx, err := rc.RoleRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	if *role.RoleName == "Admin" {
-		return inv_errors.INV_CONFLICT
+		return inv_errors.INV_CONFLICT.WithDetails("Cannot update Admin role")
 	}
 
 	inv_error := rc.RoleRepo.UpdateRole(tx, role)
@@ -68,7 +68,7 @@ func (rc *RoleController) UpdateRole(role *model.Roles) *models.INVError {
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil

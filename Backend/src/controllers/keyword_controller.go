@@ -31,7 +31,7 @@ func (kc *KeywordController) GetKeywords() (*[]model.Keywords, *models.INVError)
 func (kc *KeywordController) CreateKeyword(keywordName *string) (*uuid.UUID, *models.INVError) {
 	tx, err := kc.KeywordRepo.NewTransaction()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -41,7 +41,7 @@ func (kc *KeywordController) CreateKeyword(keywordName *string) (*uuid.UUID, *mo
 	}
 
 	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return keywordId, nil
@@ -50,7 +50,7 @@ func (kc *KeywordController) CreateKeyword(keywordName *string) (*uuid.UUID, *mo
 func (kc *KeywordController) UpdateKeyword(keyword *model.Keywords) *models.INVError {
 	tx, err := kc.KeywordRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -60,7 +60,7 @@ func (kc *KeywordController) UpdateKeyword(keyword *model.Keywords) *models.INVE
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
@@ -69,7 +69,7 @@ func (kc *KeywordController) UpdateKeyword(keyword *model.Keywords) *models.INVE
 func (kc *KeywordController) DeleteKeyword(keywordId *uuid.UUID) *models.INVError {
 	tx, err := kc.KeywordRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -79,7 +79,7 @@ func (kc *KeywordController) DeleteKeyword(keywordId *uuid.UUID) *models.INVErro
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
 	return nil
