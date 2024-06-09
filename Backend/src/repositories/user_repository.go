@@ -56,10 +56,10 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, 
 	)
 	err := stmt.Query(ur.GetDatabaseConnection(), &user)
 	if err != nil {
-		if err.Error() == "jet: sql: no rows in result set" {
-			return nil, inv_errors.INV_USER_NOT_FOUND
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_USER_NOT_FOUND.WithDetails("User not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading user")
 	}
 
 	return &user, nil
@@ -91,9 +91,9 @@ func (ur *UserRepository) GetUserByUsername(username string) (*models.UserWithTy
 	err := stmt.Query(ur.GetDatabaseConnection(), &user)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_USER_NOT_FOUND
+			return nil, inv_errors.INV_USER_NOT_FOUND.WithDetails("User not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading user")
 	}
 
 	return &user, nil
@@ -133,7 +133,7 @@ func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVEr
 
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating user")
 	}
 
 	return nil
@@ -142,10 +142,10 @@ func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVEr
 func (ur *UserRepository) CheckIfUsernameExists(username string) *models.INVError {
 	count, err := utils.CountStatement(table.Users, table.Users.Username.EQ(mysql.String(username)), ur.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if username exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_USERNAME_EXISTS
+		return inv_errors.INV_USERNAME_EXISTS.WithDetails("Username already exists")
 	}
 	return nil
 }
@@ -153,10 +153,10 @@ func (ur *UserRepository) CheckIfUsernameExists(username string) *models.INVErro
 func (ur *UserRepository) CheckIfEmailExists(email string) *models.INVError {
 	count, err := utils.CountStatement(table.Users, table.Users.Email.EQ(mysql.String(email)), ur.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if email exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_EMAIL_EXISTS
+		return inv_errors.INV_EMAIL_EXISTS.WithDetails("Email already exists")
 	}
 	return nil
 }
@@ -173,7 +173,7 @@ func (ur *UserRepository) AcceptUserRegistrationRequest(tx *sql.Tx, userId *stri
 	)
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error accepting user registration request")
 	}
 	return nil
 }

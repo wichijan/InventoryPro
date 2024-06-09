@@ -68,11 +68,7 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 	// Execute the query
 	err := stmt.Query(itr.GetDatabaseConnection(), &items)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(items) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading items")
 	}
 
 	return &items, nil
@@ -116,7 +112,7 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 	// Execute the query
 	err := stmt.Query(itr.GetDatabaseConnection(), &items)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading items")
 	}
 
 	return &items, nil
@@ -159,16 +155,16 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating item")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating item")
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Item already exists")
 	}
 
 	return &uuid, nil
@@ -207,7 +203,7 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 	// Execute the query
 	_, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating item")
 	}
 
 	return nil
@@ -215,7 +211,7 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 
 func (itr *ItemRepository) DeleteItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteItem not implemented")
 }
 
 func (itr *ItemRepository) StoreItemPicture(tx *sql.Tx, itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
@@ -231,16 +227,16 @@ func (itr *ItemRepository) StoreItemPicture(tx *sql.Tx, itemId *uuid.UUID) (*uui
 	// Execute the query
 	rows, err := updatePictureQuery.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error storing picture for item")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error storing picture for item")
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
 	}
 
 	return &uuid, nil
@@ -261,16 +257,16 @@ func (itr *ItemRepository) GetPictureIdFromItem(itemId *uuid.UUID) (*uuid.UUID, 
 	// Execute the query
 	err := stmt.Query(itr.GetDatabaseConnection(), &picture)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading picture for item")
 	}
 
 	if picture.PictureId == "" {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Picture not found")
 	}
 
 	pictureId, err := uuid.Parse(picture.PictureId)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error parsing picture id")
 	}
 
 	return &pictureId, nil
@@ -287,16 +283,16 @@ func (itr *ItemRepository) RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID
 	// Execute the query
 	rows, err := updatePictureQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error removing picture for item")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error removing picture for item")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
 	}
 
 	return nil

@@ -42,11 +42,7 @@ func (ror *RoomRepository) GetRooms() (*[]model.Rooms, *models.INVError) {
 	// Execute the query
 	err := stmt.Query(ror.GetDatabaseConnection(), &rooms)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(rooms) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading rooms")
 	}
 
 	return &rooms, nil
@@ -68,9 +64,9 @@ func (wr *RoomRepository) GetRoomsById(id *uuid.UUID) (*model.Rooms, *models.INV
 	err := stmt.Query(wr.GetDatabaseConnection(), &rooms)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("Room id not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading room")
 	}
 
 	return &rooms, nil
@@ -93,16 +89,16 @@ func (ror *RoomRepository) CreateRoom(tx *sql.Tx, room *models.RoomsODT) (*uuid.
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating room")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating room")
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Room already exists")
 	}
 
 	return &uuid, nil
@@ -119,18 +115,9 @@ func (ror *RoomRepository) UpdateRoom(tx *sql.Tx, room *model.Rooms) *models.INV
 	).WHERE(table.Rooms.ID.EQ(mysql.String(room.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(tx)
+	_, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating room")
 	}
 
 	return nil
@@ -138,7 +125,7 @@ func (ror *RoomRepository) UpdateRoom(tx *sql.Tx, room *model.Rooms) *models.INV
 
 func (ror *RoomRepository) DeleteRoom(tx *sql.Tx, roomId *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteRoom not implemented")
 }
 
 func (wr *RoomRepository) GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError) {
@@ -157,9 +144,9 @@ func (wr *RoomRepository) GetRoomsWithShelves() (*[]models.RoomWithShelves, *mod
 	err := stmt.Query(wr.GetDatabaseConnection(), &rooms)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("No rooms found with shelves")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading rooms")
 	}
 
 	return &rooms, nil
@@ -183,9 +170,9 @@ func (wr *RoomRepository) GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWi
 	err := stmt.Query(wr.GetDatabaseConnection(), &rooms)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("Room id not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading room")
 	}
 
 	return &rooms, nil

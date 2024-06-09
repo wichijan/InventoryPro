@@ -39,7 +39,7 @@ func (trr *TransactionRepository) GetTransactionByUserId(userId *uuid.UUID) (*[]
 	var transactions []model.Transactions
 	err := stmt.Query(trr.GetDatabaseConnection(), &transactions)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading transactions")
 	}
 
 	return &transactions, nil
@@ -59,7 +59,7 @@ func (trr *TransactionRepository) GetTransactionByItemId(itemId *uuid.UUID) (*[]
 	var transactions []model.Transactions
 	err := stmt.Query(trr.GetDatabaseConnection(), &transactions)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading transactions")
 	}
 
 	return &transactions, nil
@@ -92,7 +92,7 @@ func (trr *TransactionRepository) CreateTransaction(tx *sql.Tx, transaction *mod
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 
 	return nil

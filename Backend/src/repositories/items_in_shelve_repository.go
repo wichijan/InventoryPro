@@ -40,11 +40,7 @@ func (iisr *ItemInShelveRepository) GetItemsInShelf(shelfID *string) (*[]model.I
 	// Execute the query
 	err := stmt.Query(iisr.GetDatabaseConnection(), &ItemsInShelf)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(ItemsInShelf) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading items in shelve")
 	}
 
 	return &ItemsInShelf, nil
@@ -66,16 +62,16 @@ func (iisr *ItemInShelveRepository) CreateItemInShelve(tx *sql.Tx, itemInShelve 
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating item in shelve")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating item in shelve")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Item and Shelve combination already exists")
 	}
 
 	return nil
@@ -97,16 +93,16 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(tx *sql.Tx, itemInShelve 
 	// Execute the query
 	rows, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating item in shelve")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating item in shelve")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Item and Shelve combination not found")
 	}
 
 	return nil
@@ -114,7 +110,7 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(tx *sql.Tx, itemInShelve 
 
 func (iisr *ItemInShelveRepository) DeleteItemInShelve(tx *sql.Tx, itemIdInShelve *uuid.UUID) *models.INVError {
 	// TODO - Implement DeleteWarehouse
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteItemInShelve not implemented")
 }
 
 func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *uuid.UUID) (*int32, *models.INVError) {
@@ -133,9 +129,9 @@ func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *uuid.UUID) (*int
 	err := stmt.Query(iisr.GetDatabaseConnection(), &quantity)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
 		}
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading quantity of item in shelve")
 	}
 
 	return &quantity.Quantity, nil
@@ -152,16 +148,16 @@ func (iisr *ItemInShelveRepository) UpdateQuantityInShelve(tx *sql.Tx, itemId *s
 	// Execute the query
 	rows, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating quantity of item in shelve")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating quantity of item in shelve")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
 	}
 
 	return nil

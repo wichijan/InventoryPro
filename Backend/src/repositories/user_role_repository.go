@@ -35,16 +35,16 @@ func (urr *UserRoleRepository) CreateUserRole(tx *sql.Tx, user_role *model.UserR
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating user role")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating user role")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Error creating user role")
 	}
 
 	return nil
@@ -61,16 +61,16 @@ func (urr *UserRoleRepository) DeleteUserRole(tx *sql.Tx, userRole *model.UserRo
 	// Execute the query
 	rows, err := deleteQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting user role")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting user role")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Error deleting user role")
 	}
 
 	return nil

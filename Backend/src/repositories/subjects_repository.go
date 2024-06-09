@@ -39,11 +39,7 @@ func (sr *SubjectRepository) GetSubjects() (*[]model.Subjects, *models.INVError)
 	// Execute the query
 	err := stmt.Query(sr.GetDatabaseConnection(), &subjects)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(subjects) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading subjects")
 	}
 
 	return &subjects, nil
@@ -64,11 +60,11 @@ func (sr *SubjectRepository) GetSubjectByName(subjectName *string) (*model.Subje
 	// Execute the query
 	err := stmt.Query(sr.GetDatabaseConnection(), &subject)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading subject")
 	}
 
 	if subject.ID == "" {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Subject not found")
 	}
 
 	return &subject, nil
@@ -91,16 +87,16 @@ func (sr *SubjectRepository) CreateSubject(tx *sql.Tx, subject *models.SubjectOD
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating subject")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating subject")
 	}
 
 	if rowsAff == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Subject already exists")
 	}
 
 	return &uuid, nil
@@ -117,18 +113,9 @@ func (sr *SubjectRepository) UpdateSubject(tx *sql.Tx, subject *model.Subjects) 
 	).WHERE(table.Subjects.ID.EQ(mysql.String(subject.ID)))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(tx)
+	_, err := updateQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating subject")
 	}
 
 	return nil
@@ -141,16 +128,16 @@ func (sr *SubjectRepository) DeleteSubject(tx *sql.Tx, subjectId *uuid.UUID) *mo
 	// Execute the query
 	rows, err := deleteQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting subject")
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting subject")
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND
+		return inv_errors.INV_NOT_FOUND.WithDetails("Subject id not found")
 	}
 
 	return nil

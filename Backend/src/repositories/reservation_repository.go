@@ -42,7 +42,7 @@ func (rr *ReservationRepository) GetReservationByUserId(userId *uuid.UUID) (*[]m
 	var reservations []model.Reservations
 	err := stmt.Query(rr.GetDatabaseConnection(), &reservations)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading reservations")
 	}
 
 	return &reservations, nil
@@ -63,7 +63,7 @@ func (rr *ReservationRepository) GetReservationById(reservationId *uuid.UUID) (*
 	var reservation model.Reservations
 	err := stmt.Query(rr.GetDatabaseConnection(), &reservation)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading reservation")
 	}
 
 	return &reservation, nil
@@ -83,7 +83,7 @@ func (rr *ReservationRepository) GetReservationByItemId(itemId *uuid.UUID) (*[]m
 	var reservations []model.Reservations
 	err := stmt.Query(rr.GetDatabaseConnection(), &reservations)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading reservations")
 	}
 
 	return &reservations, nil
@@ -104,7 +104,7 @@ func (rr *ReservationRepository) GetReservationByItemIdAndUserId(itemId *uuid.UU
 	var reservation model.Reservations
 	err := stmt.Query(rr.GetDatabaseConnection(), &reservation)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading reservation")
 	}
 
 	return &reservation, nil
@@ -133,7 +133,7 @@ func (rr *ReservationRepository) CreateReservation(tx *sql.Tx, reservation *mode
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating reservation")
 	}
 
 	return &uuid, nil
@@ -149,7 +149,7 @@ func (rr *ReservationRepository) DeleteReservation(tx *sql.Tx, userId *uuid.UUID
 	// Execute the query
 	_, err := deleteQuery.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting reservation")
 	}
 
 	return nil

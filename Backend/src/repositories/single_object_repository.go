@@ -38,7 +38,7 @@ func (sor *SingleObjectRepository) GetSingleObjectById(singleObjectId *uuid.UUID
 	var singleObject model.SingleObject
 	err := stmt.Query(sor.GetDatabaseConnection(), &singleObject)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading single object")
 	}
 
 	return &singleObject, nil
@@ -55,7 +55,7 @@ func (sor *SingleObjectRepository) CreateSingleObject(tx *sql.Tx, singleObject *
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating single object")
 	}
 
 	return &singleObject.ItemID, nil
@@ -63,5 +63,5 @@ func (sor *SingleObjectRepository) CreateSingleObject(tx *sql.Tx, singleObject *
 
 func (sor *SingleObjectRepository) DeleteSingleObject(tx *sql.Tx, singleObjectId *uuid.UUID) *models.INVError {
 	// TODO Implement this function	
-	return nil
+	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteSingleObject not implemented")
 }

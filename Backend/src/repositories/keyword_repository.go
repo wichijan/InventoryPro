@@ -41,11 +41,7 @@ func (kr *KeywordRepository) GetKeywords() (*[]model.Keywords, *models.INVError)
 	// Execute the query
 	err := stmt.Query(kr.GetDatabaseConnection(), &keywords)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
-	}
-
-	if len(keywords) == 0 {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading keywords")
 	}
 
 	return &keywords, nil
@@ -66,11 +62,11 @@ func (kr *KeywordRepository) GetKeywordByName(keywordName *string) (*model.Keywo
 	// Execute the query
 	err := stmt.Query(kr.GetDatabaseConnection(), &keyword)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading keyword")
 	}
 
 	if keyword.Keyword == nil {
-		return nil, inv_errors.INV_NOT_FOUND
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("Keyword not found")
 	}
 
 	return &keyword, nil
@@ -91,7 +87,7 @@ func (kr *KeywordRepository) CreateKeyword(tx *sql.Tx, keywordName *string) (*uu
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating keyword")
 	}
 
 	return &uuid, nil
@@ -110,7 +106,7 @@ func (kr *KeywordRepository) UpdateKeyword(tx *sql.Tx, keyword *model.Keywords) 
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating keyword")
 	}
 
 	return nil
@@ -125,7 +121,7 @@ func (kr *KeywordRepository) DeleteKeyword(tx *sql.Tx, keywordId *uuid.UUID) *mo
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting keyword")
 	}
 
 	return nil
@@ -134,10 +130,10 @@ func (kr *KeywordRepository) DeleteKeyword(tx *sql.Tx, keywordId *uuid.UUID) *mo
 func (kr *KeywordRepository) CheckIfKeywordExists(keywordId *string) *models.INVError {
 	count, err := utils.CountStatement(table.Keywords, table.Keywords.ID.EQ(mysql.String(*keywordId)), kr.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if keyword exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_USERNAME_EXISTS
+		return inv_errors.INV_KEYWORD_EXISTS.WithDetails("Keyword already exists")
 	}
 	return nil
 }
