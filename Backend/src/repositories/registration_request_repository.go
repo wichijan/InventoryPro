@@ -1,6 +1,5 @@
 package repositories
 
-
 import (
 	"database/sql"
 
@@ -14,8 +13,9 @@ import (
 )
 
 type RegistrationRequestRepositoryI interface {
+	GetRegistrationRequests() (*[]model.RegistrationRequests, *models.INVError)
 	GetRequestByUserId(userId *uuid.UUID) (*model.RegistrationRequests, *models.INVError)
-	CreateRequest(tx *sql.Tx, book *model.RegistrationRequests) (*string, *models.INVError)
+	CreateRequest(tx *sql.Tx, book *model.RegistrationRequests) *models.INVError
 	DeleteRequest(tx *sql.Tx, userId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
@@ -23,6 +23,24 @@ type RegistrationRequestRepositoryI interface {
 
 type RegistrationRequestRepository struct {
 	managers.DatabaseManagerI
+}
+
+func (rr *RegistrationRequestRepository) GetRegistrationRequests() (*[]model.RegistrationRequests, *models.INVError) {
+	// Create the query
+	stmt := mysql.SELECT(
+		table.RegistrationRequests.AllColumns,
+	).FROM(
+		table.RegistrationRequests,
+	)
+
+	// Execute the query
+	var requests []model.RegistrationRequests
+	err := stmt.Query(rr.GetDatabaseConnection(), &requests)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR
+	}
+
+	return &requests, nil
 }
 
 func (rr *RegistrationRequestRepository) GetRequestByUserId(userId *uuid.UUID) (*model.RegistrationRequests, *models.INVError) {
@@ -45,7 +63,7 @@ func (rr *RegistrationRequestRepository) GetRequestByUserId(userId *uuid.UUID) (
 	return &request, nil
 }
 
-func (rr *RegistrationRequestRepository) CreateRequest(tx *sql.Tx, request *model.RegistrationRequests) (*string, *models.INVError) {
+func (rr *RegistrationRequestRepository) CreateRequest(tx *sql.Tx, request *model.RegistrationRequests) *models.INVError {
 	// Create the query
 	stmt := table.RegistrationRequests.INSERT(
 		table.RegistrationRequests.UserID,
@@ -58,13 +76,23 @@ func (rr *RegistrationRequestRepository) CreateRequest(tx *sql.Tx, request *mode
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 
-	return nil, nil
+	return nil
 }
 
 func (rr *RegistrationRequestRepository) DeleteRequest(tx *sql.Tx, userId *uuid.UUID) *models.INVError {
-	// TODO implement delete request
+	// Create the query
+	stmt := table.RegistrationRequests.DELETE().WHERE(
+		table.RegistrationRequests.UserID.EQ(mysql.String(userId.String())),
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
+	}
+
 	return nil
 }

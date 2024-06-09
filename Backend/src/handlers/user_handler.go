@@ -9,10 +9,11 @@ import (
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/utils"
+	"github.com/wichijan/InventoryPro/src/websocket"
 )
 
 // @Summary Register user
-// @Description Register user
+// @Description Register user - return "Admin has been informed"
 // @Tags Users
 // @Accept  json
 // @Produce  json
@@ -20,7 +21,7 @@ import (
 // @Success 201 {object} models.LoginResponse
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /auth/register [post]
-func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hub) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var registrationData models.RegistrationRequest
 		err := c.ShouldBind(&registrationData)
@@ -33,14 +34,22 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 		// user is logged in after registration
-		loginResponse, inv_err := userCtrl.RegisterUser(registrationData)
+		inv_err := userCtrl.RegisterUser(registrationData)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
 
-		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken, false)
-		c.JSON(http.StatusCreated, loginResponse.User)
+		// inform admin
+		hub.HandleMessage(websocket.Message{
+			Type:     "registrationRequest",
+			ForAdmin: true,
+			Sender:   "server",
+			Content:  "Registration Request for Admins!",
+			ID:       utils.WEBSOCKET_DEFAULT_ROOM,
+		})
+
+		c.JSON(http.StatusCreated, nil)
 	}
 }
 
@@ -70,6 +79,32 @@ func GetUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Accept User Registration Request
+// @Description Accept User Registration Request
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param userId path string true "User ID from registration request"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /XX/:userId [GET]
+func AcceptUserRegistrationRequestHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId := c.Param("userId")
+		if userId == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("User ID is empty"))
+			return
+		}
+
+		inv_err := userCtrl.AcceptUserRegistrationRequest(&userId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
 func LogoutUserHandler(c *gin.Context) {
 	utils.SetJWTCookies(c, "", "", true)
 	c.JSON(http.StatusOK, nil)
@@ -95,9 +130,9 @@ func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
 			return
 		}
-		loginResponse, kts_err := userCtrl.LoginUser(loginData)
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
+		loginResponse, inv_error := userCtrl.LoginUser(loginData)
+		if inv_error != nil {
+			utils.HandleErrorAndAbort(c, inv_error)
 			return
 		}
 
@@ -196,4 +231,23 @@ func LoggedInHandler(c *gin.Context) {
 		LoggedIn: true,
 		Id:       id,
 	})
+}
+
+// @Summary Get Registration Requests
+// @Description Get Registration Requests
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} model.RegistrationRequests
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /registration-requests [GET]
+func GetRegistrationRequestsHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		requests, inv_err := userCtrl.GetRegistrationRequests()
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, requests)
+	}
 }
