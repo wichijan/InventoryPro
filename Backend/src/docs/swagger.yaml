@@ -13,6 +13,13 @@ definitions:
       roomID:
         type: string
     type: object
+  model.RegistrationRequests:
+    properties:
+      requestTime:
+        type: string
+      userID:
+        type: string
+    type: object
   model.Roles:
     properties:
       id:
@@ -597,6 +604,29 @@ paths:
       summary: Add item to Quick Shelf
       tags:
       - Quick Shelf
+  /auth/accept-registration/:userId:
+    get:
+      consumes:
+      - application/json
+      description: Accept User Registration Request
+      parameters:
+      - description: User ID from registration request
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Accept User Registration Request
+      tags:
+      - Users
   /auth/check-email:
     post:
       consumes:
@@ -694,7 +724,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Register user
+      description: Register user - return "Admin has been informed"
       parameters:
       - description: User data
         in: body
@@ -1347,6 +1377,27 @@ paths:
       summary: Delete Quick Shelf
       tags:
       - Quick Shelf
+  /registration-requests:
+    get:
+      consumes:
+      - application/json
+      description: Get Registration Requests
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.RegistrationRequests'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get Registration Requests
+      tags:
+      - Users
   /remove-item-to-quick-shelf:
     post:
       consumes:

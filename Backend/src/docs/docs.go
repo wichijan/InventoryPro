@@ -52,6 +52,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/accept-registration/:userId": {
+            "get": {
+                "description": "Accept User Registration Request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Accept User Registration Request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID from registration request",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/check-email": {
             "post": {
                 "description": "Check email",
@@ -197,7 +232,7 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Register user",
+                "description": "Register user - return \"Admin has been informed\"",
                 "consumes": [
                     "application/json"
                 ],
@@ -1185,6 +1220,38 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/registration-requests": {
+            "get": {
+                "description": "Get Registration Requests",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get Registration Requests",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.RegistrationRequests"
+                            }
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -2610,6 +2677,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "roomID": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RegistrationRequests": {
+            "type": "object",
+            "properties": {
+                "requestTime": {
+                    "type": "string"
+                },
+                "userID": {
                     "type": "string"
                 }
             }

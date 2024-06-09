@@ -87,7 +87,7 @@ func GetUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 // @Param userId path string true "User ID from registration request"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /XX/:userId [GET]
+// @Router /auth/accept-registration/:userId [GET]
 func AcceptUserRegistrationRequestHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId := c.Param("userId")
