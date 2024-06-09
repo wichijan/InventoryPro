@@ -20,12 +20,17 @@ type UserControllerI interface {
 
 	AcceptUserRegistrationRequest(userId *string) *models.INVError
 	GetRegistrationRequests() (*[]model.RegistrationRequests, *models.INVError)
+
+	ValidateRegistrationCode(code *string) (*bool, *models.INVError)
+	RegisterUserAndCode(registrationData models.RegistrationRequest) (*models.RegistrationCodeResponse, *models.INVError)
+	UpdateUserPassword(username *string, password string) *models.INVError
 }
 
 type UserController struct {
 	UserRepo                repositories.UserRepositoryI
 	UserTypeRepo            repositories.UserTypeRepositoryI
 	RegistrationRequestRepo repositories.RegistrationRequestRepositoryI
+	RegistrationCodeRepo    repositories.RegistrationCodeRepositoryI
 }
 
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) *models.INVError {
@@ -111,6 +116,12 @@ func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.Logi
 	if !*user.RegistrationAccepted {
 		return nil, inv_errors.INV_USER_NOT_ACCEPTED.WithDetails("User registration request has not been accepted")
 	}
+	if !*user.IsActive && *user.Password == "" {
+		return nil, inv_errors.INV_USER_NOT_ACCEPTED.WithDetails("User has not being accepted by using the registration code")
+	}
+	if !*user.IsActive {
+		return nil, inv_errors.INV_USER_NOT_ACCEPTED.WithDetails("User is not (yet) active")
+	}
 
 	// Convert string to UUID
 	userID, err := uuid.Parse(user.ID)
@@ -184,3 +195,98 @@ func (uc *UserController) GetRegistrationRequests() (*[]model.RegistrationReques
 	return uc.RegistrationRequestRepo.GetRegistrationRequests()
 }
 
+func (uc *UserController) ValidateRegistrationCode(code *string) (*bool, *models.INVError) {
+	return uc.RegistrationCodeRepo.CheckIfUserWithCodeExists(code)
+}
+
+func (uc *UserController) RegisterUserAndCode(registrationData models.RegistrationRequest) (*models.RegistrationCodeResponse, *models.INVError) {
+	tx, err := uc.UserRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	userId := uuid.New()
+
+	inv_err := uc.UserRepo.CheckIfEmailExists(registrationData.Email)
+	if inv_err != nil {
+		return nil, inv_err
+	}
+
+	var userTypeId *string
+	userTypeId = nil
+	if registrationData.UserTypeName != "" {
+		userTypeId, inv_err = uc.UserTypeRepo.GetUserTypeByName(&registrationData.UserTypeName)
+		if inv_err != nil {
+			return nil, inv_err
+		}
+	}
+
+	registrationDate := time.Now()
+	isTrue := true
+	isFalse := false
+
+	user := model.Users{
+		ID:                   userId.String(),
+		Username:             &registrationData.Username,
+		Email:                &registrationData.Email,
+		FirstName:            &registrationData.FirstName,
+		LastName:             &registrationData.LastName,
+		JobTitle:             &registrationData.JobTitle,
+		PhoneNumber:          &registrationData.PhoneNumber,
+		UserTypeID:           userTypeId,
+		RegistrationTime:     &registrationDate,
+		RegistrationAccepted: &isTrue,
+		IsActive:             &isFalse,
+	}
+
+	inv_err = uc.UserRepo.CreateUser(tx, user)
+	if inv_err != nil {
+		return nil, inv_err
+	}
+
+	code := utils.GenerateRandomString(20)
+
+	// Insert Code into table RegistrationCodes
+	inv_err = uc.RegistrationCodeRepo.CreateRegistrationCode(tx, &model.RegistrationCodes{
+		UserID: userId.String(),
+		Code:   &code,
+	})
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
+	return &models.RegistrationCodeResponse{
+		RegistrationCode: code,
+	}, nil
+}
+
+func (uc *UserController) UpdateUserPassword(username *string, password string) *models.INVError {
+	tx, err := uc.UserRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	hash, err := utils.HashPassword(password)
+	if err != nil {
+		return inv_errors.INV_UPSTREAM_ERROR.WithDetails("Invalid password")
+	}
+
+	user, inv_err := uc.UserRepo.GetUserByNameClean(username)
+	if inv_err != nil {
+		return inv_err
+	}
+	user.Password = &hash
+
+	inv_error := uc.UserRepo.UpdateUser(tx, user)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+	return nil
+}

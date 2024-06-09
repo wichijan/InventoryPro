@@ -27,9 +27,9 @@ CREATE TABLE shelves(
 Create table item_types(
     id VARCHAR(36) PRIMARY KEY,
     type_name VARCHAR(20) UNIQUE
-); /* TODO Book, single_object or sets_of_objects */
+);
 
-
+/* TODO Book, single_object or sets_of_objects */
 CREATE TABLE items(
     id VARCHAR(36) PRIMARY KEY,
     item_type_id VARCHAR(36),
@@ -132,10 +132,18 @@ CREATE TABLE users(
     user_type_id VARCHAR(36),
     profile_picture TEXT,
     registration_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    registration_accepted BOOLEAN DEFAULT FALSE, /* So admin can accept */ 
-    is_active BOOLEAN DEFAULT TRUE,
+    registration_accepted BOOLEAN DEFAULT FALSE,
+    /* So admin can accept */
+    is_active BOOLEAN,
     /* Point - immer wenn er das schnell regal leer, bekommt er punkte */
     FOREIGN KEY (user_type_id) REFERENCES user_types(id)
+);
+
+create table registration_codes (
+    user_id VARCHAR(36),
+    code VARCHAR(20) UNIQUE,
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 create table registration_requests(
@@ -153,10 +161,10 @@ create table user_roles(
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
-
 CREATE TABLE quick_shelves (
     quick_shelf_id VARCHAR(36) PRIMARY KEY,
-    room_id VARCHAR(36), /* So we know where shelf is */
+    room_id VARCHAR(36),
+    /* So we know where shelf is */
     FOREIGN KEY (room_id) REFERENCES rooms(id)
 );
 
@@ -208,11 +216,22 @@ CREATE TABLE transactions (
     transaction_id VARCHAR(36) PRIMARY KEY,
     item_id VARCHAR(36) NOT NULL,
     user_id VARCHAR(36) NOT NULL,
-    transaction_type ENUM('borrow', 'return', 'place_in_quick_shelf', 'transfer_request', 'transfer_accepted', 'reserve', 'cancel_reservation', 'report_lost', 'report_damaged') NOT NULL,
+    transaction_type ENUM(
+        'borrow',
+        'return',
+        'place_in_quick_shelf',
+        'transfer_request',
+        'transfer_accepted',
+        'reserve',
+        'cancel_reservation',
+        'report_lost',
+        'report_damaged'
+    ) NOT NULL,
     target_user_id VARCHAR(36),
     origin_user_id VARCHAR(36),
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    note TEXT, /* For damage report */
+    note TEXT,
+    /* For damage report */
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (target_user_id) REFERENCES users(id)

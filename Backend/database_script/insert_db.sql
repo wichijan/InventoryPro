@@ -268,7 +268,7 @@ Insert into
         password,
         user_type_id,
         is_active,
-        registration_date
+        registration_accepted
     )
 values
     (

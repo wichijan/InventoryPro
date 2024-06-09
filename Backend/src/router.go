@@ -182,10 +182,13 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	}
 
 	// user routes
-	// TODO Add route to reset password
 	// TODO Add route to upload Picture
 	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController, hub))
 	adminRoutes.Handle(http.MethodPost, "/auth/accept-registration/:userId", handlers.AcceptUserRegistrationRequestHandler(controller.UserController))
+	adminRoutes.Handle(http.MethodPost, "/auth/generate-code", handlers.GenerateUserRegistrationCodeHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/register/:code", handlers.RegisterUserWithCodeHandler(controller.UserController))
+	securedRoutes.Handle(http.MethodPost, "/auth/reset-password", handlers.ResetPasswordHandler(controller.UserController))
+
 	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/logout", handlers.LogoutUserHandler)
 	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
