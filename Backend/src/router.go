@@ -118,7 +118,11 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
-	tranactionRepo := &repositories.TransactionRepository{
+	transactionRepo := &repositories.TransactionRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
+	registrationRequestRepo := &repositories.RegistrationRequestRepository{
 		DatabaseManagerI: databaseManager,
 	}
 
@@ -143,11 +147,12 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			ItemSubjectRepo:  itemSubjectRepo,
 			ItemTypeRepo:     itemTypeRepo,
 			ShelveRepo:       shelveRepo,
-			TransactionRepo:  tranactionRepo,
+			TransactionRepo:  transactionRepo,
 		},
 		UserController: &controllers.UserController{
-			UserRepo:     userRepo,
-			UserTypeRepo: userTypeRepo,
+			UserRepo:                userRepo,
+			UserTypeRepo:            userTypeRepo,
+			RegistrationRequestRepo: registrationRequestRepo,
 		},
 		UserRoleController: &controllers.UserRoleController{
 			UserRoleRepo: userRoleRepo,
@@ -166,7 +171,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		},
 		ReservationController: &controllers.ReservationController{
 			ReservationRepo: reservationRepo,
-			TransactionRepo: tranactionRepo,
+			TransactionRepo: transactionRepo,
 		},
 		QuickShelfController: &controllers.ItemQuickShelfController{
 			ItemQuickShelfRepo: quickShelfRepo,
@@ -177,11 +182,10 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	}
 
 	// user routes
-	// TODO Add route to request registration
-	// TODO Add route to accept registration request
 	// TODO Add route to reset password
 	// TODO Add route to upload Picture
-	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController, hub))
+	adminRoutes.Handle(http.MethodPost, "/auth/accept-registration/:userId", handlers.AcceptUserRegistrationRequestHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/logout", handlers.LogoutUserHandler)
 	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
@@ -189,6 +193,8 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
 
 	securedRoutes.Handle(http.MethodGet, "/users/get-me", handlers.GetUserHandler(controller.UserController))
+
+	adminRoutes.Handle(http.MethodGet, "/registration-requests", handlers.GetRegistrationRequestsHandler(controller.UserController))
 
 	// Warehouse routes
 	publicRoutes.Handle(http.MethodGet, "/warehouses", handlers.GetWarehousesHandler(controller.WarehouseController))

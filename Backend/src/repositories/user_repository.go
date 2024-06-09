@@ -22,6 +22,8 @@ type UserRepositoryI interface {
 
 	// TODO implement upload profile picture
 
+	AcceptUserRegistrationRequest(tx *sql.Tx, userId *string) *models.INVError
+
 	managers.DatabaseManagerI
 }
 
@@ -155,6 +157,23 @@ func (ur *UserRepository) CheckIfEmailExists(email string) *models.INVError {
 	}
 	if count > 0 {
 		return inv_errors.INV_EMAIL_EXISTS
+	}
+	return nil
+}
+
+func (ur *UserRepository) AcceptUserRegistrationRequest(tx *sql.Tx, userId *string) *models.INVError {
+	stmt := table.Users.UPDATE(
+		table.Users.RegistrationAccepted,
+		table.Users.IsActive,
+	).SET(
+		mysql.Bool(true),
+		mysql.Bool(true),
+	).WHERE(
+		table.Users.ID.EQ(mysql.String(*userId)),
+	)
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR
 	}
 	return nil
 }

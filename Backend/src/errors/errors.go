@@ -42,6 +42,8 @@ var (
 
 	// INV_QUICK_SHELF_FULL is used to indicate that the quick shelf is full
 	INV_QUICK_SHELF_FULL = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "QUICK_SHELF_FULL"}, Status: 409}
+	// INV_USER_NOT_ACCEPTED is used to indicate that user registration request has not been accepted by admins
+	INV_USER_NOT_ACCEPTED = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "USER_NOT_ACCEPTED"}, Status: 409}
 	
 	// INV_QUICK_SHELF_USER_LIMIT_FULL is used to indicate that the user has reached the limit of items in the quick shelf
 	INV_QUICK_SHELF_USER_LIMIT_FULL = &models.INVError{INVErrorMessage: models.INVErrorMessage{ErrorMessage: "QUICK_SHELF_USER_LIMIT_FULL"}, Status: 409}
