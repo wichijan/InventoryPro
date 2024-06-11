@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -26,8 +27,9 @@ type ItemControllerI interface {
 	BorrowItem(itemReserve models.ItemBorrowCreate) *models.INVError
 	ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
 
-	MoveItemRequest(itemMove models.ItemMove) *models.INVError
-	MoveItemAccepted(itemMove models.ItemMove) *models.INVError
+	MoveItemRequest(itemMove models.ItemMove) (*uuid.UUID, *models.INVError)
+	MoveItemAccepted(transferAccept models.TransferAccept) *models.INVError
+	GetTransferRequestByUserId(userId uuid.UUID) (*[]models.TransferRequestSelect, *models.INVError)
 
 	UploadItemImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetImageIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
@@ -471,10 +473,10 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 	return nil
 }
 
-func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVError {
+func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) (*uuid.UUID, *models.INVError) {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
@@ -483,9 +485,9 @@ func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVE
 	transferRequest.UserID = itemMove.UserID.String()
 	transferRequest.TargetUserID = itemMove.NewUserID.String()
 
-	_, inv_error := ic.TransferRequestRepo.CreateTransferRequest(tx, &transferRequest)
+	transferRequestId, inv_error := ic.TransferRequestRepo.CreateTransferRequest(tx, &transferRequest)
 	if inv_error != nil {
-		return inv_error
+		return nil, inv_error
 	}
 
 	// Transaction Logging
@@ -502,35 +504,53 @@ func (ic *ItemController) MoveItemRequest(itemMove models.ItemMove) *models.INVE
 	// Add Transaction
 	inv_error = ic.TransactionRepo.CreateTransaction(tx, &transaction)
 	if inv_error != nil {
-		return inv_error
+		return nil, inv_error
 	}
 
 	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
-	return nil
+	return transferRequestId, nil
 }
 
-func (ic *ItemController) MoveItemAccepted(itemMove models.ItemMove) *models.INVError {
+func (ic *ItemController) MoveItemAccepted(transferAccept models.TransferAccept) *models.INVError {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
-	inv_error := ic.UserItemRepo.MoveItemToNewUser(tx, &itemMove.UserID, &itemMove.NewUserID, &itemMove.ItemID)
+	// GET Transfer Request
+	transferRequest, inv_error := ic.TransferRequestRepo.GetTransferRequestById(*transferAccept.TransferRequestID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	log.Print("TransferRequest ", transferRequest.TargetUserID)
+	log.Print("TransferAccept ", transferAccept.UserId)
+	if transferRequest.TargetUserID.String() != transferAccept.UserId.String() {
+		return inv_errors.INV_CONFLICT.WithDetails("User ID does not match the target user ID")
+	}
+
+	inv_error = ic.UserItemRepo.MoveItemToNewUser(tx, transferRequest.UserID, transferRequest.ItemID, transferRequest.TargetUserID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Delete transfer request
+	inv_error = ic.TransferRequestRepo.DeleteTransferRequest(tx, transferAccept.TransferRequestID)
 	if inv_error != nil {
 		return inv_error
 	}
 
 	transactionDate := time.Now()
-	targetUserId := itemMove.NewUserID.String()
-	originUserId := itemMove.UserID.String()
+	targetUserId := transferRequest.TargetUserID.String()
+	originUserId := transferRequest.UserID.String()
 
 	var transaction model.Transactions
-	transaction.ItemID = itemMove.ItemID.String()
-	transaction.UserID = itemMove.UserID.String()
+	transaction.ItemID = transferRequest.ItemID.String()
+	transaction.UserID = transferRequest.UserID.String()
 	transaction.TransactionType = "transfer_accepted"
 	transaction.TransactionDate = &transactionDate
 	transaction.TargetUserID = &targetUserId
@@ -547,4 +567,8 @@ func (ic *ItemController) MoveItemAccepted(itemMove models.ItemMove) *models.INV
 	}
 
 	return nil
+}
+
+func (ic *ItemController) GetTransferRequestByUserId(userId uuid.UUID) (*[]models.TransferRequestSelect, *models.INVError) {
+	return ic.TransferRequestRepo.GetTransferRequestByUserId(userId)
 }

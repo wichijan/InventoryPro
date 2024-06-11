@@ -130,6 +130,10 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
+	transferRequestRepo := &repositories.TransferRequestRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
@@ -142,16 +146,17 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			ShelveRepo: shelveRepo,
 		},
 		ItemController: &controllers.ItemController{
-			ItemRepo:         itemRepo,
-			ItemInShelveRepo: itemInShelveRepo,
-			UserItemRepo:     userItemRepo,
-			KeywordRepo:      keywordRepo,
-			SubjectRepo:      subjectRepo,
-			ItemKeywordRepo:  itemKeywordRepo,
-			ItemSubjectRepo:  itemSubjectRepo,
-			ItemTypeRepo:     itemTypeRepo,
-			ShelveRepo:       shelveRepo,
-			TransactionRepo:  transactionRepo,
+			ItemRepo:            itemRepo,
+			ItemInShelveRepo:    itemInShelveRepo,
+			UserItemRepo:        userItemRepo,
+			KeywordRepo:         keywordRepo,
+			SubjectRepo:         subjectRepo,
+			ItemKeywordRepo:     itemKeywordRepo,
+			ItemSubjectRepo:     itemSubjectRepo,
+			ItemTypeRepo:        itemTypeRepo,
+			ShelveRepo:          shelveRepo,
+			TransactionRepo:     transactionRepo,
+			TransferRequestRepo: transferRequestRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:                userRepo,
@@ -264,6 +269,10 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	securedRoutes.Handle(http.MethodPost, "/items/remove-item-to-quick-shelf", handlers.RemoveItemFromQuickShelfHandler(controller.QuickShelfController))
 	securedRoutes.Handle(http.MethodPost, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.QuickShelfController))
 	securedRoutes.Handle(http.MethodGet, "/items/quick-shelf/:id", handlers.GetItemsInQuickShelfHandler(controller.QuickShelfController))
+	// Item Move - From User A -> User B
+	securedRoutes.Handle(http.MethodPost, "/items/transfer-request", handlers.MoveItemRequestHandler(controller.ItemController, hub))
+	securedRoutes.Handle(http.MethodPost, "/items/transfer-accept/:id", handlers.MoveItemAcceptedHandler(controller.ItemController, hub))
+	securedRoutes.Handle(http.MethodGet, "/items/transfer-requests", handlers.GetTransferRequestByIdHandler(controller.ItemController))
 
 	// Subject Routes
 	publicRoutes.Handle(http.MethodGet, "/subjects", handlers.GetSubjectsHandler(controller.SubjectController))
