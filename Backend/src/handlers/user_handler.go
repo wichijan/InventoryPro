@@ -121,9 +121,9 @@ func RegisterUserWithCodeHandler(userCtrl controllers.UserControllerI) gin.Handl
 // @Produce  json
 // @Param code path string true "Registration Code"
 // @Param user body models.RegistrationRequest true "User data"
-// @Success 201 {object} models.LoginResponse
+// @Success 201 {object} string
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /auth/register/:code [post]
+// @Router /auth/generate-code [post]
 func GenerateUserRegistrationCodeHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var registrationData models.RegistrationRequest

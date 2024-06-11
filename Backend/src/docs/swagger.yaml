@@ -361,6 +361,13 @@ definitions:
       user:
         $ref: '#/definitions/models.UserWithTypeName'
     type: object
+  models.PasswordReset:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   models.QuickShelfCreate:
     properties:
       roomId:
@@ -675,6 +682,35 @@ paths:
       summary: Check username
       tags:
       - Users
+  /auth/generate-code:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Registration Code
+        in: path
+        name: code
+        required: true
+        type: string
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      tags:
+      - Users
   /auth/logged-in:
     get:
       consumes:
@@ -737,13 +773,40 @@ paths:
       responses:
         "201":
           description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Register user
+      tags:
+      - Users
+  /auth/register/:code:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Registration Code
+        in: path
+        name: code
+        required: true
+        type: string
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/models.LoginResponse'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
-      summary: Register user
       tags:
       - Users
   /clear-quick-shelf/:id:
@@ -1423,6 +1486,30 @@ paths:
       summary: Bring item from Quick shelf to regular shelf
       tags:
       - Quick Shelf
+  /reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset Password
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.PasswordReset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Reset Password
+      tags:
+      - Users
   /roles:
     get:
       consumes:
