@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -28,7 +29,7 @@ type ItemControllerI interface {
 
 	MoveItemRequest(itemMove models.ItemMove) (*uuid.UUID, *models.INVError)
 	MoveItemAccepted(transferAccept models.TransferAccept) *models.INVError
-	GetTransferRequestById(transferAcceptId uuid.UUID) (*models.TransferRequestSelect, *models.INVError)
+	GetTransferRequestByUserId(userId uuid.UUID) (*[]models.TransferRequestSelect, *models.INVError)
 
 	UploadItemImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetImageIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
@@ -526,11 +527,19 @@ func (ic *ItemController) MoveItemAccepted(transferAccept models.TransferAccept)
 		return inv_error
 	}
 
-	if transferRequest.TargetUserID != transferAccept.UserId {
+	log.Print("TransferRequest ", transferRequest.TargetUserID)
+	log.Print("TransferAccept ", transferAccept.UserId)
+	if transferRequest.TargetUserID.String() != transferAccept.UserId.String() {
 		return inv_errors.INV_CONFLICT.WithDetails("User ID does not match the target user ID")
 	}
 
 	inv_error = ic.UserItemRepo.MoveItemToNewUser(tx, transferRequest.UserID, transferRequest.ItemID, transferRequest.TargetUserID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Delete transfer request
+	inv_error = ic.TransferRequestRepo.DeleteTransferRequest(tx, transferAccept.TransferRequestID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -560,6 +569,6 @@ func (ic *ItemController) MoveItemAccepted(transferAccept models.TransferAccept)
 	return nil
 }
 
-func (ic *ItemController) GetTransferRequestById(transferAcceptId uuid.UUID) (*models.TransferRequestSelect, *models.INVError) {
-	return ic.TransferRequestRepo.GetTransferRequestById(transferAcceptId)
+func (ic *ItemController) GetTransferRequestByUserId(userId uuid.UUID) (*[]models.TransferRequestSelect, *models.INVError) {
+	return ic.TransferRequestRepo.GetTransferRequestByUserId(userId)
 }

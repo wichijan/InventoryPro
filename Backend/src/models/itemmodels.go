@@ -169,10 +169,10 @@ type TransferAccept struct {
 }
 
 type TransferRequestSelect struct {
-	TransferRequestID *uuid.UUID `alias:"transfer_request.transfer_request_id" sql:"primary_key"`
-	ItemID            *uuid.UUID `alias:"transfer_request.item_id"`
-	UserID            *uuid.UUID `alias:"transfer_request.user_id"`
-	TargetUserID      *uuid.UUID `alias:"transfer_request.target_user_id"`
-	RequestDate       *time.Time `alias:"transfer_request.request_date"`
-	IsAccepted        *bool      `alias:"transfer_request.is_accepted"`
+	TransferRequestID *uuid.UUID `alias:"transfer_requests.transfer_request_id" sql:"primary_key"`
+	ItemID            *uuid.UUID `alias:"transfer_requests.item_id"`
+	UserID            *uuid.UUID `alias:"transfer_requests.user_id"`
+	TargetUserID      *uuid.UUID `alias:"transfer_requests.target_user_id"`
+	RequestDate       *time.Time `alias:"transfer_requests.request_date"`
+	IsAccepted        *bool      `alias:"transfer_requests.is_accepted"`
 }

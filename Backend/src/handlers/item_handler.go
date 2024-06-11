@@ -505,7 +505,7 @@ func RemoveImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 	}
 }
 
-// @Summary Create Transfer Request 
+// @Summary Create Transfer Request
 // @Description Create Transfer Request to move item from User A to User B
 // @Tags Items-Transfer
 // @Accept  json
@@ -591,28 +591,28 @@ func MoveItemAcceptedHandler(itemCtrl controllers.ItemControllerI, hub *websocke
 	}
 }
 
-// @Summary Get Transfer Requests by Id
-// @Description Get Transfer Requests by Id
+// @Summary Get Transfer Requests by UserId
+// @Description Get Transfer Requests by UserId
 // @Tags Items-Transfer
 // @Accept  json
 // @Produce  json
-// @Param id path string true "transfer request id"
 // @Success 200 {array} models.TransferRequestSelect
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /transfer-request/:id [get]
+// @Router /items/transfer-requests [get]
 func GetTransferRequestByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		transferRequestId, err := uuid.Parse(c.Param("id"))
-		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
 			return
 		}
 
-		transferRequest, inv_err := itemCtrl.GetTransferRequestById(transferRequestId)
+		transferRequest, inv_err := itemCtrl.GetTransferRequestByUserId(*userId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
+
 		c.JSON(http.StatusOK, transferRequest)
 	}
 }
