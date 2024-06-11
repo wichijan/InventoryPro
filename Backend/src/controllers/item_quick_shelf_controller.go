@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -136,7 +138,7 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 		return inv_error
 	}
 	if len(*userItems) >= int(utils.MAX_AMOUNT_OF_ITEMS_FOR_USER_IN_QUICK_SHELF) {
-		return inv_errors.INV_QUICK_SHELF_USER_LIMIT_FULL.WithDetails("User has reached the limit of items in quick shelf")
+		return inv_errors.INV_QUICK_SHELF_USER_LIMIT_FULL.WithDetails(fmt.Sprintf("User has reached the limit of items in quick shelf. Limit is %v", utils.MAX_AMOUNT_OF_ITEMS_FOR_USER_IN_QUICK_SHELF))
 	}
 
 	// is quick shelf full?
