@@ -18,7 +18,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param user body models.RegistrationRequest true "User data"
-// @Success 201 {object} models.LoginResponse
+// @Success 201
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /auth/register [post]
 func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hub) gin.HandlerFunc {
@@ -37,7 +37,6 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 			return
 		}
 
-
 		// user is logged in after registration
 		inv_err := userCtrl.RegisterUser(registrationData)
 		if inv_err != nil {
@@ -55,6 +54,104 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 		})
 
 		c.JSON(http.StatusCreated, nil)
+	}
+}
+
+// @Summary
+// @Description
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param code path string true "Registration Code"
+// @Param user body models.RegistrationRequest true "User data"
+// @Success 201 {object} models.LoginResponse
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /auth/register/:code [post]
+func RegisterUserWithCodeHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		code := c.Param("code")
+		if code == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Code is empty"))
+			return
+		}
+
+		// Validate code
+		ok, inv_err := userCtrl.ValidateRegistrationCode(&code)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		if !*ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid code"))
+			return
+		}
+
+		// Register user
+		var newPassword models.PasswordReset
+		err := c.ShouldBind(&newPassword)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(
+			newPassword.Password, *newPassword.Username,
+		) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
+			return
+		}
+
+		// user is logged in after registration
+		inv_err = userCtrl.UpdateUserPassword(newPassword.Username, newPassword.Password)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		// Delete code
+		inv_err = userCtrl.DeleteRegistrationCode(&code)
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary
+// @Description
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param code path string true "Registration Code"
+// @Param user body models.RegistrationRequest true "User data"
+// @Success 201 {object} models.LoginResponse
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /auth/register/:code [post]
+func GenerateUserRegistrationCodeHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var registrationData models.RegistrationRequest
+		err := c.ShouldBind(&registrationData)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(
+			registrationData.Username, registrationData.Email,
+			registrationData.FirstName, registrationData.LastName,
+		) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username, email, first name or last name"))
+			return
+		}
+		if registrationData.Password != "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Password has to be set by user himself"))
+			return
+		}
+
+		// user is logged in after registration
+		code, inv_err := userCtrl.RegisterUserAndCode(registrationData)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusCreated, code)
 	}
 }
 
@@ -132,7 +229,7 @@ func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
-		if utils.ContainsEmptyString(loginData.Username, loginData.Password)  {
+		if utils.ContainsEmptyString(loginData.Username, loginData.Password) {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
 			return
 		}
@@ -256,5 +353,41 @@ func GetRegistrationRequestsHandler(userCtrl controllers.UserControllerI) gin.Ha
 			return
 		}
 		c.JSON(http.StatusOK, requests)
+	}
+}
+
+// @Summary Reset Password
+// @Description Reset Password
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body models.PasswordReset true "User data"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /reset-password [POST]
+func ResetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Register user
+		var newPassword models.PasswordReset
+		err := c.ShouldBind(&newPassword)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(
+			newPassword.Password, *newPassword.Username,
+		) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
+			return
+		}
+
+		// user is logged in after registration
+		inv_err := userCtrl.UpdateUserPassword(newPassword.Username, newPassword.Password)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
 	}
 }

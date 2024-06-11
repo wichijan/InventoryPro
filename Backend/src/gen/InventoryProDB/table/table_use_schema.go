@@ -20,6 +20,7 @@ func UseSchema(schema string) {
 	KeywordsForItems = KeywordsForItems.FromSchema(schema)
 	Points = Points.FromSchema(schema)
 	QuickShelves = QuickShelves.FromSchema(schema)
+	RegistrationCodes = RegistrationCodes.FromSchema(schema)
 	RegistrationRequests = RegistrationRequests.FromSchema(schema)
 	Reservations = Reservations.FromSchema(schema)
 	Roles = Roles.FromSchema(schema)

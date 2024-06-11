@@ -15,8 +15,10 @@ import (
 
 type UserRepositoryI interface {
 	GetUserById(id *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
+	GetUserByNameClean(username *string) (*model.Users, *models.INVError)
 	GetUserByUsername(username string) (*models.UserWithTypeName, *models.INVError)
 	CreateUser(tx *sql.Tx, user model.Users) *models.INVError
+	UpdateUser(tx *sql.Tx, user *model.Users) *models.INVError
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
 
@@ -53,6 +55,37 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, 
 			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
 	).WHERE(
 		table.Users.ID.EQ(utils.MySqlString(id.String())),
+	)
+	err := stmt.Query(ur.GetDatabaseConnection(), &user)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_USER_NOT_FOUND.WithDetails("User not found")
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading user")
+	}
+
+	return &user, nil
+}
+
+func (ur *UserRepository) GetUserByNameClean(username *string) (*model.Users, *models.INVError) {
+	var user model.Users
+	stmt := mysql.SELECT(
+		table.Users.ID,
+		table.Users.Username,
+		table.Users.Email,
+		table.Users.Password,
+		table.Users.FirstName,
+		table.Users.LastName,
+		table.Users.JobTitle,
+		table.Users.PhoneNumber,
+		table.Users.ProfilePicture,
+		table.Users.RegistrationTime,
+		table.Users.RegistrationAccepted,
+		table.Users.IsActive,
+	).FROM(
+		table.Users,
+	).WHERE(
+		table.Users.Username.EQ(utils.MySqlString(*username)),
 	)
 	err := stmt.Query(ur.GetDatabaseConnection(), &user)
 	if err != nil {
@@ -134,6 +167,47 @@ func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVEr
 	_, err := stmt.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating user")
+	}
+
+	return nil
+}
+
+func (ur *UserRepository) UpdateUser(tx *sql.Tx, user *model.Users) *models.INVError {
+	stmt := table.Users.UPDATE(
+		table.Users.ID,
+		table.Users.FirstName,
+		table.Users.LastName,
+		table.Users.Username,
+		table.Users.Email,
+		table.Users.Password,
+		table.Users.JobTitle,
+		table.Users.PhoneNumber,
+		table.Users.UserTypeID,
+		table.Users.ProfilePicture,
+		table.Users.RegistrationTime,
+		table.Users.RegistrationAccepted,
+		table.Users.IsActive,
+	).SET(
+		user.ID,
+		user.FirstName,
+		user.LastName,
+		user.Username,
+		user.Email,
+		user.Password,
+		user.JobTitle,
+		user.PhoneNumber,
+		user.UserTypeID,
+		user.ProfilePicture,
+		user.RegistrationTime,
+		user.RegistrationAccepted,
+		user.IsActive,
+	).WHERE(
+		table.Users.ID.EQ(mysql.String(user.ID)),
+	)
+
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating user")
 	}
 
 	return nil

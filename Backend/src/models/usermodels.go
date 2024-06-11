@@ -16,19 +16,19 @@ type RegistrationRequest struct {
 }
 
 type UserWithTypeName struct {
-	ID           string  `alias:"users.id"`
-	FirstName    *string `alias:"users.first_name"`
-	LastName     *string `alias:"users.last_name"`
-	Username     *string `alias:"users.username"`
-	Email        *string `alias:"users.email"`
-	Password     *string `alias:"users.password"`
-	JobTitle     *string `alias:"users.job_title"`
-	PhoneNumber  *string `alias:"users.phone_number"`
-	UserTypeName *string `alias:"user_types.type_name"`
-	ProfilePicture *string `alias:"users.profile_picture"`
-	RegistrationTime *string `alias:"users.registration_time"`
-	RegistrationAccepted *bool `alias:"users.registration_accepted"`
-	IsActive     *bool   `alias:"users.is_active"`
+	ID                   string  `alias:"users.id"`
+	FirstName            *string `alias:"users.first_name"`
+	LastName             *string `alias:"users.last_name"`
+	Username             *string `alias:"users.username"`
+	Email                *string `alias:"users.email"`
+	Password             *string `alias:"users.password"`
+	JobTitle             *string `alias:"users.job_title"`
+	PhoneNumber          *string `alias:"users.phone_number"`
+	UserTypeName         *string `alias:"user_types.type_name"`
+	ProfilePicture       *string `alias:"users.profile_picture"`
+	RegistrationTime     *string `alias:"users.registration_time"`
+	RegistrationAccepted *bool   `alias:"users.registration_accepted"`
+	IsActive             *bool   `alias:"users.is_active"`
 }
 
 type LoginRequest struct {
@@ -53,4 +53,9 @@ type CheckUsernameRequest struct {
 type LoggedInResponse struct {
 	LoggedIn bool       `json:"loggedIn"`
 	Id       *uuid.UUID `json:"id"`
+}
+
+type PasswordReset struct {
+	Username *string `json:"username"`
+	Password string  `json:"password"`
 }
