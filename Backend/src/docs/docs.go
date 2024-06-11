@@ -567,7 +567,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ItemPicturePath"
+                            "$ref": "#/definitions/models.PicturePath"
                         }
                     },
                     "400": {
@@ -2460,6 +2460,119 @@ const docTemplate = `{
                 }
             }
         },
+        "/users-picture": {
+            "get": {
+                "description": "Get ImagePath For User Profile Picture",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get ImagePath For User Profile Picture",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.PicturePath"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Upload Img for user. Form with enctype=\"multipart/form-data\" \u003cinput type=\"file\" name=\"file\" /\u003e \u0026 \u003cinput type=\"hidden\" name=\"id\" /\u003e for item id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Upload Img for user",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Picture from User and replace with \"\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete Img for User",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/users/get-me": {
             "get": {
                 "description": "Get User Data when logged in",
@@ -3064,14 +3177,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ItemPicturePath": {
-            "type": "object",
-            "properties": {
-                "path": {
-                    "type": "string"
-                }
-            }
-        },
         "models.ItemQuickShelfInsertODT": {
             "type": "object",
             "required": [
@@ -3344,6 +3449,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PicturePath": {
+            "type": "object",
+            "properties": {
+                "path": {
                     "type": "string"
                 }
             }

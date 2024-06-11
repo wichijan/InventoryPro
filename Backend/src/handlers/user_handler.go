@@ -404,6 +404,12 @@ func ResetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 // @Router /users-picture [post]
 func UploadImageForUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
 		// single file
 		form, err := c.MultipartForm()
 		if err != nil {
@@ -411,15 +417,8 @@ func UploadImageForUserHandler(userCtrl controllers.UserControllerI) gin.Handler
 			return
 		}
 		file := form.File["file"][0]
-		userId, err := uuid.Parse(form.Value["id"][0])
-		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item id"))
-			return
-		}
 
-		log.Print("Uploading image for user: ", userId.String())
-
-		imageId, inv_err := userCtrl.UploadUserImage(&userId)
+		imageId, inv_err := userCtrl.UploadUserImage(userId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -440,18 +439,17 @@ func UploadImageForUserHandler(userCtrl controllers.UserControllerI) gin.Handler
 // @Success 200 {object} models.PicturePath
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /users-picture/:id [get]
+// @Router /users-picture [get]
 func GetImagePathForUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// single file
-		userId, err := uuid.Parse(c.Param("id"))
-		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
 			return
 		}
-		log.Print("ID: ", userId.String())
 
-		imageId, inv_err := userCtrl.GetImageIdFromUser(&userId)
+		imageId, inv_err := userCtrl.GetImageIdFromUser(userId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -472,17 +470,17 @@ func GetImagePathForUserHandler(userCtrl controllers.UserControllerI) gin.Handle
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /users-picture/:id [delete]
+// @Router /users-picture [delete]
 func RemoveImageForUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// single file
-		userId, err := uuid.Parse(c.Param("id"))
-		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
 			return
 		}
 
-		inv_err := userCtrl.RemoveImageIdFromUser(&userId)
+		inv_err := userCtrl.RemoveImageIdFromUser(userId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

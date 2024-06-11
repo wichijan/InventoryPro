@@ -204,9 +204,9 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 
 	securedRoutes.Handle(http.MethodGet, "/users/get-me", handlers.GetUserHandler(controller.UserController))
 	// Picture for Users
-	adminRoutes.Handle(http.MethodPost, "/users-picture", handlers.UploadImageForUserHandler(controller.UserController))
-	adminRoutes.Handle(http.MethodGet, "/users-picture/:id", handlers.GetImagePathForUserHandler(controller.UserController))
-	adminRoutes.Handle(http.MethodDelete, "/users-picture/:id", handlers.RemoveImageForUserHandler(controller.UserController))
+	securedRoutes.Handle(http.MethodPost, "/users-picture", handlers.UploadImageForUserHandler(controller.UserController))
+	securedRoutes.Handle(http.MethodGet, "/users-picture", handlers.GetImagePathForUserHandler(controller.UserController))
+	securedRoutes.Handle(http.MethodDelete, "/users-picture", handlers.RemoveImageForUserHandler(controller.UserController))
 
 	// Warehouse routes
 	publicRoutes.Handle(http.MethodGet, "/warehouses", handlers.GetWarehousesHandler(controller.WarehouseController))

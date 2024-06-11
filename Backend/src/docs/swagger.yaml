@@ -182,11 +182,6 @@ definitions:
     - name
     - regularShelfId
     type: object
-  models.ItemPicturePath:
-    properties:
-      path:
-        type: string
-    type: object
   models.ItemQuickShelfInsertODT:
     properties:
       itemID:
@@ -366,6 +361,11 @@ definitions:
       password:
         type: string
       username:
+        type: string
+    type: object
+  models.PicturePath:
+    properties:
+      path:
         type: string
     type: object
   models.QuickShelfCreate:
@@ -974,7 +974,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ItemPicturePath'
+            $ref: '#/definitions/models.PicturePath'
         "400":
           description: Bad Request
           schema:
@@ -2193,6 +2193,82 @@ paths:
       summary: Update UserType
       tags:
       - UserTypes
+  /users-picture:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Picture from User and replace with ""
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Img for User
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Get ImagePath For User Profile Picture
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PicturePath'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get ImagePath For User Profile Picture
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Upload Img for user. Form with enctype="multipart/form-data" <input
+        type="file" name="file" /> & <input type="hidden" name="id" /> for item id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Upload Img for user
+      tags:
+      - Users
   /users/get-me:
     get:
       consumes:

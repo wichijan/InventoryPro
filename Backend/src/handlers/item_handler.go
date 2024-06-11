@@ -448,7 +448,7 @@ func UploadImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 // @Accept  json
 // @Produce  json
 // @Param id path string true "item id"
-// @Success 200 {object} models.ItemPicturePath
+// @Success 200 {object} models.PicturePath
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items-picture/:id [get]
