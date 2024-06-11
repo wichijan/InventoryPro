@@ -137,8 +137,13 @@ type ItemBorrowCreate struct {
 }
 
 type ItemMove struct {
+	ItemID    *uuid.UUID
+	UserID    *uuid.UUID
+	NewUserID *uuid.UUID
+}
+
+type ItemMoveRequest struct {
 	ItemID    uuid.UUID
-	UserID    uuid.UUID
 	NewUserID uuid.UUID
 }
 
@@ -152,4 +157,22 @@ type PicturePath struct {
 
 type ItemTypes struct {
 	TypeName string `alias:"item_types.type_name"`
+}
+
+type TransferRequestResponse struct {
+	TransferRequestID string
+}
+
+type TransferAccept struct {
+	TransferRequestID *uuid.UUID
+	UserId            *uuid.UUID
+}
+
+type TransferRequestSelect struct {
+	TransferRequestID *uuid.UUID `alias:"transfer_request.transfer_request_id" sql:"primary_key"`
+	ItemID            *uuid.UUID `alias:"transfer_request.item_id"`
+	UserID            *uuid.UUID `alias:"transfer_request.user_id"`
+	TargetUserID      *uuid.UUID `alias:"transfer_request.target_user_id"`
+	RequestDate       *time.Time `alias:"transfer_request.request_date"`
+	IsAccepted        *bool      `alias:"transfer_request.is_accepted"`
 }

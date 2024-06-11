@@ -11,6 +11,7 @@ import (
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/utils"
+	"github.com/wichijan/InventoryPro/src/websocket"
 )
 
 // @Summary Get items
@@ -501,5 +502,117 @@ func RemoveImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 		}
 
 		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Create Transfer Request 
+// @Description Create Transfer Request to move item from User A to User B
+// @Tags Items-Transfer
+// @Accept  json
+// @Produce  json
+// @Param item body models.ItemMoveRequest true "ItemMoveRequest model"
+// @Success 200 {object} models.TransferRequestResponse
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/transfer-request [post]
+func MoveItemRequestHandler(itemCtrl controllers.ItemControllerI, hub *websocket.Hub) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		var item models.ItemMoveRequest
+		err := c.ShouldBindJSON(&item)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
+			return
+		}
+
+		itemMove := models.ItemMove{
+			ItemID:    &item.ItemID,
+			UserID:    userId,
+			NewUserID: &item.NewUserID,
+		}
+
+		transferRequestId, inv_err := itemCtrl.MoveItemRequest(itemMove)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		// TODO Inform user that item move request created
+
+		c.JSON(http.StatusOK, models.TransferRequestResponse{
+			TransferRequestID: transferRequestId.String(),
+		})
+	}
+}
+
+// @Summary Accept Transfer Request
+// @Description Accept Transfer Request
+// @Tags Items-Transfer
+// @Accept  json
+// @Produce  json
+// @Param id path string true "transfer request id"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/transfer-accept/:id [post]
+func MoveItemAcceptedHandler(itemCtrl controllers.ItemControllerI, hub *websocket.Hub) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		transferRequestId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+			return
+		}
+
+		transferAccept := models.TransferAccept{
+			TransferRequestID: &transferRequestId,
+			UserId:            userId,
+		}
+
+		inv_err := itemCtrl.MoveItemAccepted(transferAccept)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		// TODO Inform user that item has been moved
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Get Transfer Requests by Id
+// @Description Get Transfer Requests by Id
+// @Tags Items-Transfer
+// @Accept  json
+// @Produce  json
+// @Param id path string true "transfer request id"
+// @Success 200 {array} models.TransferRequestSelect
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /transfer-request/:id [get]
+func GetTransferRequestByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		transferRequestId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+			return
+		}
+
+		transferRequest, inv_err := itemCtrl.GetTransferRequestById(transferRequestId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, transferRequest)
 	}
 }

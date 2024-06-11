@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -11,7 +12,8 @@ import (
 )
 
 type TransferRequestRepositoryI interface {
-	CreateTransferRequest(tx *sql.Tx, book *models.TransferRequestCreate) (*string, *models.INVError)
+	GetTransferRequestById(transferId uuid.UUID) (*models.TransferRequestSelect, *models.INVError)
+	CreateTransferRequest(tx *sql.Tx, book *models.TransferRequestCreate) (*uuid.UUID, *models.INVError)
 	UpdateTransferRequest(tx *sql.Tx, book *models.TransferRequestUpdate) *models.INVError
 
 	managers.DatabaseManagerI
@@ -21,9 +23,27 @@ type TransferRequestRepository struct {
 	managers.DatabaseManagerI
 }
 
-func (trr *TransferRequestRepository) CreateTransferRequest(tx *sql.Tx, request *models.TransferRequestCreate) (*string, *models.INVError) {
-	newUUID := uuid.New().String()
-	
+func (trr *TransferRequestRepository) GetTransferRequestById(transferId uuid.UUID) (*models.TransferRequestSelect, *models.INVError) {
+	// Create the query
+	stmt := table.TransferRequests.SELECT(
+		table.TransferRequests.AllColumns,
+	).WHERE(
+		table.TransferRequests.TransferRequestID.EQ(mysql.String(transferId.String())),
+	)
+
+	// Execute the query
+	var transferRequest models.TransferRequestSelect
+	err := stmt.Query(trr.GetDatabaseConnection(), &transferRequest)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error getting transfer request")
+	}
+
+	return &transferRequest, nil
+}
+
+func (trr *TransferRequestRepository) CreateTransferRequest(tx *sql.Tx, request *models.TransferRequestCreate) (*uuid.UUID, *models.INVError) {
+	newUUID := uuid.New()
+
 	// Create the query
 	stmt := table.TransferRequests.INSERT(
 		table.TransferRequests.TransferRequestID,
@@ -31,7 +51,7 @@ func (trr *TransferRequestRepository) CreateTransferRequest(tx *sql.Tx, request 
 		table.TransferRequests.ItemID,
 		table.TransferRequests.TargetUserID,
 	).VALUES(
-		newUUID,
+		newUUID.String(),
 		request.UserID,
 		request.ItemID,
 		request.TargetUserID,
