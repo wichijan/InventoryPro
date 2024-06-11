@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -383,6 +384,103 @@ func ResetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 
 		// user is logged in after registration
 		inv_err := userCtrl.UpdateUserPassword(newPassword.Username, newPassword.Password)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Upload Img for user
+// @Description Upload Img for user. Form with enctype="multipart/form-data" <input type="file" name="file" /> & <input type="hidden" name="id" /> for item id
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /users-picture [post]
+func UploadImageForUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		// single file
+		form, err := c.MultipartForm()
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Unable to read the form data"))
+			return
+		}
+		file := form.File["file"][0]
+
+		imageId, inv_err := userCtrl.UploadUserImage(userId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		imageName := "./../uploads/" + imageId.String() + ".jpeg"
+		c.SaveUploadedFile(file, imageName)
+
+		c.JSON(http.StatusOK, imageName)
+	}
+}
+
+// @Summary Get ImagePath For User Profile Picture
+// @Description Get ImagePath For User Profile Picture
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param id path string true "user id"
+// @Success 200 {object} models.PicturePath
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /users-picture [get]
+func GetImagePathForUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// single file
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		imageId, inv_err := userCtrl.GetImageIdFromUser(userId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		imageName := "./../uploads/" + imageId.String() + ".jpeg"
+		log.Print("Reading image: ", imageName)
+
+		c.JSON(http.StatusOK, models.PicturePath{Path: imageName})
+	}
+}
+
+// @Summary Delete Img for User
+// @Description Delete Picture from User and replace with ""
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param id path string true "user id"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /users-picture [delete]
+func RemoveImageForUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// single file
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		inv_err := userCtrl.RemoveImageIdFromUser(userId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
