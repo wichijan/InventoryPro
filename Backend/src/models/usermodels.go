@@ -59,3 +59,8 @@ type PasswordReset struct {
 	Username *string `json:"username"`
 	Password string  `json:"password"`
 }
+
+
+type UserPicture struct {
+	PictureId string `alias:"users.profile_picture"`
+}

@@ -22,7 +22,9 @@ type UserRepositoryI interface {
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
 
-	// TODO implement upload profile picture
+	StoreUserPicture(tx *sql.Tx, userId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	GetPictureIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	RemovePictureIdFromUser(tx *sql.Tx, userId *uuid.UUID) *models.INVError
 
 	AcceptUserRegistrationRequest(tx *sql.Tx, userId *string) *models.INVError
 
@@ -249,5 +251,92 @@ func (ur *UserRepository) AcceptUserRegistrationRequest(tx *sql.Tx, userId *stri
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error accepting user registration request")
 	}
+	return nil
+}
+
+
+func (ur *UserRepository) StoreUserPicture(tx *sql.Tx, userId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+	uuid := uuid.New()
+
+	// Create the insert statement
+	updatePictureQuery := table.Users.UPDATE(
+		table.Users.ProfilePicture,
+	).SET(
+		uuid.String(),
+	).WHERE(table.Users.ID.EQ(mysql.String(userId.String())))
+
+	// Execute the query
+	rows, err := updatePictureQuery.Exec(tx)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error storing picture for user")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error storing picture for user")
+	}
+
+	if rowsAff == 0 {
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("User not found")
+	}
+
+	return &uuid, nil
+}
+
+
+func (ur *UserRepository) GetPictureIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+	var picture models.UserPicture
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Users.ProfilePicture,
+	).FROM(
+		table.Users,
+	).WHERE(
+		table.Users.ID.EQ(mysql.String(userId.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(ur.GetDatabaseConnection(), &picture)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading picture for user")
+	}
+
+	if picture.PictureId == "" {
+		return nil, inv_errors.INV_NOT_FOUND.WithDetails("User not found")
+	}
+
+	pictureId, err := uuid.Parse(picture.PictureId)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error parsing picture id")
+	}
+
+	return &pictureId, nil
+}
+
+
+func (ur *UserRepository) RemovePictureIdFromUser(tx *sql.Tx, userId *uuid.UUID) *models.INVError {
+	// Create the update statement
+	updatePictureQuery := table.Users.UPDATE(
+		table.Users.ProfilePicture,
+	).SET(
+		"",
+	).WHERE(table.Users.ID.EQ(mysql.String(userId.String())))
+
+	// Execute the query
+	rows, err := updatePictureQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error removing picture for User")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error removing picture for User")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("User not found")
+	}
+
 	return nil
 }

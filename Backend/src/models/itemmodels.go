@@ -146,7 +146,7 @@ type ItemPicture struct {
 	PictureId string `alias:"items.picture"`
 }
 
-type ItemPicturePath struct {
+type PicturePath struct {
 	Path string
 }
 

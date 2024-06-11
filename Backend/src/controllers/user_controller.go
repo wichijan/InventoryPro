@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,6 +26,10 @@ type UserControllerI interface {
 	RegisterUserAndCode(registrationData models.RegistrationRequest) (*models.RegistrationCodeResponse, *models.INVError)
 	UpdateUserPassword(username *string, password string) *models.INVError
 	DeleteRegistrationCode(code *string) *models.INVError
+
+	UploadUserImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	GetImageIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	RemoveImageIdFromUser(userId *uuid.UUID) *models.INVError
 }
 
 type UserController struct {
@@ -319,5 +324,63 @@ func (uc *UserController) DeleteRegistrationCode(code *string) *models.INVError 
 	if err = tx.Commit(); err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
+	return nil
+}
+
+func (uc *UserController) UploadUserImage(userId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+	tx, err := uc.UserRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	pictureId, inv_error := uc.UserRepo.StoreUserPicture(tx, userId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
+	return pictureId, nil
+}
+
+func (uc *UserController) GetImageIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+	pictureId, inv_error := uc.UserRepo.GetPictureIdFromUser(userId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	return pictureId, nil
+}
+
+func (uc *UserController) RemoveImageIdFromUser(userId *uuid.UUID) *models.INVError {
+	tx, err := uc.UserRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	pictureId, inv_error := uc.UserRepo.GetPictureIdFromUser(userId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	inv_error = uc.UserRepo.RemovePictureIdFromUser(tx, userId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	imageName := "./../uploads/" + pictureId.String() + ".jpeg"
+	inv_err := os.Remove(imageName)
+	if inv_err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error removing image")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
 	return nil
 }

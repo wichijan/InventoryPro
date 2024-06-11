@@ -29,7 +29,7 @@ type ItemControllerI interface {
 	MoveItemRequest(itemMove models.ItemMove) *models.INVError
 	MoveItemAccepted(itemMove models.ItemMove) *models.INVError
 
-	UploadImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
+	UploadItemImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetImageIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	RemoveImageIdFromItem(itemId *uuid.UUID) *models.INVError
 }
@@ -302,7 +302,7 @@ func (ic *ItemController) RemoveSubjectFromItem(itemSubject models.ItemWithSubje
 	return nil
 }
 
-func (ic *ItemController) UploadImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
+func (ic *ItemController) UploadItemImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
 	tx, err := ic.UserItemRepo.NewTransaction()
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")

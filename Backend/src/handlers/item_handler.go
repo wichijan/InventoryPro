@@ -430,7 +430,7 @@ func UploadImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 
 		log.Print("Uploading image for item: ", itemId.String())
 
-		imageId, inv_err := itemCtrl.UploadImage(&itemId)
+		imageId, inv_err := itemCtrl.UploadItemImage(&itemId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -470,7 +470,7 @@ func GetImagePathForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handle
 		imageName := "./../uploads/" + imageId.String() + ".jpeg"
 		log.Print("Reading image: ", imageName)
 
-		c.JSON(http.StatusOK, models.ItemPicturePath{Path: imageName})
+		c.JSON(http.StatusOK, models.PicturePath{Path: imageName})
 	}
 }
 
