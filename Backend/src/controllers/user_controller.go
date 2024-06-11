@@ -108,6 +108,10 @@ func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.Logi
 		return nil, inv_err
 	}
 
+	if !*user.IsActive {
+		return nil, inv_errors.INV_CREDENTIALS_INVALID.WithDetails("User not active")
+	}
+
 	// check if password is correct
 	if ok := utils.ComparePasswordHash(loginData.Password, *user.Password); !ok {
 		return nil, inv_errors.INV_CREDENTIALS_INVALID.WithDetails("Invalid username or password")
@@ -281,6 +285,11 @@ func (uc *UserController) UpdateUserPassword(username *string, password string) 
 	user, inv_err := uc.UserRepo.GetUserByNameClean(username)
 	if inv_err != nil {
 		return inv_err
+	}
+
+	if !*user.IsActive && user.Password == nil {
+		var isTrue bool = true
+		user.IsActive = &isTrue
 	}
 	user.Password = &hash
 
