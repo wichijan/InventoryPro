@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/middlewares"
 	"github.com/wichijan/InventoryPro/src/repositories"
+	"github.com/wichijan/InventoryPro/src/utils"
 	"github.com/wichijan/InventoryPro/src/websocket"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -192,7 +194,6 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	}
 
 	// user routes
-	// TODO Add route to upload Picture
 	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController, hub))
 	adminRoutes.Handle(http.MethodPost, "/auth/accept-registration/:userId", handlers.AcceptUserRegistrationRequestHandler(controller.UserController))
 	adminRoutes.Handle(http.MethodPost, "/auth/generate-code", handlers.GenerateUserRegistrationCodeHandler(controller.UserController))
@@ -309,7 +310,35 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	securedRoutes.GET("/ws/:roomId", handlers.WebsocketHandler(databaseManager, hub))
+	securedRoutes.GET("/ws", handlers.WebsocketHandler(databaseManager, hub))
+	publicRoutes.GET("/message/:userId", func(c *gin.Context) {
+		userId := c.Param("userId")
+		log.Println("Send message to user: ", userId)
+		hub.HandleMessage(websocket.Message{
+			Type:         utils.MESSAGE_TYPE_TO_USER,
+			SentToUserId: userId,
+			Sender:       "server",
+			Content:      "Broadcast message from server to single user",
+		})
+	})
+	publicRoutes.GET("/message/admin", func(c *gin.Context) {
+		log.Println("Broadcasting message to admins only")
+		hub.HandleMessage(websocket.Message{
+			Type:         utils.MESSAGE_TYPE_TO_ADMINS,
+			SentToUserId: "",
+			Sender:       "server",
+			Content:      "Broadcast message from server to admins",
+		})
+	})
+	publicRoutes.GET("/message/everyone", func(c *gin.Context) {
+		log.Println("Broadcasting message to everyone")
+		hub.HandleMessage(websocket.Message{
+			Type:         utils.MESSAGE_TYPE_EVERYONE,
+			SentToUserId: "",
+			Sender:       "server",
+			Content:      "Broadcast message from server to everyone",
+		})
+	})
 
 	return router
 }

@@ -35,7 +35,6 @@ var upgrader = websocket.Upgrader{
 // Client struct for websocket connection and message sending
 type Client struct {
 	ID      string
-	RoomId  string
 	IsAdmin bool
 	UserId  string
 	Conn    *websocket.Conn
@@ -44,12 +43,11 @@ type Client struct {
 }
 
 // NewClient creates a new client
-func NewClient(roomId string, isAdmin bool, userId string, conn *websocket.Conn, hub *Hub) *Client {
+func NewClient(isAdmin bool, userId string, conn *websocket.Conn, hub *Hub) *Client {
 	log.Printf("User %s is admin: %v; Conn: %v", userId, isAdmin, fmt.Sprintf("%p", conn))
 
 	return &Client{
 		ID:      fmt.Sprintf("%p", conn),
-		RoomId:  roomId,
 		UserId:  userId,
 		IsAdmin: isAdmin,
 		Conn:    conn,
@@ -117,14 +115,14 @@ func (c *Client) Close() {
 }
 
 // Function to handle websocket connection and register client to hub and start goroutines
-func ServeWS(ctx *gin.Context, roomId string, userId string, isAdmin bool, hub *Hub) {
-	fmt.Print("ServeWS: ", roomId)
+func ServeWS(ctx *gin.Context, userId string, isAdmin bool, hub *Hub) {
+	fmt.Print("---- ServeWS ----")
 	ws, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	client := NewClient(roomId, isAdmin, userId, ws, hub)
+	client := NewClient(isAdmin, userId, ws, hub)
 
 	hub.register <- client
 	go client.Write()

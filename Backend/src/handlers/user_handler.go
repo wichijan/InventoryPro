@@ -47,12 +47,13 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 
 		// inform admin
 		hub.HandleMessage(websocket.Message{
-			Type:     "registrationRequest",
-			ForAdmin: true,
+			Type:     utils.MESSAGE_TYPE_TO_ADMINS,
+			SentToUserId: "",
 			Sender:   "server",
 			Content:  "Registration Request for Admins!",
-			ID:       utils.WEBSOCKET_DEFAULT_ROOM,
 		})
+
+
 
 		c.JSON(http.StatusCreated, nil)
 	}
