@@ -92,6 +92,14 @@ func (rr *RoleRepository) UpdateRole(tx *sql.Tx, role *model.Roles) *models.INVE
 }
 
 func (rr *RoleRepository) DeleteRole(tx *sql.Tx, roleId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteRole not implemented")
+	// Create the delete statement
+	deleteQuery := table.Roles.DELETE().WHERE(table.Roles.ID.EQ(mysql.String(roleId.String())))
+
+	// Execute the query
+	_, err := deleteQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting role")
+	}
+
+	return nil
 }

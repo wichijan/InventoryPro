@@ -120,8 +120,27 @@ func (sr *ShelveRepository) UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *mod
 }
 
 func (sr *ShelveRepository) DeleteShelve(tx *sql.Tx, shelveId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteShelve not implemented yet")
+	// Create the query
+	stmt := table.Shelves.DELETE().WHERE(
+		table.Shelves.ID.EQ(mysql.String(shelveId.String())),
+	)
+
+	// Execute the query
+	rows, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting shelve")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting shelve")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Shelve does not exist")
+	}
+
+	return nil
 }
 
 func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *models.INVError) {

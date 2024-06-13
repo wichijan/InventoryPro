@@ -104,6 +104,25 @@ func (br *BookRepository) UpdateBook(tx *sql.Tx, book *model.Books) *models.INVE
 }
 
 func (br *BookRepository) DeleteBook(tx *sql.Tx, bookId *uuid.UUID) *models.INVError {
-	// TODO To be implemented
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("Not implemented yet")
+	// Create the query
+	stmt := table.Books.DELETE().WHERE(
+		table.Books.ItemID.EQ(mysql.String(bookId.String())),
+	)
+
+	// Execute the query
+	rows, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting book")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error: No changes on entry")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Book Id not found")
+	}
+
+	return nil
 }

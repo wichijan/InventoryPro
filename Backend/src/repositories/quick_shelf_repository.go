@@ -62,6 +62,16 @@ func (qsr *QuickShelfRepository) CreateQuickShelf(tx *sql.Tx, shelf *model.Quick
 }
 
 func (qsr *QuickShelfRepository) DeleteQuickShelf(tx *sql.Tx, shelfId *uuid.UUID) *models.INVError {
-	// TODO implement delete quick shelf
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteQuickShelf not implemented")
+	// Create the query
+	stmt := table.QuickShelves.DELETE().WHERE(
+		table.QuickShelves.QuickShelfID.EQ(mysql.String(shelfId.String())),
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting quick shelf")
+	}
+
+	return nil
 }

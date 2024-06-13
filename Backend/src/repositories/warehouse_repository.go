@@ -135,8 +135,27 @@ func (wr *WarehouseRepository) UpdateWarehouse(tx *sql.Tx, warehouse *model.Ware
 }
 
 func (wr *WarehouseRepository) DeleteWarehouse(tx *sql.Tx, warehouseId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteWarehouse not implemented")
+	// Create the query
+	stmt := table.Warehouses.DELETE().WHERE(
+		table.Warehouses.ID.EQ(mysql.String(warehouseId.String())),
+	)
+
+	// Execute the query
+	rows, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting warehouse")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting warehouse")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Warehouse not found")
+	}
+
+	return nil
 }
 
 func (wr *WarehouseRepository) GetWarehousesWithRooms() (*[]models.WarehouseWithRooms, *models.INVError) {

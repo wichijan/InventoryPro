@@ -153,6 +153,25 @@ func (utr *UserTypeRepository) UpdateUserType(tx *sql.Tx, userType *model.UserTy
 }
 
 func (utr *UserTypeRepository) DeleteUserType(tx *sql.Tx, userTypeId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteUserType not implemented yet")
+	// Create the query
+	stmt := table.UserTypes.DELETE().WHERE(
+		table.UserTypes.ID.EQ(mysql.String(userTypeId.String())),
+	)
+
+	// Execute the query
+	rows, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting user type")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting user type")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("User type not found")
+	}
+
+	return nil
 }

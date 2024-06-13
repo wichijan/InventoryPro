@@ -29,7 +29,7 @@ Create table item_types(
     type_name VARCHAR(20) UNIQUE
 );
 
-/* TODO Book, single_object or sets_of_objects */
+/* Book, single_object or sets_of_objects */
 CREATE TABLE items(
     id VARCHAR(36) PRIMARY KEY,
     item_type_id VARCHAR(36),

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -13,7 +14,7 @@ import (
 
 type PointRepositoryI interface {
 	GetPointsByUserId(userId *uuid.UUID) (*model.Points, *models.INVError)
-	CreateBook(tx *sql.Tx, points *model.Points) *models.INVError
+	CreatePoints(tx *sql.Tx, points *model.Points) *models.INVError
 	AddPointsToUser(tx *sql.Tx, userId *uuid.UUID, points int) *models.INVError
 	SubtractPointsToUser(tx *sql.Tx, userId *uuid.UUID, points int) *models.INVError
 
@@ -44,7 +45,7 @@ func (pr *PointRepository) GetPointsByUserId(userId *uuid.UUID) (*model.Points, 
 	return &points, nil
 }
 
-func (pr *PointRepository) CreateBook(tx *sql.Tx, points *model.Points) *models.INVError {
+func (pr *PointRepository) CreatePoints(tx *sql.Tx, points *model.Points) *models.INVError {
 	// Create the query
 	stmt := table.Points.INSERT(
 		table.Points.UserID,
@@ -84,7 +85,7 @@ func (pr *PointRepository) AddPointsToUser(tx *sql.Tx, userId *uuid.UUID, points
 
 func (pr *PointRepository) SubtractPointsToUser(tx *sql.Tx, userId *uuid.UUID, points int) *models.INVError {
 	// TODO Check if minus points is possible
-	
+
 	// Create the query
 	stmt := table.Points.UPDATE(
 		table.Points.Points,

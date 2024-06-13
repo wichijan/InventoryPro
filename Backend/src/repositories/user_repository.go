@@ -19,6 +19,7 @@ type UserRepositoryI interface {
 	GetUserByUsername(username string) (*models.UserWithTypeName, *models.INVError)
 	CreateUser(tx *sql.Tx, user model.Users) *models.INVError
 	UpdateUser(tx *sql.Tx, user *model.Users) *models.INVError
+	DeleteUser(tx *sql.Tx, userId *uuid.UUID) *models.INVError
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
 
@@ -215,6 +216,19 @@ func (ur *UserRepository) UpdateUser(tx *sql.Tx, user *model.Users) *models.INVE
 	return nil
 }
 
+func (ur *UserRepository) DeleteUser(tx *sql.Tx, userId *uuid.UUID) *models.INVError {
+	stmt := table.Users.DELETE().WHERE(
+		table.Users.ID.EQ(mysql.String(userId.String())),
+	)
+
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting user")
+	}
+
+	return nil
+}
+
 func (ur *UserRepository) CheckIfUsernameExists(username string) *models.INVError {
 	count, err := utils.CountStatement(table.Users, table.Users.Username.EQ(mysql.String(username)), ur.GetDatabaseConnection())
 	if err != nil {
@@ -254,7 +268,6 @@ func (ur *UserRepository) AcceptUserRegistrationRequest(tx *sql.Tx, userId *stri
 	return nil
 }
 
-
 func (ur *UserRepository) StoreUserPicture(tx *sql.Tx, userId *uuid.UUID) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
@@ -282,7 +295,6 @@ func (ur *UserRepository) StoreUserPicture(tx *sql.Tx, userId *uuid.UUID) (*uuid
 
 	return &uuid, nil
 }
-
 
 func (ur *UserRepository) GetPictureIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError) {
 	var picture models.UserPicture
@@ -313,7 +325,6 @@ func (ur *UserRepository) GetPictureIdFromUser(userId *uuid.UUID) (*uuid.UUID, *
 
 	return &pictureId, nil
 }
-
 
 func (ur *UserRepository) RemovePictureIdFromUser(tx *sql.Tx, userId *uuid.UUID) *models.INVError {
 	// Create the update statement

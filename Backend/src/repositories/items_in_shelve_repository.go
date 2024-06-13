@@ -16,7 +16,7 @@ type ItemInShelveRepositoryI interface {
 	GetItemsInShelf(shelfID *string) (*[]model.ItemsInShelf, *models.INVError)
 	CreateItemInShelve(tx *sql.Tx, itemInShelve *model.ItemsInShelf) *models.INVError
 	UpdateItemInShelve(tx *sql.Tx, itemInShelve *model.ItemsInShelf) *models.INVError
-	DeleteItemInShelve(tx *sql.Tx, itemIdInShelve *uuid.UUID) *models.INVError
+	DeleteItemInShelve(tx *sql.Tx, itemInShelve *model.ItemsInShelf) *models.INVError
 	GetQuantityInShelve(itemId *uuid.UUID) (*int32, *models.INVError)
 	UpdateQuantityInShelve(tx *sql.Tx, itemId *string, quantity *int32) *models.INVError
 
@@ -108,9 +108,30 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(tx *sql.Tx, itemInShelve 
 	return nil
 }
 
-func (iisr *ItemInShelveRepository) DeleteItemInShelve(tx *sql.Tx, itemIdInShelve *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteItemInShelve not implemented")
+func (iisr *ItemInShelveRepository) DeleteItemInShelve(tx *sql.Tx, itemInShelve *model.ItemsInShelf) *models.INVError {
+	// Create the query
+	deleteQuery := table.ItemsInShelf.DELETE().
+		WHERE(
+			table.ItemsInShelf.ItemID.EQ(mysql.String(itemInShelve.ItemID)).
+				AND(table.ItemsInShelf.ShelfID.EQ(mysql.String(itemInShelve.ShelfID))),
+		)
+
+	// Execute the query
+	rows, err := deleteQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting item in shelve")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting item in shelve")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
+	}
+
+	return nil
 }
 
 func (iisr *ItemInShelveRepository) GetQuantityInShelve(itemId *uuid.UUID) (*int32, *models.INVError) {

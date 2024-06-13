@@ -124,8 +124,27 @@ func (ror *RoomRepository) UpdateRoom(tx *sql.Tx, room *model.Rooms) *models.INV
 }
 
 func (ror *RoomRepository) DeleteRoom(tx *sql.Tx, roomId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteRoom not implemented")
+	// Create the query
+	stmt := table.Rooms.DELETE().WHERE(
+		table.Rooms.ID.EQ(mysql.String(roomId.String())),
+	)
+
+	// Execute the query
+	rows, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting room")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting room")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Room Id not found")
+	}
+
+	return nil
 }
 
 func (wr *RoomRepository) GetRoomsWithShelves() (*[]models.RoomWithShelves, *models.INVError) {

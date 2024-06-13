@@ -96,6 +96,16 @@ func (sor *SetsOfObjectsRepository) UpdateSetsOfObjects(tx *sql.Tx, setsOfObject
 }
 
 func (sor *SetsOfObjectsRepository) DeleteSetsOfObjects(tx *sql.Tx, setsOfObjectsId *uuid.UUID) *models.INVError {
-	// TODO Implement this function
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteSetsOfObjects not implemented")
+	// Create the query
+	stmt := table.SetsOfObjects.DELETE().WHERE(
+		table.SetsOfObjects.ItemID.EQ(mysql.String(setsOfObjectsId.String())),
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting sets of objects")
+	}
+
+	return nil
 }

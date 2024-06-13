@@ -48,7 +48,6 @@ func (rr *ReservationRepository) GetReservationByUserId(userId *uuid.UUID) (*[]m
 	return &reservations, nil
 }
 
-
 func (rr *ReservationRepository) GetReservationById(reservationId *uuid.UUID) (*model.Reservations, *models.INVError) {
 	// Create the query
 	stmt := mysql.SELECT(
