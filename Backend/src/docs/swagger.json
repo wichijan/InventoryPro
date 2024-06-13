@@ -967,6 +967,125 @@
                 }
             }
         },
+        "/items/transfer-accept/:id": {
+            "post": {
+                "description": "Accept Transfer Request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items-Transfer"
+                ],
+                "summary": "Accept Transfer Request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "transfer request id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/transfer-request": {
+            "post": {
+                "description": "Create Transfer Request to move item from User A to User B",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items-Transfer"
+                ],
+                "summary": "Create Transfer Request",
+                "parameters": [
+                    {
+                        "description": "ItemMoveRequest model",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemMoveRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TransferRequestResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/transfer-requests": {
+            "get": {
+                "description": "Get Transfer Requests by UserId",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items-Transfer"
+                ],
+                "summary": "Get Transfer Requests by UserId",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TransferRequestSelect"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/keywords": {
             "get": {
                 "description": "Get Keywords",
@@ -2861,21 +2980,13 @@
                 }
             }
         },
-        "/ws/:roomId": {
+        "/ws": {
             "get": {
-                "description": "RoomId can be empty for public notifications. RoomId is required for chat functions if ever implemented. IMPORTANT: WebSocket has to be called / created after Login.",
+                "description": "IMPORTANT: WebSocket has to be called / created after Login.",
                 "tags": [
                     "Websocket"
                 ],
-                "summary": "Websocket Handler - js -\u003e new WebSocket(\"ws://localhost:8080/ws/:roomId\")",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Room ID - leave empty for notifications",
-                        "name": "roomId",
-                        "in": "path"
-                    }
-                ],
+                "summary": "Websocket Handler - js -\u003e new WebSocket(\"ws://localhost:8080/ws\")",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -3162,6 +3273,17 @@
                     "type": "string"
                 },
                 "regularShelfId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemMoveRequest": {
+            "type": "object",
+            "properties": {
+                "itemID": {
+                    "type": "string"
+                },
+                "newUserID": {
                     "type": "string"
                 }
             }
@@ -3690,6 +3812,37 @@
                     }
                 },
                 "roomID": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TransferRequestResponse": {
+            "type": "object",
+            "properties": {
+                "transferRequestID": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TransferRequestSelect": {
+            "type": "object",
+            "properties": {
+                "isAccepted": {
+                    "type": "boolean"
+                },
+                "itemID": {
+                    "type": "string"
+                },
+                "requestDate": {
+                    "type": "string"
+                },
+                "targetUserID": {
+                    "type": "string"
+                },
+                "transferRequestID": {
+                    "type": "string"
+                },
+                "userID": {
                     "type": "string"
                 }
             }
