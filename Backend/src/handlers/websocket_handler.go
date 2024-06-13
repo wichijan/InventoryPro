@@ -13,19 +13,13 @@ import (
 	"github.com/wichijan/InventoryPro/src/managers"
 )
 
-// @Summary Websocket Handler - js -> new WebSocket("ws://localhost:8080/ws/:roomId")
-// @Description RoomId can be empty for public notifications. RoomId is required for chat functions if ever implemented. IMPORTANT: WebSocket has to be called / created after Login.
+// @Summary Websocket Handler - js -> new WebSocket("ws://localhost:8080/ws")
+// @Description IMPORTANT: WebSocket has to be called / created after Login.
 // @Tags Websocket
-// @Param roomId path string false "Room ID - leave empty for notifications"
 // @Success 200
-// @Router /ws/:roomId [get]
+// @Router /ws [get]
 func WebsocketHandler(databaseManager managers.DatabaseManagerI, hub *websocket.Hub) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		roomId := c.Param("roomId")
-		if roomId == "" {
-			roomId = utils.WEBSOCKET_DEFAULT_ROOM
-		}
-
 		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
 		if !ok {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
@@ -60,6 +54,6 @@ func WebsocketHandler(databaseManager managers.DatabaseManagerI, hub *websocket.
 				continue
 			}
 		}
-		websocket.ServeWS(c, roomId, userId.String(), isAdmin, hub)
+		websocket.ServeWS(c, userId.String(), isAdmin, hub)
 	}
 }

@@ -542,7 +542,13 @@ func MoveItemRequestHandler(itemCtrl controllers.ItemControllerI, hub *websocket
 			return
 		}
 
-		// TODO Inform user that item move request created
+		// Inform user that item move request created
+		hub.HandleMessage(websocket.Message{
+			Type:         utils.MESSAGE_TYPE_TO_USER,
+			SentToUserId: item.NewUserID.String(),
+			Sender:       userId.String(),
+			Content:      "Item move request created",
+		})
 
 		c.JSON(http.StatusOK, models.TransferRequestResponse{
 			TransferRequestID: transferRequestId.String(),
@@ -579,13 +585,19 @@ func MoveItemAcceptedHandler(itemCtrl controllers.ItemControllerI, hub *websocke
 			UserId:            userId,
 		}
 
-		inv_err := itemCtrl.MoveItemAccepted(transferAccept)
+		transferRequest, inv_err := itemCtrl.MoveItemAccepted(transferAccept)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
 
-		// TODO Inform user that item has been moved
+		// Inform user that item has been moved
+		hub.HandleMessage(websocket.Message{
+			Type:         utils.MESSAGE_TYPE_TO_USER,
+			SentToUserId: transferRequest.UserID.String(),
+			Sender:       userId.String(),
+			Content:      "Item move request accepted",
+		})
 
 		c.JSON(http.StatusOK, nil)
 	}

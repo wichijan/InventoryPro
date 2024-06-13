@@ -2,14 +2,14 @@ package websocket
 
 import (
 	"log"
+
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 // Hub is a struct that holds all the clients and the messages that are sent to them
 type Hub struct {
 	// Registered clients.
-	clients map[string]map[*Client]bool
-	// Admin clients.
-	admins map[*Client]bool
+	clients map[*Client]bool
 	// Unregistered clients.
 	unregister chan *Client
 	// Register requests from the clients.
@@ -20,17 +20,15 @@ type Hub struct {
 
 // Message struct to hold message data
 type Message struct {
-	Type     string `json:"type"`
-	ForAdmin bool   `json:"forAdmin"`
-	Sender   string `json:"sender"`
-	Content  string `json:"content"`
-	ID       string `json:"id"`
+	Type         string `json:"type"`
+	SentToUserId string `json:"sentToUserId"`
+	Sender       string `json:"sender"`
+	Content      string `json:"content"`
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		clients:    make(map[string]map[*Client]bool),
-		admins:     make(map[*Client]bool),
+		clients:    make(map[*Client]bool),
 		unregister: make(chan *Client),
 		register:   make(chan *Client),
 		broadcast:  make(chan Message),
@@ -56,27 +54,21 @@ func (h *Hub) Run() {
 
 // Function to check if room exists and if not create it and add client to it
 func (h *Hub) RegisterNewClient(client *Client) {
-	if client.IsAdmin {
-		h.admins[client] = true
-	} else {
-		connections := h.clients[client.RoomId]
-		if connections == nil {
-			connections = make(map[*Client]bool)
-			h.clients[client.RoomId] = connections
-		}
-		h.clients[client.RoomId][client] = true
+	connections := h.clients
+	if connections == nil {
+		connections = make(map[*Client]bool)
+		h.clients = connections
 	}
+	h.clients[client] = true
 	log.Printf("Client registered: %s, Admin: %v", client.UserId, client.IsAdmin)
 }
 
 // Function to remove client from room
 func (h *Hub) RemoveClient(client *Client) {
-	if client.IsAdmin {
-		delete(h.admins, client)
-	} else if _, ok := h.clients[client.RoomId]; ok {
-		delete(h.clients[client.RoomId], client)
-		if len(h.clients[client.RoomId]) == 0 {
-			delete(h.clients, client.RoomId)
+	if _, ok := h.clients[client]; ok {
+		delete(h.clients, client)
+		if len(h.clients) == 0 {
+			delete(h.clients, client)
 		}
 	}
 	close(client.send)
@@ -85,34 +77,51 @@ func (h *Hub) RemoveClient(client *Client) {
 
 // Function to handle message based on type of message
 func (h *Hub) HandleMessage(message Message) {
-	h.broadcastToAdmins(message)
-	if message.ForAdmin {
+	if len(h.clients) == 0 {
+		log.Print("No clients to send message to")
 		return
 	}
-	h.broadcastToRoom(message)
-}
 
-// Function to broadcast messages to all clients in a room
-func (h *Hub) broadcastToRoom(message Message) {
-	clients := h.clients[message.ID]
-	for client := range clients {
-		select {
-		case client.send <- message.Content:
-		default:
-			close(client.send)
-			delete(clients, client)
+	if message.Type == utils.MESSAGE_TYPE_TO_USER {
+		log.Printf("Send to user %v", message.SentToUserId)
+		for client := range h.clients {
+			if client.UserId == message.SentToUserId {
+				select {
+				case client.send <- message.Content:
+				default:
+					close(client.send)
+					delete(h.clients, client)
+				}
+			}
+		}
+
+	}
+
+	if message.Type == utils.MESSAGE_TYPE_TO_ADMINS {
+		log.Print("Send to admins")
+		for client := range h.clients {
+			log.Print("Client ID: ", client.ID)
+			if client.IsAdmin {
+				select {
+				case client.send <- message.Content:
+				default:
+					close(client.send)
+					delete(h.clients, client)
+				}
+			}
 		}
 	}
-}
 
-// Function to broadcast messages to all admin clients
-func (h *Hub) broadcastToAdmins(message Message) {
-	for client := range h.admins {
-		select {
-		case client.send <- message.Content:
-		default:
-			close(client.send)
-			delete(h.admins, client)
+	if message.Type == utils.MESSAGE_TYPE_EVERYONE {
+		log.Print("Send to everyone")
+		for client := range h.clients {
+			select {
+			case client.send <- message.Content:
+			default:
+				close(client.send)
+				delete(h.clients, client)
+			}
 		}
 	}
+
 }
