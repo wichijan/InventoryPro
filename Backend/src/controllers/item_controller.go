@@ -3,7 +3,6 @@ package controllers
 import (
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -45,7 +44,6 @@ type ItemController struct {
 	ItemKeywordRepo     repositories.ItemKeywordRepositoryI
 	ItemSubjectRepo     repositories.ItemSubjectRepositoryI
 	ReservationRepo     repositories.ReservationRepositoryI
-	ItemTypeRepo        repositories.ItemTypeRepositoryI
 	TransactionRepo     repositories.TransactionRepositoryI
 	TransferRequestRepo repositories.TransferRequestRepositoryI
 	ShelveRepo          repositories.ShelveRepositoryI
@@ -76,14 +74,6 @@ func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *mode
 	}
 	defer tx.Rollback()
 
-	item.ItemTypeName = strings.ToLower(item.ItemTypeName)
-
-	// Get item type id
-	itemTypeId, inv_err := ic.ItemTypeRepo.GetItemTypesByName(&item.ItemTypeName)
-	if inv_err != nil {
-		return nil, inv_err
-	}
-
 	// Check if shelf id exists
 	inv_error := ic.ShelveRepo.CheckIfShelveExists(&item.RegularShelfId)
 	if inv_error != nil {
@@ -92,7 +82,7 @@ func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *mode
 
 	var pureItem model.Items
 	pureItem.Name = &item.Name
-	pureItem.ItemTypeID = &itemTypeId.ID
+	pureItem.ItemTypes = item.ItemTypeName
 	pureItem.RegularShelfID = utils.GetStringPointer(item.RegularShelfId.String())
 	pureItem.HintText = &item.HintText
 	pureItem.Description = &item.Description
@@ -131,31 +121,29 @@ func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 	}
 	defer tx.Rollback()
 
-	item.ItemTypeName = strings.ToLower(item.ItemTypeName)
-	itemTypeId, inv_err := ic.ItemTypeRepo.GetItemTypesByName(&item.ItemTypeName)
-	if inv_err != nil {
-		return inv_err
-	}
-
 	// Check if shelf id exists
-	inv_error := ic.ShelveRepo.CheckIfShelveExists(&item.RegularShelfId)
+	convertedUUID, inv_error := utils.ConvertStringToUUID(*item.RegularShelfID)
+	if inv_error != nil{
+		return inv_error
+	}
+	inv_error = ic.ShelveRepo.CheckIfShelveExists(convertedUUID)
 	if inv_error != nil {
 		return inv_error
 	}
 
 	var pureItem model.Items
 	pureItem.ID = item.ID
-	pureItem.Name = &item.Name
-	pureItem.ItemTypeID = &itemTypeId.ID
-	pureItem.RegularShelfID = utils.GetStringPointer(item.RegularShelfId.String())
-	pureItem.HintText = &item.HintText
-	pureItem.Description = &item.Description
-	pureItem.ClassOne = &item.ClassOne
-	pureItem.ClassTwo = &item.ClassTwo
-	pureItem.ClassThree = &item.ClassThree
-	pureItem.ClassFour = &item.ClassFour
-	pureItem.Damaged = &item.Damaged
-	pureItem.DamagedDescription = &item.DamagedDesc
+	pureItem.Name = item.Name
+	pureItem.ItemTypes = item.ItemTypes
+	pureItem.RegularShelfID = item.RegularShelfID
+	pureItem.HintText = item.HintText
+	pureItem.Description = item.Description
+	pureItem.ClassOne = item.ClassOne
+	pureItem.ClassTwo = item.ClassTwo
+	pureItem.ClassThree = item.ClassThree
+	pureItem.ClassFour = item.ClassFour
+	pureItem.Damaged = item.Damaged
+	pureItem.DamagedDescription = item.DamagedDescription
 
 	inv_error = ic.ItemRepo.UpdateItem(tx, &pureItem)
 	if inv_error != nil {
@@ -164,7 +152,7 @@ func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 
 	inv_error = ic.ItemInShelveRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
 		ItemID:   item.ID,
-		ShelfID:  item.RegularShelfId.String(),
+		ShelfID:  *item.RegularShelfID,
 		Quantity: &item.QuantityInShelf,
 	})
 	if inv_error != nil {

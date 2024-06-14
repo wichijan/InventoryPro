@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/wichijan/InventoryPro/src/utils"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type DatabaseManagerI interface {

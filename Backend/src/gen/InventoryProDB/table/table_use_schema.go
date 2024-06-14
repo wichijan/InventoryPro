@@ -15,7 +15,6 @@ func UseSchema(schema string) {
 	ItemsInShelf = ItemsInShelf.FromSchema(schema)
 	ItemQuickShelf = ItemQuickShelf.FromSchema(schema)
 	ItemSubjects = ItemSubjects.FromSchema(schema)
-	ItemTypes = ItemTypes.FromSchema(schema)
 	Keywords = Keywords.FromSchema(schema)
 	KeywordsForItems = KeywordsForItems.FromSchema(schema)
 	Points = Points.FromSchema(schema)

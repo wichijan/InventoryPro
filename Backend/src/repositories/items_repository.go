@@ -36,6 +36,7 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 	// Create the query
 	stmt := mysql.SELECT(
 		table.Items.ID,
+		table.Items.ItemTypes,
 		table.Items.Name,
 		table.Items.Description,
 		table.Items.RegularShelfID,
@@ -52,12 +53,10 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.KeywordsForItems.AllColumns,
 		table.Users.ID,
 		table.Users.Username,
-		table.ItemTypes.TypeName,
 		table.Reservations.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.ItemTypes, table.ItemTypes.ID.EQ(table.Items.ItemTypeID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
@@ -81,6 +80,7 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 	stmt := mysql.SELECT(
 		table.Items.ID,
 		table.Items.Name,
+		table.Items.ItemTypes,
 		table.Items.Description,
 		table.Items.RegularShelfID,
 		table.Items.ClassOne,
@@ -134,7 +134,7 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 		table.Items.DamagedDescription,
 		table.Items.Picture,
 		table.Items.HintText,
-		table.Items.ItemTypeID,
+		table.Items.ItemTypes,
 		table.Items.RegularShelfID,
 	).VALUES(
 		uuid.String(),
@@ -148,7 +148,7 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 		item.DamagedDescription,
 		item.Picture,
 		item.HintText,
-		item.ItemTypeID,
+		item.ItemTypes,
 		item.RegularShelfID,
 	)
 
@@ -183,7 +183,7 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 		table.Items.DamagedDescription,
 		table.Items.Picture,
 		table.Items.HintText,
-		table.Items.ItemTypeID,
+		table.Items.ItemTypes,
 		table.Items.RegularShelfID,
 	).SET(
 		item.Name,
@@ -196,7 +196,7 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 		item.DamagedDescription,
 		item.Picture,
 		item.HintText,
-		item.ItemTypeID,
+		item.ItemTypes,
 		item.RegularShelfID,
 	).WHERE(table.Items.ID.EQ(mysql.String(item.ID)))
 
