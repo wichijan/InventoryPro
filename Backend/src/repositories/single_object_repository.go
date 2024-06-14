@@ -10,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type SingleObjectRepositoryI interface {
@@ -17,6 +18,7 @@ type SingleObjectRepositoryI interface {
 	CreateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) (*string, *models.INVError)
 	// UpdateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) *models.INVError // Not needed because there are not attributes
 	DeleteSingleObject(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -74,5 +76,16 @@ func (sor *SingleObjectRepository) DeleteSingleObject(tx *sql.Tx, itemId *uuid.U
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting single object")
 	}
 
+	return nil
+}
+
+func (sor *SingleObjectRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.SingleObject, table.SingleObject.ItemID.EQ(mysql.String(itemId.String())), sor.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Single_Object table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Single_Object still has items in it")
+	}
 	return nil
 }

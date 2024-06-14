@@ -125,6 +125,35 @@ func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
+
+// @Summary Delete Item
+// @Description Delete Item
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Item Id"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/:id [delete]
+func DeleteItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		itemId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room id"))
+			return
+		}
+
+		inv_err := itemCtrl.DeleteItem(&itemId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
 // @Summary Add keyword to item
 // @Description Add keyword to item
 // @Tags Items

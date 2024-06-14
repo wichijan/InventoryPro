@@ -198,7 +198,7 @@ func (sr *ShelveRepository) CheckIfShelveExists(shelveId *uuid.UUID) *models.INV
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if shelve exists")
 	}
 	if count <= 0 {
-		return inv_errors.INV_SHELVE_DOES_NOT_EXISTS.WithDetails("Shelve does not exist")
+		return inv_errors.INV_CONFLICT.WithDetails("ShelveId does not exist")
 	}
 	return nil
 }

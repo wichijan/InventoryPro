@@ -242,6 +242,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodDelete, "/items/:id", handlers.DeleteItemHandler(controller.ItemController))
 	// Picture for item
 	adminRoutes.Handle(http.MethodPost, "/items-picture", handlers.UploadImageForItemHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodGet, "/items-picture/:id", handlers.GetImagePathForItemHandler(controller.ItemController))
@@ -301,9 +302,9 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	publicRoutes.Handle(http.MethodGet, "/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	securedRoutes.GET("/ws", handlers.WebsocketHandler(databaseManager, hub))
+	securedRoutes.Handle(http.MethodGet, "/ws", handlers.WebsocketHandler(databaseManager, hub))
 
 	return router
 }

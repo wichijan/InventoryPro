@@ -18,6 +18,7 @@ type ItemControllerI interface {
 	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
 	CreateItem(item *models.ItemCreate) (*uuid.UUID, *models.INVError)
 	UpdateItem(item *models.ItemUpdate) *models.INVError
+	DeleteItem(itemId *uuid.UUID) *models.INVError
 	AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError
 	RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError
 	AddSubjectToItem(itemSubject models.ItemWithSubjectName) *models.INVError
@@ -47,6 +48,12 @@ type ItemController struct {
 	TransactionRepo     repositories.TransactionRepositoryI
 	TransferRequestRepo repositories.TransferRequestRepositoryI
 	ShelveRepo          repositories.ShelveRepositoryI
+
+	ItemsQuickShelfRepo repositories.ItemQuickShelfRepositoryI
+
+	BookRepo         repositories.BookRepositoryI
+	SingleObjectRepo repositories.SingleObjectRepositoryI
+	SetOfObjectsRepo repositories.SetsOfObjectsRepositoryI
 }
 
 func (ic *ItemController) GetItems() (*[]models.ItemWithEverything, *models.INVError) {
@@ -123,7 +130,7 @@ func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 
 	// Check if shelf id exists
 	convertedUUID, inv_error := utils.ConvertStringToUUID(*item.RegularShelfID)
-	if inv_error != nil{
+	if inv_error != nil {
 		return inv_error
 	}
 	inv_error = ic.ShelveRepo.CheckIfShelveExists(convertedUUID)
@@ -163,6 +170,105 @@ func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
+	return nil
+}
+
+func (ic *ItemController) DeleteItem(itemId *uuid.UUID) *models.INVError {
+	tx, err := ic.ItemRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	// Check if item exists in other tables
+	// Book
+	if inv_error := ic.BookRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.BookRepo.DeleteBook(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// SingleObject
+	if inv_error := ic.SingleObjectRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.SingleObjectRepo.DeleteSingleObject(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// SetOfObjects
+	if inv_error := ic.SetOfObjectsRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.SetOfObjectsRepo.DeleteSetsOfObjects(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// ItemKeyword
+	if inv_error := ic.ItemKeywordRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.ItemKeywordRepo.DeleteKeywordsForItem(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// ItemSubject
+	if inv_error := ic.ItemSubjectRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.ItemSubjectRepo.DeleteSubjectsForItem(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// ItemsInShelve
+	if inv_error := ic.ItemInShelveRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.ItemInShelveRepo.DeleteItemsInShelve(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// Items Quick Shelf
+	if inv_error := ic.ItemsQuickShelfRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.ItemsQuickShelfRepo.DeleteQuickShelf(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// UserItem
+	if inv_error := ic.UserItemRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.UserItemRepo.DeleteItemUsers(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// Reservation
+	if inv_error := ic.ReservationRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.ReservationRepo.DeleteReservationForItems(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// Transfer Request
+	if inv_error := ic.TransferRequestRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+		return inv_error
+	}
+	if inv_error := ic.TransferRequestRepo.DeleteTransferRequest(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	// Item itself
+	if inv_error := ic.ItemRepo.DeleteItem(tx, itemId); inv_error != nil {
+		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
 	return nil
 }
 

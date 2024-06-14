@@ -9,6 +9,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type TransferRequestRepositoryI interface {
@@ -17,6 +18,9 @@ type TransferRequestRepositoryI interface {
 	CreateTransferRequest(tx *sql.Tx, book *models.TransferRequestCreate) (*uuid.UUID, *models.INVError)
 	UpdateTransferRequest(tx *sql.Tx, book *models.TransferRequestUpdate) *models.INVError
 	DeleteTransferRequest(tx *sql.Tx, trans *uuid.UUID) *models.INVError
+	DeleteTransferRequestsForItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
+
+	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -129,5 +133,31 @@ func (trr *TransferRequestRepository) DeleteTransferRequest(tx *sql.Tx, transfer
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting transfer request")
 	}
 
+	return nil
+}
+
+func (trr *TransferRequestRepository) DeleteTransferRequestsForItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
+	// Create the query
+	stmt := table.TransferRequests.DELETE().WHERE(
+		table.TransferRequests.ItemID.EQ(mysql.String(itemId.String())),
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting transfer request")
+	}
+
+	return nil
+}
+
+func (trr *TransferRequestRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.TransferRequests, table.TransferRequests.ItemID.EQ(mysql.String(itemId.String())), trr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in TransferRequests table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("TransferRequests still has items in it")
+	}
 	return nil
 }

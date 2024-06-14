@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/go-jet/jet/v2/mysql"
+	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
@@ -16,7 +17,10 @@ type ItemSubjectRepositoryI interface {
 	GetItemsForSubject(subjectId *string) (*[]model.ItemSubjects, *models.INVError)
 	CreateSubjectForItem(tx *sql.Tx, keyword *models.ItemWithSubject) *models.INVError
 	DeleteSubjectForItem(tx *sql.Tx, keyword *models.ItemWithSubject) *models.INVError
+	DeleteSubjectsForItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 	CheckIfSubjectAndItemExists(subjectAndItem models.ItemWithSubject) *models.INVError
+
+	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -97,6 +101,30 @@ func (isjr *ItemSubjectRepository) DeleteSubjectForItem(tx *sql.Tx, keyword *mod
 	return nil
 }
 
+
+func (isjr *ItemSubjectRepository) DeleteSubjectsForItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
+	deleteQuery := table.ItemSubjects.DELETE().WHERE(
+		table.ItemSubjects.ItemID.EQ(mysql.String(itemId.String())),
+	)
+
+	// Execute the query
+	rows, err := deleteQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting keyword for item")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting keyword for item")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Combination not found")
+	}
+
+	return nil
+}
+
 func (isjr *ItemSubjectRepository) CheckIfSubjectAndItemExists(subjectAndItem models.ItemWithSubject) *models.INVError {
 	count, err := utils.CountStatement(table.ItemSubjects, table.ItemSubjects.SubjectID.EQ(mysql.String(subjectAndItem.SubjectID)).AND(table.ItemSubjects.ItemID.EQ(mysql.String(subjectAndItem.ItemID))), isjr.GetDatabaseConnection())
 	if err != nil {
@@ -104,6 +132,17 @@ func (isjr *ItemSubjectRepository) CheckIfSubjectAndItemExists(subjectAndItem mo
 	}
 	if count > 0 {
 		return inv_errors.INV_SUBJECT_ITEM_COMBI_EXISTS.WithDetails("Subject and item combination already exists")
+	}
+	return nil
+}
+
+func (isjr *ItemSubjectRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(mysql.String(itemId.String())), isjr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in ItemSubjects table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("ItemSubjects still has items in it")
 	}
 	return nil
 }

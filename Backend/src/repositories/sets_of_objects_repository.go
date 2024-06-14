@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -9,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type SetsOfObjectsRepositoryI interface {
@@ -16,6 +18,8 @@ type SetsOfObjectsRepositoryI interface {
 	CreateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) (*string, *models.INVError)
 	UpdateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) *models.INVError
 	DeleteSetsOfObjects(tx *sql.Tx, setsOfObjectsId *uuid.UUID) *models.INVError
+
+	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -91,7 +95,6 @@ func (sor *SetsOfObjectsRepository) UpdateSetsOfObjects(tx *sql.Tx, setsOfObject
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating sets of objects")
 	}
 
-
 	return nil
 }
 
@@ -107,5 +110,16 @@ func (sor *SetsOfObjectsRepository) DeleteSetsOfObjects(tx *sql.Tx, setsOfObject
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting sets of objects")
 	}
 
+	return nil
+}
+
+func (sor *SetsOfObjectsRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.SetsOfObjects, table.SetsOfObjects.ItemID.EQ(mysql.String(itemId.String())), sor.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Sets_Of_Objects table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Sets_Of_Objects still has items in it")
+	}
 	return nil
 }
