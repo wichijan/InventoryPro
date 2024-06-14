@@ -104,7 +104,7 @@ func UpdateQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfContro
 // @Param id path string true "quick shelf id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /quick-shelves/:id [delete]
+// @Router /quick-shelves/{id} [delete]
 func DeleteQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		quickShelfId, err := uuid.Parse(c.Param("id"))
@@ -200,7 +200,7 @@ func RemoveItemFromQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShe
 // @Param id path string true "quick shelf id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /clear-quick-shelf/:id [post]
+// @Router /clear-quick-shelf/{id} [post]
 func ClearQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		quickShelfId, err := uuid.Parse(c.Param("id"))
@@ -227,7 +227,7 @@ func ClearQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControl
 // @Param id path string true "quick shelf id"
 // @Success 200 {array} models.GetQuickShelf
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /quick-shelf/:id [get]
+// @Router /quick-shelf/{id} [get]
 func GetItemsInQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		quickShelfId, err := uuid.Parse(c.Param("id"))

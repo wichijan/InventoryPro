@@ -110,7 +110,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
-	quickShelfRepo := &repositories.ItemQuickShelfRepository{
+	itemQuickShelfRepo := &repositories.ItemQuickShelfRepository{
 		DatabaseManagerI: databaseManager,
 	}
 
@@ -130,10 +130,23 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
+	bookRepo := &repositories.BookRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
+	singleObjectRepo := &repositories.SingleObjectRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
+	setOfObjectsRepo := &repositories.SetsOfObjectsRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
 			WarehouseRepo: warehouseRepo,
+			RoomRepo:      roomRepo,
 		},
 		RoomController: &controllers.RoomController{
 			RoomRepo: roomRepo,
@@ -152,6 +165,12 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			ShelveRepo:          shelveRepo,
 			TransactionRepo:     transactionRepo,
 			TransferRequestRepo: transferRequestRepo,
+
+			BookRepo:            bookRepo,
+			SingleObjectRepo:    singleObjectRepo,
+			SetOfObjectsRepo:    setOfObjectsRepo,
+			ReservationRepo:     reservationRepo,
+			ItemsQuickShelfRepo: itemQuickShelfRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:                userRepo,
@@ -179,7 +198,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			TransactionRepo: transactionRepo,
 		},
 		QuickShelfController: &controllers.ItemQuickShelfController{
-			ItemQuickShelfRepo: quickShelfRepo,
+			ItemQuickShelfRepo: itemQuickShelfRepo,
 			UserItemRepo:       userItemRepo,
 			ItemRepo:           itemRepo,
 			ItemsInShelfRepo:   itemInShelveRepo,
@@ -214,6 +233,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/warehouses/:id", handlers.GetWarehouseByIdHandler(controller.WarehouseController))
 	adminRoutes.Handle(http.MethodPost, "/warehouses", handlers.CreateWarehouseHandler(controller.WarehouseController))
 	adminRoutes.Handle(http.MethodPut, "/warehouses", handlers.UpdateWarehouseHandler(controller.WarehouseController))
+	adminRoutes.Handle(http.MethodDelete, "/warehouses/:id", handlers.DeleteWarehouse(controller.WarehouseController))
 
 	// Room routes
 	publicRoutes.Handle(http.MethodGet, "/rooms", handlers.GetRoomsHandler(controller.RoomController))

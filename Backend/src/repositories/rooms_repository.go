@@ -22,6 +22,8 @@ type RoomRepositoryI interface {
 	UpdateRoom(tx *sql.Tx, room *model.Rooms) *models.INVError
 	DeleteRoom(tx *sql.Tx, roomId *uuid.UUID) *models.INVError
 
+	CheckIfWarehouseIdExists(warehouseId *uuid.UUID) *models.INVError
+
 	managers.DatabaseManagerI
 }
 
@@ -195,4 +197,15 @@ func (wr *RoomRepository) GetRoomsByIdWithShelves(id *uuid.UUID) (*models.RoomWi
 	}
 
 	return &rooms, nil
+}
+
+func (wr *RoomRepository) CheckIfWarehouseIdExists(warehouseId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.Rooms, table.Rooms.WarehouseID.EQ(mysql.String(warehouseId.String())), wr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if warehouseId exists in Rooms table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Rooms still has warehouseId in it")
+	}
+	return nil
 }
