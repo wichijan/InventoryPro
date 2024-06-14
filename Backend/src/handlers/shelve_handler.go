@@ -165,26 +165,25 @@ func UpdateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFu
 	}
 }
 
-/*
-// @Summary Delete room
-// @Description Delete room
-// @Tags Rooms
+// @Summary Delete Shelve
+// @Description Delete Shelve
+// @Tags Shelves
 // @Accept  json
 // @Produce  json
-// @Param id path string true "Room ID"
+// @Param id path string true "Shelve ID"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /rooms/{id} [delete]
-func DeleteGenre(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
+// @Router /shelves/{id} [delete]
+func DeleteShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		genreId, err := uuid.Parse(c.Param("id"))
+		shelveId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid shelve id"))
 			return
 		}
 
-		inv_err := shelveCtrl.DeleteGenre(&genreId)
+		inv_err := shelveCtrl.DeleteShelve(&shelveId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -192,4 +191,3 @@ func DeleteGenre(shelveCtrl controllers.ShelveControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusOK, nil)
 	}
 }
-*/

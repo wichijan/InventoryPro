@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -9,13 +10,15 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type SingleObjectRepositoryI interface {
 	GetSingleObjectById(singleObjectId *uuid.UUID) (*model.SingleObject, *models.INVError)
 	CreateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) (*string, *models.INVError)
-	// TODO TO be implemented UpdateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) *models.INVError
-	DeleteSingleObject(tx *sql.Tx, singleObjectId *uuid.UUID) *models.INVError
+	// UpdateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) *models.INVError // Not needed because there are not attributes
+	DeleteSingleObject(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -61,7 +64,28 @@ func (sor *SingleObjectRepository) CreateSingleObject(tx *sql.Tx, singleObject *
 	return &singleObject.ItemID, nil
 }
 
-func (sor *SingleObjectRepository) DeleteSingleObject(tx *sql.Tx, singleObjectId *uuid.UUID) *models.INVError {
-	// TODO Implement this function	
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteSingleObject not implemented")
+func (sor *SingleObjectRepository) DeleteSingleObject(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
+	// Create the query
+	stmt := table.SingleObject.DELETE().WHERE(
+		table.SingleObject.ItemID.EQ(mysql.String(itemId.String())),
+	)
+
+	// Execute the query
+	_, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting single object")
+	}
+
+	return nil
+}
+
+func (sor *SingleObjectRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.SingleObject, table.SingleObject.ItemID.EQ(mysql.String(itemId.String())), sor.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Single_Object table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Single_Object still has items in it")
+	}
+	return nil
 }

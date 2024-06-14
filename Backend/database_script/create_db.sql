@@ -24,15 +24,9 @@ CREATE TABLE shelves(
 );
 
 /* ITEMS */
-Create table item_types(
-    id VARCHAR(36) PRIMARY KEY,
-    type_name VARCHAR(20) UNIQUE
-);
-
-/* TODO Book, single_object or sets_of_objects */
 CREATE TABLE items(
     id VARCHAR(36) PRIMARY KEY,
-    item_type_id VARCHAR(36),
+    item_types ENUM('book', 'single_object', 'sets_of_objects') NOT NULL,
     name VARCHAR(100),
     description TEXT,
     regular_shelf_id VARCHAR(36),
@@ -44,8 +38,7 @@ CREATE TABLE items(
     damaged_description TEXT,
     picture TEXT,
     hint_text TEXT,
-    FOREIGN KEY (regular_shelf_id) REFERENCES shelves(id),
-    FOREIGN KEY (item_type_id) REFERENCES item_types(id)
+    FOREIGN KEY (regular_shelf_id) REFERENCES shelves(id)
 );
 
 CREATE TABLE books(
@@ -116,7 +109,7 @@ create table user_types (
 
 create table roles(
     id VARCHAR(36) PRIMARY KEY,
-    role_name VARCHAR(100)
+    role_name VARCHAR(100) UNIQUE
     /* Here come the roles (read table...) so that users can have multiple grants  */
 );
 
@@ -230,11 +223,8 @@ CREATE TABLE transactions (
     target_user_id VARCHAR(36),
     origin_user_id VARCHAR(36),
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    note TEXT,
+    note TEXT
     /* For damage report */
-    FOREIGN KEY (item_id) REFERENCES items(id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (target_user_id) REFERENCES users(id)
 );
 
 /* Moving item from  */

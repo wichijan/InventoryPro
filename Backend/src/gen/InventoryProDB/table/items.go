@@ -18,7 +18,7 @@ type itemsTable struct {
 
 	// Columns
 	ID                 mysql.ColumnString
-	ItemTypeID         mysql.ColumnString
+	ItemTypes          mysql.ColumnString
 	Name               mysql.ColumnString
 	Description        mysql.ColumnString
 	RegularShelfID     mysql.ColumnString
@@ -71,7 +71,7 @@ func newItemsTable(schemaName, tableName, alias string) *ItemsTable {
 func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 	var (
 		IDColumn                 = mysql.StringColumn("id")
-		ItemTypeIDColumn         = mysql.StringColumn("item_type_id")
+		ItemTypesColumn          = mysql.StringColumn("item_types")
 		NameColumn               = mysql.StringColumn("name")
 		DescriptionColumn        = mysql.StringColumn("description")
 		RegularShelfIDColumn     = mysql.StringColumn("regular_shelf_id")
@@ -83,8 +83,8 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 		DamagedDescriptionColumn = mysql.StringColumn("damaged_description")
 		PictureColumn            = mysql.StringColumn("picture")
 		HintTextColumn           = mysql.StringColumn("hint_text")
-		allColumns               = mysql.ColumnList{IDColumn, ItemTypeIDColumn, NameColumn, DescriptionColumn, RegularShelfIDColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn, HintTextColumn}
-		mutableColumns           = mysql.ColumnList{ItemTypeIDColumn, NameColumn, DescriptionColumn, RegularShelfIDColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn, HintTextColumn}
+		allColumns               = mysql.ColumnList{IDColumn, ItemTypesColumn, NameColumn, DescriptionColumn, RegularShelfIDColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn, HintTextColumn}
+		mutableColumns           = mysql.ColumnList{ItemTypesColumn, NameColumn, DescriptionColumn, RegularShelfIDColumn, ClassOneColumn, ClassTwoColumn, ClassThreeColumn, ClassFourColumn, DamagedColumn, DamagedDescriptionColumn, PictureColumn, HintTextColumn}
 	)
 
 	return itemsTable{
@@ -92,7 +92,7 @@ func newItemsTableImpl(schemaName, tableName, alias string) itemsTable {
 
 		//Columns
 		ID:                 IDColumn,
-		ItemTypeID:         ItemTypeIDColumn,
+		ItemTypes:          ItemTypesColumn,
 		Name:               NameColumn,
 		Description:        DescriptionColumn,
 		RegularShelfID:     RegularShelfIDColumn,

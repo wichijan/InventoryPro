@@ -174,7 +174,7 @@ func UpdateWarehouseHandler(warehouseCtrl controllers.WarehouseControllerI) gin.
 	}
 }
 
-/*
+
 // @Summary Delete warehouse
 // @Description Delete warehouse
 // @Tags Warehouses
@@ -185,7 +185,7 @@ func UpdateWarehouseHandler(warehouseCtrl controllers.WarehouseControllerI) gin.
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /warehouses/{id} [delete]
-func DeleteGenre(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
+func DeleteWarehouse(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		genreId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -193,7 +193,7 @@ func DeleteGenre(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc
 			return
 		}
 
-		inv_err := warehouseCtrl.DeleteGenre(&genreId)
+		inv_err := warehouseCtrl.DeleteWarehouse(&genreId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -201,4 +201,4 @@ func DeleteGenre(warehouseCtrl controllers.WarehouseControllerI) gin.HandlerFunc
 		c.JSON(http.StatusOK, nil)
 	}
 }
-*/
+

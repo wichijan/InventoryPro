@@ -11,6 +11,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type UserItemRepositoryI interface {
@@ -19,9 +20,12 @@ type UserItemRepositoryI interface {
 
 	InsertUserItem(tx *sql.Tx, itemBorrow *models.ItemBorrow) *models.INVError
 	DeleteItemUser(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID) *models.INVError
+	DeleteItemUsers(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 	ReduceQuantityOfUserItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, newQuantity *int32) *models.INVError
 
 	GetQuantityFromUserItem(itemId *uuid.UUID) (*int32, *models.INVError)
+
+	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -118,6 +122,21 @@ func (uir *UserItemRepository) DeleteItemUser(tx *sql.Tx, userId *uuid.UUID, ite
 	return nil
 }
 
+func (uir *UserItemRepository) DeleteItemUsers(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
+	// Create the delete statement
+	deleteQuery := table.UserItems.DELETE().WHERE(
+		table.UserItems.ItemID.EQ(mysql.String(itemId.String())),
+	)
+
+	// Execute the query
+	_, err := deleteQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting user item")
+	}
+
+	return nil
+}
+
 func (uir *UserItemRepository) MoveItemToNewUser(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, newUserId *uuid.UUID) *models.INVError {
 	// Create the update statement
 	updateQuery := table.UserItems.UPDATE(
@@ -137,6 +156,7 @@ func (uir *UserItemRepository) MoveItemToNewUser(tx *sql.Tx, userId *uuid.UUID, 
 
 	return nil
 }
+
 func (uir *UserItemRepository) ReduceQuantityOfUserItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, newQuantity *int32) *models.INVError {
 	// Create the update statement
 	updateQuery := table.UserItems.UPDATE(
@@ -156,5 +176,16 @@ func (uir *UserItemRepository) ReduceQuantityOfUserItem(tx *sql.Tx, userId *uuid
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reducing quantity of user item")
 	}
 
+	return nil
+}
+
+func (uir *UserItemRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.UserItems, table.UserItems.ItemID.EQ(mysql.String(itemId.String())), uir.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in UserItems table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("UserItems still has items in it")
+	}
 	return nil
 }

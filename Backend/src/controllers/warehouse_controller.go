@@ -20,6 +20,7 @@ type WarehouseControllerI interface {
 
 type WarehouseController struct {
 	WarehouseRepo repositories.WarehouseRepositoryI
+	RoomRepo      repositories.RoomRepositoryI
 }
 
 func (mc *WarehouseController) GetWarehouses() (*[]model.Warehouses, *models.INVError) {
@@ -73,12 +74,22 @@ func (mc *WarehouseController) UpdateWarehouse(warehouse *model.Warehouses) *mod
 }
 
 func (mc *WarehouseController) DeleteWarehouse(warehouse_id *uuid.UUID) *models.INVError {
-	// TODO Needs to be implemented
 	tx, err := mc.WarehouseRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
+
+	// Get Rooms with Warehouse ID
+	if inv_error := mc.RoomRepo.CheckIfWarehouseIdExists(warehouse_id); inv_error != nil {
+		return inv_error
+	}
+
+	// Delete Warehouse
+	inv_error := mc.WarehouseRepo.DeleteWarehouse(tx, warehouse_id)
+	if inv_error != nil {
+		return inv_error
+	}
 
 	if err = tx.Commit(); err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")

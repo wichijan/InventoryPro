@@ -10,13 +10,15 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type RoleRepositoryI interface {
 	GetRoles() (*[]model.Roles, *models.INVError)
+	GetRoleIdByName(roleName *string) (*uuid.UUID, *models.INVError)
 	CreateRole(tx *sql.Tx, roleName *string) (*uuid.UUID, *models.INVError)
 	UpdateRole(tx *sql.Tx, role *model.Roles) *models.INVError
-	DeleteRole(tx *sql.Tx, roleId *uuid.UUID) *models.INVError
+	DeleteRole(tx *sql.Tx, roleName *string) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -42,6 +44,32 @@ func (rr *RoleRepository) GetRoles() (*[]model.Roles, *models.INVError) {
 	}
 
 	return &roles, nil
+}
+
+func (rr *RoleRepository) GetRoleIdByName(roleName *string) (*uuid.UUID, *models.INVError) {
+	var role model.Roles
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Roles.AllColumns,
+	).FROM(
+		table.Roles,
+	).WHERE(
+		table.Roles.RoleName.EQ(mysql.String(*roleName)),
+	)
+
+	// Execute the query
+	err := stmt.Query(rr.GetDatabaseConnection(), &role)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading roles")
+	}
+
+	roleId, inv_err := utils.ConvertStringToUUID(role.ID)
+	if inv_err != nil {
+		return nil, inv_err
+	}
+
+	return roleId, nil
 }
 
 func (rr *RoleRepository) CreateRole(tx *sql.Tx, roleName *string) (*uuid.UUID, *models.INVError) {
@@ -91,7 +119,15 @@ func (rr *RoleRepository) UpdateRole(tx *sql.Tx, role *model.Roles) *models.INVE
 	return nil
 }
 
-func (rr *RoleRepository) DeleteRole(tx *sql.Tx, roleId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteRole not implemented")
+func (rr *RoleRepository) DeleteRole(tx *sql.Tx, roleName *string) *models.INVError {
+	// Create the delete statement
+	deleteQuery := table.Roles.DELETE().WHERE(table.Roles.RoleName.EQ(mysql.String(*roleName)))
+
+	// Execute the query
+	_, err := deleteQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting role")
+	}
+
+	return nil
 }

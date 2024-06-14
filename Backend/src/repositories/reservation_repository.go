@@ -1,6 +1,5 @@
 package repositories
 
-
 import (
 	"database/sql"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type ReservationRepositoryI interface {
@@ -20,6 +20,9 @@ type ReservationRepositoryI interface {
 	GetReservationByItemIdAndUserId(itemId *uuid.UUID, userId *uuid.UUID) (*model.Reservations, *models.INVError)
 	CreateReservation(tx *sql.Tx, reservation *models.ReservationCreate) (*uuid.UUID, *models.INVError)
 	DeleteReservation(tx *sql.Tx, userId *uuid.UUID, reservationID *uuid.UUID) *models.INVError
+	DeleteReservationForItems(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
+
+	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -47,7 +50,6 @@ func (rr *ReservationRepository) GetReservationByUserId(userId *uuid.UUID) (*[]m
 
 	return &reservations, nil
 }
-
 
 func (rr *ReservationRepository) GetReservationById(reservationId *uuid.UUID) (*model.Reservations, *models.INVError) {
 	// Create the query
@@ -112,7 +114,7 @@ func (rr *ReservationRepository) GetReservationByItemIdAndUserId(itemId *uuid.UU
 
 func (rr *ReservationRepository) CreateReservation(tx *sql.Tx, reservation *models.ReservationCreate) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
-	
+
 	// Create the query
 	stmt := table.Reservations.INSERT(
 		table.Reservations.ReservationID,
@@ -152,5 +154,31 @@ func (rr *ReservationRepository) DeleteReservation(tx *sql.Tx, userId *uuid.UUID
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting reservation")
 	}
 
+	return nil
+}
+
+func (rr *ReservationRepository) DeleteReservationForItems(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
+	// Create the delete statement
+	deleteQuery := table.Reservations.DELETE().WHERE(
+		table.Reservations.ItemID.EQ(mysql.String(itemId.String())),
+	)
+
+	// Execute the query
+	_, err := deleteQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting reservation")
+	}
+
+	return nil
+}
+
+func (rr *ReservationRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.Reservations, table.Reservations.ItemID.EQ(mysql.String(itemId.String())), rr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Reservations table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Reservations still has items in it")
+	}
 	return nil
 }

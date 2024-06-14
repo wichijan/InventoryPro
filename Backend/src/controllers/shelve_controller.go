@@ -19,7 +19,9 @@ type ShelveControllerI interface {
 }
 
 type ShelveController struct {
-	ShelveRepo     repositories.ShelveRepositoryI
+	ShelveRepo   repositories.ShelveRepositoryI
+	ItemRepo     repositories.ItemRepositoryI
+	ItemInShelve repositories.ItemInShelveRepositoryI
 }
 
 func (sc *ShelveController) GetShelves() (*[]model.Shelves, *models.INVError) {
@@ -80,12 +82,27 @@ func (sc *ShelveController) UpdateShelve(shelve *model.Shelves) *models.INVError
 }
 
 func (sc *ShelveController) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
-	// TODO needs to be implemented
 	tx, err := sc.ShelveRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
+
+	// Check if shelve exists in items
+	if err := sc.ItemRepo.CheckIfShelfIdExists(shelveId); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting shelve")
+	}
+
+	// Check if shelve exists in items_in_shelf
+	if err := sc.ItemInShelve.CheckIfShelfIdExists(shelveId); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting shelve")
+	}
+
+	// Delete
+	inv_error := sc.ShelveRepo.DeleteShelve(tx, shelveId)
+	if inv_error != nil {
+		return inv_error
+	}
 
 	if err = tx.Commit(); err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")

@@ -174,7 +174,6 @@ func UpdateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	}
 }
 
-/*
 // @Summary Delete room
 // @Description Delete room
 // @Tags Rooms
@@ -185,7 +184,7 @@ func UpdateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /rooms/{id} [delete]
-func DeleteGenre(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
+func DeleteRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		genreId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
@@ -193,7 +192,7 @@ func DeleteGenre(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 			return
 		}
 
-		inv_err := roomCtrl.DeleteGenre(&genreId)
+		inv_err := roomCtrl.DeleteRoom(&genreId)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -201,4 +200,3 @@ func DeleteGenre(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusOK, nil)
 	}
 }
-*/

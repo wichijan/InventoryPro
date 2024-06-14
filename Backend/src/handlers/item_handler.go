@@ -41,7 +41,7 @@ func GetItemsHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Param id path string true "item id"
 // @Success 200 {object} models.ItemWithEverything
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/:id [get]
+// @Router /items/{id} [get]
 func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
@@ -125,6 +125,34 @@ func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Delete Item
+// @Description Delete Item
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Item Id"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/{id} [delete]
+func DeleteItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		itemId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room id"))
+			return
+		}
+
+		inv_err := itemCtrl.DeleteItem(&itemId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
 // @Summary Add keyword to item
 // @Description Add keyword to item
 // @Tags Items
@@ -163,7 +191,7 @@ func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/remove-keyword [post]
+// @Router /items/remove-keyword [delete]
 func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithKeywordName
@@ -304,7 +332,7 @@ func ReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.
 // @Param id path string true "reservation id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /items/reserve-cancel/:id [post]
+// @Router /items/reserve-cancel/{id} [post]
 func CancelReserveItemHandler(reservationCtrl controllers.ReservationControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -379,7 +407,7 @@ func BorrowItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Param id path string true "item id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /items/return/:id [post]
+// @Router /items/return/{id} [delete]
 func ReturnReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -452,7 +480,7 @@ func UploadImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 // @Success 200 {object} models.PicturePath
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items-picture/:id [get]
+// @Router /items-picture/{id} [get]
 func GetImagePathForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// single file
@@ -484,7 +512,7 @@ func GetImagePathForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handle
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items-picture/:id [delete]
+// @Router /items-picture/{id} [delete]
 func RemoveImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// single file
@@ -565,7 +593,7 @@ func MoveItemRequestHandler(itemCtrl controllers.ItemControllerI, hub *websocket
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/transfer-accept/:id [post]
+// @Router /items/transfer-accept/{id} [post]
 func MoveItemAcceptedHandler(itemCtrl controllers.ItemControllerI, hub *websocket.Hub) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)

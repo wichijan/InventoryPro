@@ -133,7 +133,7 @@ func (kr *KeywordRepository) CheckIfKeywordExists(keywordId *string) *models.INV
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if keyword exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_KEYWORD_EXISTS.WithDetails("Keyword already exists")
+		return inv_errors.INV_CONFLICT.WithDetails("Keyword already exists")
 	}
 	return nil
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type ItemRepositoryI interface {
@@ -22,6 +23,8 @@ type ItemRepositoryI interface {
 	StoreItemPicture(tx *sql.Tx, itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetPictureIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
+
+	CheckIfShelfIdExists(shelfId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -36,6 +39,7 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 	// Create the query
 	stmt := mysql.SELECT(
 		table.Items.ID,
+		table.Items.ItemTypes,
 		table.Items.Name,
 		table.Items.Description,
 		table.Items.RegularShelfID,
@@ -52,12 +56,10 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.KeywordsForItems.AllColumns,
 		table.Users.ID,
 		table.Users.Username,
-		table.ItemTypes.TypeName,
 		table.Reservations.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
-			LEFT_JOIN(table.ItemTypes, table.ItemTypes.ID.EQ(table.Items.ItemTypeID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
@@ -81,6 +83,7 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 	stmt := mysql.SELECT(
 		table.Items.ID,
 		table.Items.Name,
+		table.Items.ItemTypes,
 		table.Items.Description,
 		table.Items.RegularShelfID,
 		table.Items.ClassOne,
@@ -134,7 +137,7 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 		table.Items.DamagedDescription,
 		table.Items.Picture,
 		table.Items.HintText,
-		table.Items.ItemTypeID,
+		table.Items.ItemTypes,
 		table.Items.RegularShelfID,
 	).VALUES(
 		uuid.String(),
@@ -148,7 +151,7 @@ func (itr *ItemRepository) CreateItem(tx *sql.Tx, item *model.Items) (*uuid.UUID
 		item.DamagedDescription,
 		item.Picture,
 		item.HintText,
-		item.ItemTypeID,
+		item.ItemTypes,
 		item.RegularShelfID,
 	)
 
@@ -183,7 +186,7 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 		table.Items.DamagedDescription,
 		table.Items.Picture,
 		table.Items.HintText,
-		table.Items.ItemTypeID,
+		table.Items.ItemTypes,
 		table.Items.RegularShelfID,
 	).SET(
 		item.Name,
@@ -196,7 +199,7 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 		item.DamagedDescription,
 		item.Picture,
 		item.HintText,
-		item.ItemTypeID,
+		item.ItemTypes,
 		item.RegularShelfID,
 	).WHERE(table.Items.ID.EQ(mysql.String(item.ID)))
 
@@ -210,8 +213,25 @@ func (itr *ItemRepository) UpdateItem(tx *sql.Tx, item *model.Items) *models.INV
 }
 
 func (itr *ItemRepository) DeleteItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteItem not implemented")
+	// Create the query
+	deleteQuery := table.Items.DELETE().WHERE(table.Items.ID.EQ(mysql.String(itemId.String())))
+
+	// Execute the query
+	rows, err := deleteQuery.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting item")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting item")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
+	}
+
+	return nil
 }
 
 func (itr *ItemRepository) StoreItemPicture(tx *sql.Tx, itemId *uuid.UUID) (*uuid.UUID, *models.INVError) {
@@ -295,5 +315,16 @@ func (itr *ItemRepository) RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID
 		return inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
 	}
 
+	return nil
+}
+
+func (itr *ItemRepository) CheckIfShelfIdExists(shelfId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.Items, table.Items.RegularShelfID.EQ(mysql.String(shelfId.String())), itr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if shelfId (RegularShelfId) exists in Items table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Items still has shelfId (RegularShelfId) in it")
+	}
 	return nil
 }

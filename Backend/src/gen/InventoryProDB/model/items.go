@@ -9,7 +9,7 @@ package model
 
 type Items struct {
 	ID                 string `sql:"primary_key"`
-	ItemTypeID         *string
+	ItemTypes          ItemsItemTypes
 	Name               *string
 	Description        *string
 	RegularShelfID     *string

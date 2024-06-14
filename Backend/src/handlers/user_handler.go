@@ -111,6 +111,10 @@ func RegisterUserWithCodeHandler(userCtrl controllers.UserControllerI) gin.Handl
 
 		// Delete code
 		inv_err = userCtrl.DeleteRegistrationCode(&code)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
 
 		c.JSON(http.StatusOK, nil)
 	}

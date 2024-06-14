@@ -21,7 +21,9 @@ type ShelveRepositoryI interface {
 	CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uuid.UUID, *models.INVError)
 	UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *models.INVError
 	DeleteShelve(tx *sql.Tx, shelveId *uuid.UUID) *models.INVError
+
 	CheckIfShelveExists(shelveId *uuid.UUID) *models.INVError
+	CheckIfRoomIdExists(roomId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -120,8 +122,27 @@ func (sr *ShelveRepository) UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *mod
 }
 
 func (sr *ShelveRepository) DeleteShelve(tx *sql.Tx, shelveId *uuid.UUID) *models.INVError {
-	// TODO - Implement DeleteWarehouse
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("DeleteShelve not implemented yet")
+	// Create the query
+	stmt := table.Shelves.DELETE().WHERE(
+		table.Shelves.ID.EQ(mysql.String(shelveId.String())),
+	)
+
+	// Execute the query
+	rows, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting shelve")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting shelve")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Shelve does not exist")
+	}
+
+	return nil
 }
 
 func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *models.INVError) {
@@ -179,7 +200,18 @@ func (sr *ShelveRepository) CheckIfShelveExists(shelveId *uuid.UUID) *models.INV
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if shelve exists")
 	}
 	if count <= 0 {
-		return inv_errors.INV_SHELVE_DOES_NOT_EXISTS.WithDetails("Shelve does not exist")
+		return inv_errors.INV_CONFLICT.WithDetails("ShelveId does not exist")
+	}
+	return nil
+}
+
+func (sr *ShelveRepository) CheckIfRoomIdExists(roomId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.Shelves, table.Shelves.RoomID.EQ(mysql.String(roomId.String())), sr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if roomId exists in Shelves table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Shelves still has RoomId in it")
 	}
 	return nil
 }

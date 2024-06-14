@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +11,6 @@ import (
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/middlewares"
 	"github.com/wichijan/InventoryPro/src/repositories"
-	"github.com/wichijan/InventoryPro/src/utils"
 	"github.com/wichijan/InventoryPro/src/websocket"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -20,18 +18,19 @@ import (
 )
 
 type Controllers struct {
-	WarehouseController   controllers.WarehouseControllerI
-	RoomController        controllers.RoomControllerI
-	ShelveController      controllers.ShelveControllerI
-	ItemController        controllers.ItemControllerI
-	UserController        controllers.UserControllerI
-	KeywordController     controllers.KeywordControllerI
-	UserRoleController    controllers.UserRoleControllerI
-	RoleController        controllers.RoleControllerI
-	SubjectController     controllers.SubjectControllerI
-	UserTypeController    controllers.UserTypeControllerI
-	ReservationController controllers.ReservationControllerI
-	QuickShelfController  controllers.ItemQuickShelfControllerI
+	WarehouseController       controllers.WarehouseControllerI
+	RoomController            controllers.RoomControllerI
+	ShelveController          controllers.ShelveControllerI
+	ItemController            controllers.ItemControllerI
+	UserController            controllers.UserControllerI
+	KeywordController         controllers.KeywordControllerI
+	UserRoleController        controllers.UserRoleControllerI
+	RoleController            controllers.RoleControllerI
+	SubjectController         controllers.SubjectControllerI
+	UserTypeController        controllers.UserTypeControllerI
+	ReservationController     controllers.ReservationControllerI
+	ItemsQuickShelfController controllers.ItemQuickShelfControllerI
+	QuickShelfController      controllers.QuickShelfControllerI
 }
 
 func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
@@ -112,11 +111,11 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
-	quickShelfRepo := &repositories.ItemQuickShelfRepository{
+	itemQuickShelfRepo := &repositories.ItemQuickShelfRepository{
 		DatabaseManagerI: databaseManager,
 	}
 
-	itemTypeRepo := &repositories.ItemTypeRepository{
+	quickShelfRepo := &repositories.QuickShelfRepository{
 		DatabaseManagerI: databaseManager,
 	}
 
@@ -136,13 +135,28 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
+	bookRepo := &repositories.BookRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
+	singleObjectRepo := &repositories.SingleObjectRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
+	setOfObjectsRepo := &repositories.SetsOfObjectsRepository{
+		DatabaseManagerI: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		WarehouseController: &controllers.WarehouseController{
 			WarehouseRepo: warehouseRepo,
+			RoomRepo:      roomRepo,
 		},
 		RoomController: &controllers.RoomController{
-			RoomRepo: roomRepo,
+			RoomRepo:        roomRepo,
+			ShelveRepo:      shelveRepo,
+			QuickShelveRepo: quickShelfRepo,
 		},
 		ShelveController: &controllers.ShelveController{
 			ShelveRepo: shelveRepo,
@@ -155,10 +169,15 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			SubjectRepo:         subjectRepo,
 			ItemKeywordRepo:     itemKeywordRepo,
 			ItemSubjectRepo:     itemSubjectRepo,
-			ItemTypeRepo:        itemTypeRepo,
 			ShelveRepo:          shelveRepo,
 			TransactionRepo:     transactionRepo,
 			TransferRequestRepo: transferRequestRepo,
+
+			BookRepo:            bookRepo,
+			SingleObjectRepo:    singleObjectRepo,
+			SetOfObjectsRepo:    setOfObjectsRepo,
+			ReservationRepo:     reservationRepo,
+			ItemsQuickShelfRepo: itemQuickShelfRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:                userRepo,
@@ -185,11 +204,14 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			ReservationRepo: reservationRepo,
 			TransactionRepo: transactionRepo,
 		},
-		QuickShelfController: &controllers.ItemQuickShelfController{
-			ItemQuickShelfRepo: quickShelfRepo,
+		ItemsQuickShelfController: &controllers.ItemQuickShelfController{
+			ItemQuickShelfRepo: itemQuickShelfRepo,
 			UserItemRepo:       userItemRepo,
 			ItemRepo:           itemRepo,
 			ItemsInShelfRepo:   itemInShelveRepo,
+		},
+		QuickShelfController: &controllers.QuickShelfController{
+			QuickShelfRepo: quickShelfRepo,
 		},
 	}
 
@@ -221,6 +243,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/warehouses/:id", handlers.GetWarehouseByIdHandler(controller.WarehouseController))
 	adminRoutes.Handle(http.MethodPost, "/warehouses", handlers.CreateWarehouseHandler(controller.WarehouseController))
 	adminRoutes.Handle(http.MethodPut, "/warehouses", handlers.UpdateWarehouseHandler(controller.WarehouseController))
+	adminRoutes.Handle(http.MethodDelete, "/warehouses/:id", handlers.DeleteWarehouse(controller.WarehouseController))
 
 	// Room routes
 	publicRoutes.Handle(http.MethodGet, "/rooms", handlers.GetRoomsHandler(controller.RoomController))
@@ -229,6 +252,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/rooms/:id", handlers.GetRoomsByIdHandle(controller.RoomController))
 	adminRoutes.Handle(http.MethodPost, "/rooms", handlers.CreateRoomHandle(controller.RoomController))
 	adminRoutes.Handle(http.MethodPut, "/rooms", handlers.UpdateRoomHandle(controller.RoomController))
+	adminRoutes.Handle(http.MethodDelete, "/rooms/:id", handlers.DeleteRoomHandle(controller.RoomController))
 
 	// Shelve routes
 	publicRoutes.Handle(http.MethodGet, "/shelves", handlers.GetShelvesHandler(controller.ShelveController))
@@ -237,6 +261,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/shelves/:id", handlers.GetShelveByIdHandler(controller.ShelveController))
 	adminRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
 	adminRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
+	adminRoutes.Handle(http.MethodDelete, "/shelves/:id", handlers.DeleteShelveHandler(controller.ShelveController))
 
 	// Quick Shelf routes
 	publicRoutes.Handle(http.MethodGet, "/quick-shelves", handlers.GetQuickShelvesHandler(controller.QuickShelfController))
@@ -249,13 +274,14 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodDelete, "/items/:id", handlers.DeleteItemHandler(controller.ItemController))
 	// Picture for item
 	adminRoutes.Handle(http.MethodPost, "/items-picture", handlers.UploadImageForItemHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodGet, "/items-picture/:id", handlers.GetImagePathForItemHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodDelete, "/items-picture/:id", handlers.RemoveImageForItemHandler(controller.ItemController))
 	// Keyword for item
 	adminRoutes.Handle(http.MethodPost, "/items/add-keyword", handlers.AddKeywordToItemHandler(controller.ItemController))
-	adminRoutes.Handle(http.MethodPost, "/items/remove-keyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodDelete, "/items/remove-keyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
 	// Subject for item
 	adminRoutes.Handle(http.MethodPost, "/items/add-subject", handlers.AddSubjectToItemHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodDelete, "/items/remove-subject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
@@ -264,12 +290,12 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	securedRoutes.Handle(http.MethodDelete, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ReservationController))
 	// Item move
 	securedRoutes.Handle(http.MethodPost, "/items/borrow", handlers.BorrowItemHandler(controller.ItemController))
-	securedRoutes.Handle(http.MethodPost, "/items/return/:id", handlers.ReturnReserveItemHandler(controller.ItemController))
+	securedRoutes.Handle(http.MethodDelete, "/items/return/:id", handlers.ReturnReserveItemHandler(controller.ItemController))
 	// Item quick shelf
-	securedRoutes.Handle(http.MethodPost, "/items/add-item-to-quick-shelf", handlers.AddToQuickShelfHandler(controller.QuickShelfController))
-	securedRoutes.Handle(http.MethodPost, "/items/remove-item-to-quick-shelf", handlers.RemoveItemFromQuickShelfHandler(controller.QuickShelfController))
-	securedRoutes.Handle(http.MethodPost, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.QuickShelfController))
-	securedRoutes.Handle(http.MethodGet, "/items/quick-shelf/:id", handlers.GetItemsInQuickShelfHandler(controller.QuickShelfController))
+	securedRoutes.Handle(http.MethodPost, "/items/add-item-to-quick-shelf", handlers.AddToQuickShelfHandler(controller.ItemsQuickShelfController))
+	securedRoutes.Handle(http.MethodDelete, "/items/remove-item-to-quick-shelf", handlers.RemoveItemFromQuickShelfHandler(controller.ItemsQuickShelfController))
+	securedRoutes.Handle(http.MethodDelete, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.ItemsQuickShelfController))
+	securedRoutes.Handle(http.MethodGet, "/items/quick-shelf/:id", handlers.GetItemsInQuickShelfHandler(controller.ItemsQuickShelfController))
 	// Item Move - From User A -> User B
 	securedRoutes.Handle(http.MethodPost, "/items/transfer-request", handlers.MoveItemRequestHandler(controller.ItemController, hub))
 	securedRoutes.Handle(http.MethodPost, "/items/transfer-accept/:id", handlers.MoveItemAcceptedHandler(controller.ItemController, hub))
@@ -291,6 +317,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	adminRoutes.Handle(http.MethodGet, "/roles", handlers.GetRolesHandler(controller.RoleController))
 	adminRoutes.Handle(http.MethodPost, "/roles", handlers.CreateRoleHandler(controller.RoleController))
 	adminRoutes.Handle(http.MethodPut, "/roles", handlers.UpdateRoleHandler(controller.RoleController))
+	adminRoutes.Handle(http.MethodDelete, "/roles", handlers.DeleteRoleHandler(controller.RoleController))
 
 	// User roles routes
 	adminRoutes.Handle(http.MethodPost, "/user-roles/add-role", handlers.AddRoleToUserHandler(controller.UserRoleController))
@@ -308,37 +335,9 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	publicRoutes.Handle(http.MethodGet, "/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	securedRoutes.GET("/ws", handlers.WebsocketHandler(databaseManager, hub))
-	publicRoutes.GET("/message/:userId", func(c *gin.Context) {
-		userId := c.Param("userId")
-		log.Println("Send message to user: ", userId)
-		hub.HandleMessage(websocket.Message{
-			Type:         utils.MESSAGE_TYPE_TO_USER,
-			SentToUserId: userId,
-			Sender:       "server",
-			Content:      "Broadcast message from server to single user",
-		})
-	})
-	publicRoutes.GET("/message/admin", func(c *gin.Context) {
-		log.Println("Broadcasting message to admins only")
-		hub.HandleMessage(websocket.Message{
-			Type:         utils.MESSAGE_TYPE_TO_ADMINS,
-			SentToUserId: "",
-			Sender:       "server",
-			Content:      "Broadcast message from server to admins",
-		})
-	})
-	publicRoutes.GET("/message/everyone", func(c *gin.Context) {
-		log.Println("Broadcasting message to everyone")
-		hub.HandleMessage(websocket.Message{
-			Type:         utils.MESSAGE_TYPE_EVERYONE,
-			SentToUserId: "",
-			Sender:       "server",
-			Content:      "Broadcast message from server to everyone",
-		})
-	})
+	securedRoutes.Handle(http.MethodGet, "/ws", handlers.WebsocketHandler(databaseManager, hub))
 
 	return router
 }

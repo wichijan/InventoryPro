@@ -1,13 +1,6 @@
 use InventoryProDB;
 
 Insert into
-    item_types(id, type_name)
-values
-    ("af7c1fe6-d669-414e-b066-e9733f0de7a8", 'book'),
-    ("1ad1fccc-d279-46a0-8980-1d91afd6ba67", 'single-object'),
-    (UUID(), 'sets-of-objects');
-
-Insert into
     roles(id, role_name)
 values
     (
@@ -143,7 +136,7 @@ Insert into
         damaged,
         damaged_description,
         regular_shelf_id,
-        item_type_id
+        item_types
     )
 values
     (
@@ -158,7 +151,7 @@ values
         /* false */
         Null,
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
-        "af7c1fe6-d669-414e-b066-e9733f0de7a8"
+        "book"
     ),
     (
         "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
@@ -171,7 +164,7 @@ values
         0,
         NULL,
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
-        "1ad1fccc-d279-46a0-8980-1d91afd6ba67"
+        "single_object"
     ),
     (
         "7791a294-94de-4cbf-9243-3f7210664f92",
@@ -184,7 +177,7 @@ values
         0,
         NULL,
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
-        "1ad1fccc-d279-46a0-8980-1d91afd6ba67"
+        "single_object"
     ),
     (
         "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
@@ -197,7 +190,7 @@ values
         0,
         NULL,
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
-        "1ad1fccc-d279-46a0-8980-1d91afd6ba67"
+        "single_object"
     );
 
 Insert into

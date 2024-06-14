@@ -124,13 +124,13 @@ func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.Logi
 
 	// Check if user registration request has been accepted
 	if !*user.RegistrationAccepted {
-		return nil, inv_errors.INV_USER_NOT_ACCEPTED.WithDetails("User registration request has not been accepted")
+		return nil, inv_errors.INV_CONFLICT.WithDetails("User registration request has not been accepted")
 	}
 	if !*user.IsActive && *user.Password == "" {
-		return nil, inv_errors.INV_USER_NOT_ACCEPTED.WithDetails("User has not being accepted by using the registration code")
+		return nil, inv_errors.INV_CONFLICT.WithDetails("User has not being accepted by using the registration code")
 	}
 	if !*user.IsActive {
-		return nil, inv_errors.INV_USER_NOT_ACCEPTED.WithDetails("User is not (yet) active")
+		return nil, inv_errors.INV_CONFLICT.WithDetails("User is not (yet) active")
 	}
 
 	// Convert string to UUID

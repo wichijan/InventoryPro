@@ -95,3 +95,36 @@ func UpdateRoleHandler(roleCtrl controllers.RoleControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusCreated, nil)
 	}
 }
+
+// @Summary Delete Role
+// @Description Delete Role
+// @Tags Roles
+// @Accept  json
+// @Produce  json
+// @Param role body models.RoleODT true "RoleODT model"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /roles [delete]
+func DeleteRoleHandler(roleCtrl controllers.RoleControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var role models.RoleODT
+		err := c.ShouldBindJSON(&role)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if role.RoleName == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid role name"))
+			return
+		}
+
+		inv_err := roleCtrl.DeleteRole(&role.RoleName)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusCreated, nil)
+	}
+}

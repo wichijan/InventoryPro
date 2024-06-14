@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+
 	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
@@ -9,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type BookRepositoryI interface {
@@ -16,6 +18,7 @@ type BookRepositoryI interface {
 	CreateBook(tx *sql.Tx, book *model.Books) (*string, *models.INVError)
 	UpdateBook(tx *sql.Tx, book *model.Books) *models.INVError
 	DeleteBook(tx *sql.Tx, bookId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -104,6 +107,36 @@ func (br *BookRepository) UpdateBook(tx *sql.Tx, book *model.Books) *models.INVE
 }
 
 func (br *BookRepository) DeleteBook(tx *sql.Tx, bookId *uuid.UUID) *models.INVError {
-	// TODO To be implemented
-	return inv_errors.INV_INTERNAL_ERROR.WithDetails("Not implemented yet")
+	// Create the query
+	stmt := table.Books.DELETE().WHERE(
+		table.Books.ItemID.EQ(mysql.String(bookId.String())),
+	)
+
+	// Execute the query
+	rows, err := stmt.Exec(tx)
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting book")
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error: No changes on entry")
+	}
+
+	if rowsAff == 0 {
+		return inv_errors.INV_NOT_FOUND.WithDetails("Book Id not found")
+	}
+
+	return nil
+}
+
+func (br *BookRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.Books, table.Books.ItemID.EQ(mysql.String(itemId.String())), br.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Book table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Book still has items in it")
+	}
+	return nil
 }
