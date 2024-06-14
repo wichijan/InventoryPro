@@ -35,7 +35,7 @@ func (rc *RoleController) CreateRole(roleName *string) (*uuid.UUID, *models.INVE
 	}
 	for _, role := range *roles {
 		if *role.RoleName == *roleName {
-			return nil, inv_errors.INV_ROLE_EXISTS
+			return nil, inv_errors.INV_CONFLICT.WithDetails("Role already exists")
 		}
 	}
 

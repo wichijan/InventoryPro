@@ -235,7 +235,7 @@ func (ur *UserRepository) CheckIfUsernameExists(username string) *models.INVErro
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if username exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_USERNAME_EXISTS.WithDetails("Username already exists")
+		return inv_errors.INV_CONFLICT.WithDetails("Username already exists")
 	}
 	return nil
 }
@@ -246,7 +246,7 @@ func (ur *UserRepository) CheckIfEmailExists(email string) *models.INVError {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if email exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_EMAIL_EXISTS.WithDetails("Email already exists")
+		return inv_errors.INV_CONFLICT.WithDetails("Email already exists")
 	}
 	return nil
 }

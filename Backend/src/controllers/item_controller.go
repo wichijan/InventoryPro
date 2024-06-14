@@ -471,7 +471,7 @@ func (ic *ItemController) BorrowItem(itemReserve models.ItemBorrowCreate) *model
 
 	newQuantityInShelve := *quantityInShelve - itemReserve.Quantity
 	if newQuantityInShelve < 0 {
-		return inv_errors.INV_NOT_ENOUGH_QUANTITY.WithDetails("Not enough quantity in shelve")
+		return inv_errors.INV_CONFLICT.WithDetails("Not enough quantity in shelve")
 	}
 
 	// insert into user_items

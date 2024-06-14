@@ -84,7 +84,7 @@ func (qsc *ItemQuickShelfController) DeleteQuickShelf(quickShelfId *uuid.UUID) *
 	}
 
 	if len(*items) > 0 {
-		return inv_errors.INV_QUICK_SHELF_FULL.WithDetails("Quick shelf is not empty")
+		return inv_errors.INV_CONFLICT.WithDetails("Quick shelf is not empty")
 	}
 
 	inv_error = qsc.ItemQuickShelfRepo.DeleteQuickShelf(tx, quickShelfId)
@@ -112,14 +112,14 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 	// Remove item from user => User_item_table
 	currentQuantityOfUserItem, inv_error := qsc.UserItemRepo.GetQuantityFromUserItem(&itemQuickShelf.ItemID)
 	if inv_error == inv_errors.INV_NOT_FOUND {
-		return inv_errors.INV_ITEM_NOT_BORROWED_FROM_USER.WithDetails("Item is not borrowed from user")
+		return inv_errors.INV_CONFLICT.WithDetails("Item is not borrowed from user")
 	} else if inv_error != nil {
 		return inv_error
 	}
 
 	number := *currentQuantityOfUserItem - itemQuickShelf.Quantity
 	if number < 0 {
-		return inv_errors.INV_NOT_ENOUGH_QUANTITY.WithDetails("Not enough quantity")
+		return inv_errors.INV_CONFLICT.WithDetails("Not enough quantity")
 	} else if number == 0 {
 		inv_error := qsc.UserItemRepo.DeleteItemUser(tx, &itemQuickShelf.UserID, &itemQuickShelf.ItemID)
 		if inv_error != nil {
@@ -138,7 +138,7 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 		return inv_error
 	}
 	if len(*userItems) >= int(utils.MAX_AMOUNT_OF_ITEMS_FOR_USER_IN_QUICK_SHELF) {
-		return inv_errors.INV_QUICK_SHELF_USER_LIMIT_FULL.WithDetails(fmt.Sprintf("User has reached the limit of items in quick shelf. Limit is %v", utils.MAX_AMOUNT_OF_ITEMS_FOR_USER_IN_QUICK_SHELF))
+		return inv_errors.INV_CONFLICT.WithDetails(fmt.Sprintf("User has reached the limit of items in quick shelf. Limit is %v", utils.MAX_AMOUNT_OF_ITEMS_FOR_USER_IN_QUICK_SHELF))
 	}
 
 	// is quick shelf full?
@@ -147,7 +147,7 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 		return inv_error
 	}
 	if len(*allItems) >= utils.MAX_AMOUNT_OF_ITEMS_IN_QUICK_SHELF {
-		return inv_errors.INV_QUICK_SHELF_FULL.WithDetails("Quick shelf is full")
+		return inv_errors.INV_CONFLICT.WithDetails("Quick shelf is full")
 	}
 
 	// Check if item is already in quick shelf

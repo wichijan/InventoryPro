@@ -86,7 +86,7 @@ func (utr *UserTypeRepository) GetUserTypeByName(name *string) (*string, *models
 	// Execute the query
 	err := stmt.Query(utr.GetDatabaseConnection(), &userTypes)
 	if err != nil {
-		return nil, inv_errors.INV_USER_TYPE_NOT_FOUND.WithDetails("User type not found")
+		return nil, inv_errors.INV_CONFLICT.WithDetails("User type not found")
 	}
 
 	if userTypes.TypeName == nil {

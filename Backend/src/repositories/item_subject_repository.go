@@ -131,7 +131,7 @@ func (isjr *ItemSubjectRepository) CheckIfSubjectAndItemExists(subjectAndItem mo
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if subject and item exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_SUBJECT_ITEM_COMBI_EXISTS.WithDetails("Subject and item combination already exists")
+		return inv_errors.INV_CONFLICT.WithDetails("Subject and item combination already exists")
 	}
 	return nil
 }

@@ -130,7 +130,7 @@ func (kfir *ItemKeywordRepository) CheckIfKeywordAndItemExists(keywordAndItem mo
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if keyword and item exists")
 	}
 	if count > 0 {
-		return inv_errors.INV_KEYWORDS_ITEM_COMBI_EXISTS.WithDetails("Keyword and item combination already exists")
+		return inv_errors.INV_CONFLICT.WithDetails("Keyword and item combination already exists")
 	}
 	return nil
 }
