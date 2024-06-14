@@ -227,7 +227,7 @@ func (qsc *ItemQuickShelfController) ClearQuickShelf(quickShelfId *uuid.UUID) *m
 		// Update Quantity in regular shelf
 		inv_error = qsc.ItemsInShelfRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
 			ItemID:   item.ID,
-			ShelfID:  item.RegularShelfId,
+			ShelfID:  *item.RegularShelfID,
 			Quantity: &newQuantity,
 		})
 		if inv_error != nil {
@@ -275,7 +275,7 @@ func (qsc *ItemQuickShelfController) RemoveItemFromQuickShelf(itemId *uuid.UUID,
 	// Update Quantity in regular shelf
 	inv_error = qsc.ItemsInShelfRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
 		ItemID:   itemId.String(),
-		ShelfID:  item.RegularShelfId,
+		ShelfID:  *item.RegularShelfID,
 		Quantity: &newQuantity,
 	})
 	if inv_error != nil {

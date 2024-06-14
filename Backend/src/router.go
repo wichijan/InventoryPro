@@ -114,10 +114,6 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		DatabaseManagerI: databaseManager,
 	}
 
-	itemTypeRepo := &repositories.ItemTypeRepository{
-		DatabaseManagerI: databaseManager,
-	}
-
 	transactionRepo := &repositories.TransactionRepository{
 		DatabaseManagerI: databaseManager,
 	}
@@ -153,7 +149,6 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			SubjectRepo:         subjectRepo,
 			ItemKeywordRepo:     itemKeywordRepo,
 			ItemSubjectRepo:     itemSubjectRepo,
-			ItemTypeRepo:        itemTypeRepo,
 			ShelveRepo:          shelveRepo,
 			TransactionRepo:     transactionRepo,
 			TransferRequestRepo: transferRequestRepo,
