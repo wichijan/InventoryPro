@@ -261,6 +261,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/shelves/:id", handlers.GetShelveByIdHandler(controller.ShelveController))
 	adminRoutes.Handle(http.MethodPost, "/shelves", handlers.CreateShelveHandler(controller.ShelveController))
 	adminRoutes.Handle(http.MethodPut, "/shelves", handlers.UpdateShelveHandler(controller.ShelveController))
+	adminRoutes.Handle(http.MethodDelete, "/shelves/:id", handlers.DeleteShelveHandler(controller.ShelveController))
 
 	// Quick Shelf routes
 	publicRoutes.Handle(http.MethodGet, "/quick-shelves", handlers.GetQuickShelvesHandler(controller.QuickShelfController))

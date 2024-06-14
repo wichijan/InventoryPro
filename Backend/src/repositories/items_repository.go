@@ -10,6 +10,7 @@ import (
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/table"
 	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
+	"github.com/wichijan/InventoryPro/src/utils"
 )
 
 type ItemRepositoryI interface {
@@ -22,6 +23,8 @@ type ItemRepositoryI interface {
 	StoreItemPicture(tx *sql.Tx, itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetPictureIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
+
+	CheckIfShelfIdExists(shelfId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -312,5 +315,16 @@ func (itr *ItemRepository) RemovePictureIdFromItem(tx *sql.Tx, itemId *uuid.UUID
 		return inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
 	}
 
+	return nil
+}
+
+func (itr *ItemRepository) CheckIfShelfIdExists(shelfId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.Items, table.Items.RegularShelfID.EQ(mysql.String(shelfId.String())), itr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if shelfId (RegularShelfId) exists in Items table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Items still has shelfId (RegularShelfId) in it")
+	}
 	return nil
 }
