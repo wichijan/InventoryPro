@@ -281,7 +281,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	adminRoutes.Handle(http.MethodDelete, "/items-picture/:id", handlers.RemoveImageForItemHandler(controller.ItemController))
 	// Keyword for item
 	adminRoutes.Handle(http.MethodPost, "/items/add-keyword", handlers.AddKeywordToItemHandler(controller.ItemController))
-	adminRoutes.Handle(http.MethodPost, "/items/remove-keyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodDelete, "/items/remove-keyword", handlers.RemoveKeywordFromItemHandler(controller.ItemController))
 	// Subject for item
 	adminRoutes.Handle(http.MethodPost, "/items/add-subject", handlers.AddSubjectToItemHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodDelete, "/items/remove-subject", handlers.RemoveSubjectFromItemHandler(controller.ItemController))
@@ -290,11 +290,11 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	securedRoutes.Handle(http.MethodDelete, "/items/reserve-cancel/:id", handlers.CancelReserveItemHandler(controller.ReservationController))
 	// Item move
 	securedRoutes.Handle(http.MethodPost, "/items/borrow", handlers.BorrowItemHandler(controller.ItemController))
-	securedRoutes.Handle(http.MethodPost, "/items/return/:id", handlers.ReturnReserveItemHandler(controller.ItemController))
+	securedRoutes.Handle(http.MethodDelete, "/items/return/:id", handlers.ReturnReserveItemHandler(controller.ItemController))
 	// Item quick shelf
 	securedRoutes.Handle(http.MethodPost, "/items/add-item-to-quick-shelf", handlers.AddToQuickShelfHandler(controller.ItemsQuickShelfController))
-	securedRoutes.Handle(http.MethodPost, "/items/remove-item-to-quick-shelf", handlers.RemoveItemFromQuickShelfHandler(controller.ItemsQuickShelfController))
-	securedRoutes.Handle(http.MethodPost, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.ItemsQuickShelfController))
+	securedRoutes.Handle(http.MethodDelete, "/items/remove-item-to-quick-shelf", handlers.RemoveItemFromQuickShelfHandler(controller.ItemsQuickShelfController))
+	securedRoutes.Handle(http.MethodDelete, "/items/clear-quick-shelf/:id", handlers.ClearQuickShelfHandler(controller.ItemsQuickShelfController))
 	securedRoutes.Handle(http.MethodGet, "/items/quick-shelf/:id", handlers.GetItemsInQuickShelfHandler(controller.ItemsQuickShelfController))
 	// Item Move - From User A -> User B
 	securedRoutes.Handle(http.MethodPost, "/items/transfer-request", handlers.MoveItemRequestHandler(controller.ItemController, hub))
@@ -317,6 +317,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	adminRoutes.Handle(http.MethodGet, "/roles", handlers.GetRolesHandler(controller.RoleController))
 	adminRoutes.Handle(http.MethodPost, "/roles", handlers.CreateRoleHandler(controller.RoleController))
 	adminRoutes.Handle(http.MethodPut, "/roles", handlers.UpdateRoleHandler(controller.RoleController))
+	adminRoutes.Handle(http.MethodDelete, "/roles", handlers.DeleteRoleHandler(controller.RoleController))
 
 	// User roles routes
 	adminRoutes.Handle(http.MethodPost, "/user-roles/add-role", handlers.AddRoleToUserHandler(controller.UserRoleController))

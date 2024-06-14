@@ -125,7 +125,6 @@ func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
-
 // @Summary Delete Item
 // @Description Delete Item
 // @Tags Items
@@ -192,7 +191,7 @@ func AddKeywordToItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFu
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items/remove-keyword [post]
+// @Router /items/remove-keyword [delete]
 func RemoveKeywordFromItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemAndKeyword models.ItemWithKeywordName
@@ -408,7 +407,7 @@ func BorrowItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Param id path string true "item id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /items/return/{id} [post]
+// @Router /items/return/{id} [delete]
 func ReturnReserveItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 

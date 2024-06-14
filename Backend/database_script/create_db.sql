@@ -109,7 +109,7 @@ create table user_types (
 
 create table roles(
     id VARCHAR(36) PRIMARY KEY,
-    role_name VARCHAR(100)
+    role_name VARCHAR(100) UNIQUE
     /* Here come the roles (read table...) so that users can have multiple grants  */
 );
 
