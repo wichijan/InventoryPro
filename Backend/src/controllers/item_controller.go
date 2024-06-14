@@ -233,7 +233,7 @@ func (ic *ItemController) DeleteItem(itemId *uuid.UUID) *models.INVError {
 	if inv_error := ic.ItemsQuickShelfRepo.CheckIfItemIdExists(itemId); inv_error != nil {
 		return inv_error
 	}
-	if inv_error := ic.ItemsQuickShelfRepo.DeleteQuickShelf(tx, itemId); inv_error != nil {
+	if inv_error := ic.ItemsQuickShelfRepo.DeleteItemsQuickShelf(tx, itemId); inv_error != nil {
 		return inv_error
 	}
 

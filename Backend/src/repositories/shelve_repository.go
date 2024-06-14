@@ -21,7 +21,9 @@ type ShelveRepositoryI interface {
 	CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uuid.UUID, *models.INVError)
 	UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *models.INVError
 	DeleteShelve(tx *sql.Tx, shelveId *uuid.UUID) *models.INVError
+
 	CheckIfShelveExists(shelveId *uuid.UUID) *models.INVError
+	CheckIfRoomIdExists(roomId *uuid.UUID) *models.INVError
 
 	managers.DatabaseManagerI
 }
@@ -199,6 +201,17 @@ func (sr *ShelveRepository) CheckIfShelveExists(shelveId *uuid.UUID) *models.INV
 	}
 	if count <= 0 {
 		return inv_errors.INV_CONFLICT.WithDetails("ShelveId does not exist")
+	}
+	return nil
+}
+
+func (sr *ShelveRepository) CheckIfRoomIdExists(roomId *uuid.UUID) *models.INVError {
+	count, err := utils.CountStatement(table.Shelves, table.Shelves.RoomID.EQ(mysql.String(roomId.String())), sr.GetDatabaseConnection())
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if roomId exists in Shelves table")
+	}
+	if count <= 0 {
+		return inv_errors.INV_CONFLICT.WithDetails("Shelves still has RoomId in it")
 	}
 	return nil
 }

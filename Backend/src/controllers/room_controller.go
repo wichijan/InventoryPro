@@ -19,7 +19,9 @@ type RoomControllerI interface {
 }
 
 type RoomController struct {
-	RoomRepo repositories.RoomRepositoryI
+	RoomRepo        repositories.RoomRepositoryI
+	ShelveRepo      repositories.ShelveRepositoryI
+	QuickShelveRepo repositories.QuickShelfRepositoryI
 }
 
 func (rc *RoomController) GetRooms() (*[]model.Rooms, *models.INVError) {
@@ -73,12 +75,27 @@ func (rc *RoomController) UpdateRoom(room *model.Rooms) *models.INVError {
 }
 
 func (rc *RoomController) DeleteRoom(roomId *uuid.UUID) *models.INVError {
-	// TODO Needs to be implemented
 	tx, err := rc.RoomRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
+
+	// Check if room exists in shelves
+	if inv_error := rc.ShelveRepo.CheckIfRoomIdExists(roomId); inv_error != nil {
+		return inv_error
+	}
+
+	// Check if room exists in Quick shelves
+	if inv_error := rc.QuickShelveRepo.CheckIfRoomIdExists(roomId); inv_error != nil {
+		return inv_error
+	}
+
+	// Delete Room
+	inv_error := rc.RoomRepo.DeleteRoom(tx, roomId)
+	if inv_error != nil {
+		return inv_error
+	}
 
 	if err = tx.Commit(); err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")

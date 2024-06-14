@@ -12,11 +12,6 @@ import (
 )
 
 type ItemQuickShelfControllerI interface {
-	GetQuickShelves() (*[]models.QuickShelfWithItems, *models.INVError)
-	CreateQuickShelf(quickShelf *models.QuickShelfCreate) (*uuid.UUID, *models.INVError)
-	UpdateQuickShelf(quickShelf *model.QuickShelves) *models.INVError
-	DeleteQuickShelf(quickShelfId *uuid.UUID) *models.INVError
-
 	GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.GetQuickShelf, *models.INVError)
 	InsertItemInQuickShelf(itemQuickShelf *models.ItemQuickShelfInsert) *models.INVError // Check user amount & total amount
 
@@ -31,86 +26,20 @@ type ItemQuickShelfController struct {
 	ItemsInShelfRepo   repositories.ItemInShelveRepositoryI
 }
 
-func (qsc *ItemQuickShelfController) GetQuickShelves() (*[]models.QuickShelfWithItems, *models.INVError) {
-	return qsc.ItemQuickShelfRepo.GetQuickShelves()
+
+func (iqsc *ItemQuickShelfController) GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.GetQuickShelf, *models.INVError) {
+	return iqsc.ItemQuickShelfRepo.GetItemsInQuickShelf(quickShelfId)
 }
 
-func (qsc *ItemQuickShelfController) CreateQuickShelf(quickShelf *models.QuickShelfCreate) (*uuid.UUID, *models.INVError) {
-	tx, err := qsc.ItemQuickShelfRepo.NewTransaction()
-	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
-	}
-	defer tx.Rollback()
-
-	id, inv_error := qsc.ItemQuickShelfRepo.CreateQuickShelf(tx, quickShelf)
-	if inv_error != nil {
-		return nil, inv_error
-	}
-
-	if err = tx.Commit(); err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
-	}
-	return id, nil
-}
-
-func (qsc *ItemQuickShelfController) UpdateQuickShelf(quickShelf *model.QuickShelves) *models.INVError {
-	tx, err := qsc.ItemQuickShelfRepo.NewTransaction()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
-	}
-	defer tx.Rollback()
-
-	inv_error := qsc.ItemQuickShelfRepo.UpdateQuickShelf(tx, quickShelf)
-	if inv_error != nil {
-		return inv_error
-	}
-
-	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
-	}
-	return nil
-}
-
-func (qsc *ItemQuickShelfController) DeleteQuickShelf(quickShelfId *uuid.UUID) *models.INVError {
-	tx, err := qsc.ItemQuickShelfRepo.NewTransaction()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
-	}
-	defer tx.Rollback()
-
-	items, inv_error := qsc.ItemQuickShelfRepo.GetItemsInQuickShelf(quickShelfId)
-	if inv_error != nil {
-		return inv_error
-	}
-
-	if len(*items) > 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("Quick shelf is not empty")
-	}
-
-	inv_error = qsc.ItemQuickShelfRepo.DeleteQuickShelf(tx, quickShelfId)
-	if inv_error != nil {
-		return inv_error
-	}
-
-	if err = tx.Commit(); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
-	}
-	return nil
-}
-
-func (qsc *ItemQuickShelfController) GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.GetQuickShelf, *models.INVError) {
-	return qsc.ItemQuickShelfRepo.GetItemsInQuickShelf(quickShelfId)
-}
-
-func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *models.ItemQuickShelfInsert) *models.INVError {
-	tx, err := qsc.ItemQuickShelfRepo.NewTransaction()
+func (iqsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *models.ItemQuickShelfInsert) *models.INVError {
+	tx, err := iqsc.ItemQuickShelfRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	// Remove item from user => User_item_table
-	currentQuantityOfUserItem, inv_error := qsc.UserItemRepo.GetQuantityFromUserItem(&itemQuickShelf.ItemID)
+	currentQuantityOfUserItem, inv_error := iqsc.UserItemRepo.GetQuantityFromUserItem(&itemQuickShelf.ItemID)
 	if inv_error == inv_errors.INV_NOT_FOUND {
 		return inv_errors.INV_CONFLICT.WithDetails("Item is not borrowed from user")
 	} else if inv_error != nil {
@@ -121,19 +50,19 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 	if number < 0 {
 		return inv_errors.INV_CONFLICT.WithDetails("Not enough quantity")
 	} else if number == 0 {
-		inv_error := qsc.UserItemRepo.DeleteItemUser(tx, &itemQuickShelf.UserID, &itemQuickShelf.ItemID)
+		inv_error := iqsc.UserItemRepo.DeleteItemUser(tx, &itemQuickShelf.UserID, &itemQuickShelf.ItemID)
 		if inv_error != nil {
 			return inv_error
 		}
 	} else {
-		inv_error := qsc.UserItemRepo.ReduceQuantityOfUserItem(tx, &itemQuickShelf.UserID, &itemQuickShelf.ItemID, &number)
+		inv_error := iqsc.UserItemRepo.ReduceQuantityOfUserItem(tx, &itemQuickShelf.UserID, &itemQuickShelf.ItemID, &number)
 		if inv_error != nil {
 			return inv_error
 		}
 	}
 
 	// Check if user has more than three items already in quick shelf
-	userItems, inv_error := qsc.ItemQuickShelfRepo.GetItemsFromUserInQuickShelf(&itemQuickShelf.UserID)
+	userItems, inv_error := iqsc.ItemQuickShelfRepo.GetItemsFromUserInQuickShelf(&itemQuickShelf.UserID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -142,7 +71,7 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 	}
 
 	// is quick shelf full?
-	allItems, inv_error := qsc.ItemQuickShelfRepo.GetItemsInQuickShelf(&itemQuickShelf.QuickShelfID)
+	allItems, inv_error := iqsc.ItemQuickShelfRepo.GetItemsInQuickShelf(&itemQuickShelf.QuickShelfID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -151,7 +80,7 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 	}
 
 	// Check if item is already in quick shelf
-	isInQuickShelf, inv_error := qsc.ItemQuickShelfRepo.CheckIfItemAlreadyInQuickShelf(&itemQuickShelf.ItemID, &itemQuickShelf.QuickShelfID)
+	isInQuickShelf, inv_error := iqsc.ItemQuickShelfRepo.CheckIfItemAlreadyInQuickShelf(&itemQuickShelf.ItemID, &itemQuickShelf.QuickShelfID)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -166,7 +95,7 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 	// Insert new oder update quantity of item in quick shelf
 	if *isInQuickShelf {
 		// Get Quantity
-		quantity, inv_error := qsc.ItemQuickShelfRepo.GetQuantityOfItemInQuickShelf(&itemQuickShelf.ItemID, &itemQuickShelf.QuickShelfID)
+		quantity, inv_error := iqsc.ItemQuickShelfRepo.GetQuantityOfItemInQuickShelf(&itemQuickShelf.ItemID, &itemQuickShelf.QuickShelfID)
 		if inv_error != nil {
 			return inv_error
 		}
@@ -174,13 +103,13 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 		quickShelfItem.Quantity = &newQuantity
 
 		// Update
-		inv_error = qsc.ItemQuickShelfRepo.UpdateQuantityOfItemInQuickShelf(tx, &quickShelfItem)
+		inv_error = iqsc.ItemQuickShelfRepo.UpdateQuantityOfItemInQuickShelf(tx, &quickShelfItem)
 		if inv_error != nil {
 			return inv_error
 		}
 	} else {
 		// Insert
-		inv_error = qsc.ItemQuickShelfRepo.InsertNewItemInQuickShelf(tx, &quickShelfItem)
+		inv_error = iqsc.ItemQuickShelfRepo.InsertNewItemInQuickShelf(tx, &quickShelfItem)
 		if inv_error != nil {
 			return inv_error
 		}
@@ -192,15 +121,15 @@ func (qsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mode
 	return nil
 }
 
-func (qsc *ItemQuickShelfController) ClearQuickShelf(quickShelfId *uuid.UUID) *models.INVError {
-	tx, err := qsc.ItemQuickShelfRepo.NewTransaction()
+func (iqsc *ItemQuickShelfController) ClearQuickShelf(quickShelfId *uuid.UUID) *models.INVError {
+	tx, err := iqsc.ItemQuickShelfRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	// Get all items in quick shelf
-	quickShelfItems, inv_error := qsc.ItemQuickShelfRepo.GetItemsInQuickShelf(quickShelfId)
+	quickShelfItems, inv_error := iqsc.ItemQuickShelfRepo.GetItemsInQuickShelf(quickShelfId)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -212,20 +141,20 @@ func (qsc *ItemQuickShelfController) ClearQuickShelf(quickShelfId *uuid.UUID) *m
 			return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error parsing item id from quick shelf items")
 		}
 
-		item, inv_error := qsc.ItemRepo.GetItemById(&itemId)
+		item, inv_error := iqsc.ItemRepo.GetItemById(&itemId)
 		if inv_error != nil {
 			return inv_error
 		}
 
 		// Get Quantity in regular shelf
-		quantity, inv_error := qsc.ItemsInShelfRepo.GetQuantityInShelve(&itemId)
+		quantity, inv_error := iqsc.ItemsInShelfRepo.GetQuantityInShelve(&itemId)
 		if inv_error != nil {
 			return inv_error
 		}
 		newQuantity := *quantity + itemInQuickShelf.Quantity
 
 		// Update Quantity in regular shelf
-		inv_error = qsc.ItemsInShelfRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
+		inv_error = iqsc.ItemsInShelfRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
 			ItemID:   item.ID,
 			ShelfID:  *item.RegularShelfID,
 			Quantity: &newQuantity,
@@ -235,7 +164,7 @@ func (qsc *ItemQuickShelfController) ClearQuickShelf(quickShelfId *uuid.UUID) *m
 		}
 	}
 	// Clear quick shelf
-	inv_error = qsc.ItemQuickShelfRepo.ClearQuickShelf(tx, quickShelfId)
+	inv_error = iqsc.ItemQuickShelfRepo.ClearQuickShelf(tx, quickShelfId)
 	if inv_error != nil {
 		return inv_error
 	}
@@ -246,34 +175,34 @@ func (qsc *ItemQuickShelfController) ClearQuickShelf(quickShelfId *uuid.UUID) *m
 	return nil
 }
 
-func (qsc *ItemQuickShelfController) RemoveItemFromQuickShelf(itemId *uuid.UUID, quickShelfId *uuid.UUID) *models.INVError {
-	tx, err := qsc.ItemQuickShelfRepo.NewTransaction()
+func (iqsc *ItemQuickShelfController) RemoveItemFromQuickShelf(itemId *uuid.UUID, quickShelfId *uuid.UUID) *models.INVError {
+	tx, err := iqsc.ItemQuickShelfRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
 	}
 	defer tx.Rollback()
 
 	// Get Quantity in quick shelf
-	quantity, inv_error := qsc.ItemQuickShelfRepo.GetQuantityOfItemInQuickShelf(itemId, quickShelfId)
+	quantity, inv_error := iqsc.ItemQuickShelfRepo.GetQuantityOfItemInQuickShelf(itemId, quickShelfId)
 	if inv_error != nil {
 		return inv_error
 	}
 
 	// Get Item
-	item, inv_error := qsc.ItemRepo.GetItemById(itemId)
+	item, inv_error := iqsc.ItemRepo.GetItemById(itemId)
 	if inv_error != nil {
 		return inv_error
 	}
 
 	// Get Quantity in regular shelf
-	quantityInRegularShelf, inv_error := qsc.ItemsInShelfRepo.GetQuantityInShelve(itemId)
+	quantityInRegularShelf, inv_error := iqsc.ItemsInShelfRepo.GetQuantityInShelve(itemId)
 	if inv_error != nil {
 		return inv_error
 	}
 	newQuantity := *quantityInRegularShelf + *quantity
 
 	// Update Quantity in regular shelf
-	inv_error = qsc.ItemsInShelfRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
+	inv_error = iqsc.ItemsInShelfRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
 		ItemID:   itemId.String(),
 		ShelfID:  *item.RegularShelfID,
 		Quantity: &newQuantity,
@@ -283,7 +212,7 @@ func (qsc *ItemQuickShelfController) RemoveItemFromQuickShelf(itemId *uuid.UUID,
 	}
 
 	// Remove item from quick shelf
-	inv_error = qsc.ItemQuickShelfRepo.RemoveItemFromQuickShelf(tx, itemId, quickShelfId)
+	inv_error = iqsc.ItemQuickShelfRepo.RemoveItemFromQuickShelf(tx, itemId, quickShelfId)
 	if inv_error != nil {
 		return inv_error
 	}
