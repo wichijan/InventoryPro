@@ -16,8 +16,17 @@ import (
 type ItemControllerI interface {
 	GetItems() (*[]models.ItemWithEverything, *models.INVError)
 	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
-	CreateItem(item *models.ItemCreate) (*uuid.UUID, *models.INVError)
-	UpdateItem(item *models.ItemUpdate) *models.INVError
+
+	CreateItemWithBook(item *models.ItemCreateWithBook) (*uuid.UUID, *models.INVError)
+	CreateItemWithSingleObject(item *models.ItemCreateWithSingleObject) (*uuid.UUID, *models.INVError)
+	CreateItemWithSetOfObject(item *models.ItemCreateWithSetOfObject) (*uuid.UUID, *models.INVError)
+
+	UpdateItemWithBook(item *models.ItemUpdateWithBook) *models.INVError
+	UpdateItemWithSingleObject(item *models.ItemUpdateWithSingleObject) *models.INVError
+	UpdateItemWithSetOfObject(item *models.ItemUpdateWithSetsOfObjects) *models.INVError
+
+
+
 	DeleteItem(itemId *uuid.UUID) *models.INVError
 	AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError
 	RemoveKeywordFromItem(itemKeyword models.ItemWithKeywordName) *models.INVError
@@ -74,7 +83,7 @@ func (ic *ItemController) GetItemById(itemId *uuid.UUID) (*models.ItemWithEveryt
 	return item, nil
 }
 
-func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *models.INVError) {
+func (ic *ItemController) CreateItemWithBook(item *models.ItemCreateWithBook) (*uuid.UUID, *models.INVError) {
 	tx, err := ic.ItemRepo.NewTransaction()
 	if err != nil {
 		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
@@ -105,6 +114,18 @@ func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *mode
 		return nil, inv_error
 	}
 
+	// Create Book
+	inv_error = ic.BookRepo.CreateBook(tx, &model.Books{
+		ItemID:    id.String(),
+		Isbn:      item.Isbn,
+		Author:    &item.Author,
+		Publisher: &item.Publisher,
+		Edition:   &item.Edition,
+	})
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
 	inv_error = ic.ItemInShelveRepo.CreateItemInShelve(tx, &model.ItemsInShelf{
 		ItemID:   id.String(),
 		ShelfID:  item.RegularShelfId.String(),
@@ -121,7 +142,121 @@ func (ic *ItemController) CreateItem(item *models.ItemCreate) (*uuid.UUID, *mode
 	return id, nil
 }
 
-func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
+func (ic *ItemController) CreateItemWithSingleObject(item *models.ItemCreateWithSingleObject) (*uuid.UUID, *models.INVError) {
+	tx, err := ic.ItemRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	// Check if shelf id exists
+	inv_error := ic.ShelveRepo.CheckIfShelveExists(&item.RegularShelfId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	var pureItem model.Items
+	pureItem.Name = &item.Name
+	pureItem.ItemTypes = item.ItemTypeName
+	pureItem.RegularShelfID = utils.GetStringPointer(item.RegularShelfId.String())
+	pureItem.HintText = &item.HintText
+	pureItem.Description = &item.Description
+	pureItem.ClassOne = &item.ClassOne
+	pureItem.ClassTwo = &item.ClassTwo
+	pureItem.ClassThree = &item.ClassThree
+	pureItem.ClassFour = &item.ClassFour
+	pureItem.Damaged = &item.Damaged
+	pureItem.DamagedDescription = &item.DamagedDesc
+
+	id, inv_error := ic.ItemRepo.CreateItem(tx, &pureItem)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	// Create SingleObject
+	inv_error = ic.SingleObjectRepo.CreateSingleObject(tx, &model.SingleObject{
+		ItemID: id.String(),
+	})
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	inv_error = ic.ItemInShelveRepo.CreateItemInShelve(tx, &model.ItemsInShelf{
+		ItemID:   id.String(),
+		ShelfID:  item.RegularShelfId.String(),
+		Quantity: &item.BaseQuantityInShelf,
+	})
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
+	return id, nil
+}
+
+func (ic *ItemController) CreateItemWithSetOfObject(item *models.ItemCreateWithSetOfObject) (*uuid.UUID, *models.INVError) {
+	tx, err := ic.ItemRepo.NewTransaction()
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	// Check if shelf id exists
+	inv_error := ic.ShelveRepo.CheckIfShelveExists(&item.RegularShelfId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	var pureItem model.Items
+	pureItem.Name = &item.Name
+	pureItem.ItemTypes = item.ItemTypeName
+	pureItem.RegularShelfID = utils.GetStringPointer(item.RegularShelfId.String())
+	pureItem.HintText = &item.HintText
+	pureItem.Description = &item.Description
+	pureItem.ClassOne = &item.ClassOne
+	pureItem.ClassTwo = &item.ClassTwo
+	pureItem.ClassThree = &item.ClassThree
+	pureItem.ClassFour = &item.ClassFour
+	pureItem.Damaged = &item.Damaged
+	pureItem.DamagedDescription = &item.DamagedDesc
+
+	id, inv_error := ic.ItemRepo.CreateItem(tx, &pureItem)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	// Create SetOfObjects
+	inv_error = ic.SetOfObjectsRepo.CreateSetsOfObjects(tx, &model.SetsOfObjects{
+		ItemID:        id.String(),
+		TotalObjects:  item.TotalObjects,
+		UsefulObjects: item.UsefulObjects,
+		BrokenObjects: item.BrokenObjects,
+		LostObjects:   item.LostObjects,
+	})
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	inv_error = ic.ItemInShelveRepo.CreateItemInShelve(tx, &model.ItemsInShelf{
+		ItemID:   id.String(),
+		ShelfID:  item.RegularShelfId.String(),
+		Quantity: &item.BaseQuantityInShelf,
+	})
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
+	return id, nil
+}
+
+func (ic *ItemController) UpdateItemWithBook(item *models.ItemUpdateWithBook) *models.INVError {
 	tx, err := ic.ItemRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
@@ -162,6 +297,138 @@ func (ic *ItemController) UpdateItem(item *models.ItemUpdate) *models.INVError {
 		ShelfID:  *item.RegularShelfID,
 		Quantity: &item.QuantityInShelf,
 	})
+	if inv_error != nil {
+		return inv_error
+	}
+
+	book := model.Books{
+		ItemID:    item.ID,
+		Isbn:      item.Isbn,
+		Author:   item.Author,
+		Publisher: item.Publisher,
+		Edition:   item.Edition,
+	}
+
+	inv_error = ic.BookRepo.UpdateBook(tx, &book)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
+	return nil
+}
+
+func (ic *ItemController) UpdateItemWithSingleObject(item *models.ItemUpdateWithSingleObject) *models.INVError {
+	tx, err := ic.ItemRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	// Check if shelf id exists
+	convertedUUID, inv_error := utils.ConvertStringToUUID(*item.RegularShelfID)
+	if inv_error != nil {
+		return inv_error
+	}
+	inv_error = ic.ShelveRepo.CheckIfShelveExists(convertedUUID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	var pureItem model.Items
+	pureItem.ID = item.ID
+	pureItem.Name = item.Name
+	pureItem.ItemTypes = item.ItemTypes
+	pureItem.RegularShelfID = item.RegularShelfID
+	pureItem.HintText = item.HintText
+	pureItem.Description = item.Description
+	pureItem.ClassOne = item.ClassOne
+	pureItem.ClassTwo = item.ClassTwo
+	pureItem.ClassThree = item.ClassThree
+	pureItem.ClassFour = item.ClassFour
+	pureItem.Damaged = item.Damaged
+	pureItem.DamagedDescription = item.DamagedDescription
+
+	inv_error = ic.ItemRepo.UpdateItem(tx, &pureItem)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	inv_error = ic.ItemInShelveRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
+		ItemID:   item.ID,
+		ShelfID:  *item.RegularShelfID,
+		Quantity: &item.QuantityInShelf,
+	})
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// If singleObject has more attributes we need to update them here
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
+	return nil
+}
+
+func (ic *ItemController) UpdateItemWithSetOfObject(item *models.ItemUpdateWithSetsOfObjects) *models.INVError {
+	tx, err := ic.ItemRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	// Check if shelf id exists
+	convertedUUID, inv_error := utils.ConvertStringToUUID(*item.RegularShelfID)
+	if inv_error != nil {
+		return inv_error
+	}
+	inv_error = ic.ShelveRepo.CheckIfShelveExists(convertedUUID)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	var pureItem model.Items
+	pureItem.ID = item.ID
+	pureItem.Name = item.Name
+	pureItem.ItemTypes = item.ItemTypes
+	pureItem.RegularShelfID = item.RegularShelfID
+	pureItem.HintText = item.HintText
+	pureItem.Description = item.Description
+	pureItem.ClassOne = item.ClassOne
+	pureItem.ClassTwo = item.ClassTwo
+	pureItem.ClassThree = item.ClassThree
+	pureItem.ClassFour = item.ClassFour
+	pureItem.Damaged = item.Damaged
+	pureItem.DamagedDescription = item.DamagedDescription
+
+	inv_error = ic.ItemRepo.UpdateItem(tx, &pureItem)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	inv_error = ic.ItemInShelveRepo.UpdateItemInShelve(tx, &model.ItemsInShelf{
+		ItemID:   item.ID,
+		ShelfID:  *item.RegularShelfID,
+		Quantity: &item.QuantityInShelf,
+	})
+	if inv_error != nil {
+		return inv_error
+	}
+
+	setOfObjects := model.SetsOfObjects{
+		ItemID:    item.ID,
+		TotalObjects: item.TotalObjects,
+		UsefulObjects: item.UsefulObjects,
+		BrokenObjects: item.BrokenObjects,
+		LostObjects: item.LostObjects,
+	}
+
+	inv_error = ic.SetOfObjectsRepo.UpdateSetsOfObjects(tx, &setOfObjects)
 	if inv_error != nil {
 		return inv_error
 	}

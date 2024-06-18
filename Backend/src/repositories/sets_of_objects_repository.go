@@ -15,7 +15,7 @@ import (
 
 type SetsOfObjectsRepositoryI interface {
 	GetSetsOfObjectsById(setsOfObjectsId *uuid.UUID) (*model.SetsOfObjects, *models.INVError)
-	CreateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) (*string, *models.INVError)
+	CreateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) *models.INVError
 	UpdateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) *models.INVError
 	DeleteSetsOfObjects(tx *sql.Tx, setsOfObjectsId *uuid.UUID) *models.INVError
 
@@ -48,7 +48,7 @@ func (sor *SetsOfObjectsRepository) GetSetsOfObjectsById(setsOfObjectsId *uuid.U
 	return &setsOfObjects, nil
 }
 
-func (sor *SetsOfObjectsRepository) CreateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) (*string, *models.INVError) {
+func (sor *SetsOfObjectsRepository) CreateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) *models.INVError {
 	// Create the query
 	stmt := table.SetsOfObjects.INSERT(
 		table.SetsOfObjects.ItemID,
@@ -67,10 +67,10 @@ func (sor *SetsOfObjectsRepository) CreateSetsOfObjects(tx *sql.Tx, setsOfObject
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating sets of objects")
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating sets of objects")
 	}
 
-	return nil, nil
+	return nil
 }
 
 func (sor *SetsOfObjectsRepository) UpdateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) *models.INVError {

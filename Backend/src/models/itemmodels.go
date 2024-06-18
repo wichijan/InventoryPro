@@ -35,7 +35,27 @@ type ItemWithEverything struct {
 	}
 }
 
-type ItemCreate struct {
+type ItemCreateWithBook struct {
+	Name                string               `json:"name" binding:"required"`
+	Description         string               `json:"description"`
+	ItemTypeName        model.ItemsItemTypes `json:"itemTypeName" binding:"required"`
+	RegularShelfId      uuid.UUID            `json:"regularShelfId" binding:"required"`
+	ClassOne            bool                 `json:"classOne"`
+	ClassTwo            bool                 `json:"classTwo"`
+	ClassThree          bool                 `json:"classThree"`
+	ClassFour           bool                 `json:"classFour"`
+	Damaged             bool                 `json:"damaged"`
+	DamagedDesc         string               `json:"damagedDesc"`
+	HintText            string               `json:"hintText"`
+	BaseQuantityInShelf int32                `json:"BaseQuantityInShelf" binding:"required"`
+
+	Isbn      string `json:"isbn" binding:"required"`
+	Author    string `json:"author" binding:"required"`
+	Publisher string `json:"publisher" binding:"required"`
+	Edition   string `json:"edition" binding:"required"`
+}
+
+type ItemCreateWithSingleObject struct {
 	Name                string               `json:"name" binding:"required"`
 	Description         string               `json:"description"`
 	ItemTypeName        model.ItemsItemTypes `json:"itemTypeName" binding:"required"`
@@ -50,9 +70,42 @@ type ItemCreate struct {
 	BaseQuantityInShelf int32                `json:"BaseQuantityInShelf" binding:"required"`
 }
 
-type ItemUpdate struct {
+type ItemCreateWithSetOfObject struct {
+	Name                string               `json:"name" binding:"required"`
+	Description         string               `json:"description"`
+	ItemTypeName        model.ItemsItemTypes `json:"itemTypeName" binding:"required"`
+	RegularShelfId      uuid.UUID            `json:"regularShelfId" binding:"required"`
+	ClassOne            bool                 `json:"classOne"`
+	ClassTwo            bool                 `json:"classTwo"`
+	ClassThree          bool                 `json:"classThree"`
+	ClassFour           bool                 `json:"classFour"`
+	Damaged             bool                 `json:"damaged"`
+	DamagedDesc         string               `json:"damagedDesc"`
+	HintText            string               `json:"hintText"`
+	BaseQuantityInShelf int32                `json:"BaseQuantityInShelf" binding:"required"`
+
+	TotalObjects  *int32 `json:"TotalObjects"`
+	UsefulObjects *int32 `json:"UsefulObjects"`
+	BrokenObjects *int32 `json:"BrokenObjects"`
+	LostObjects   *int32 `json:"LostObjects"`
+}
+
+type ItemUpdateWithBook struct {
 	model.Items
 	QuantityInShelf int32 `json:"QuantityInShelf"`
+	model.Books
+}
+
+type ItemUpdateWithSingleObject struct {
+	model.Items
+	QuantityInShelf int32 `json:"QuantityInShelf"`
+	model.SingleObject
+}
+
+type ItemUpdateWithSetsOfObjects struct {
+	model.Items
+	QuantityInShelf int32 `json:"QuantityInShelf"`
+	model.SetsOfObjects
 }
 
 type ItemWithKeyword struct {

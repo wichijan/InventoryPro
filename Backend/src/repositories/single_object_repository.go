@@ -15,7 +15,7 @@ import (
 
 type SingleObjectRepositoryI interface {
 	GetSingleObjectById(singleObjectId *uuid.UUID) (*model.SingleObject, *models.INVError)
-	CreateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) (*string, *models.INVError)
+	CreateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) *models.INVError
 	// UpdateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) *models.INVError // Not needed because there are not attributes
 	DeleteSingleObject(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
@@ -47,7 +47,7 @@ func (sor *SingleObjectRepository) GetSingleObjectById(singleObjectId *uuid.UUID
 	return &singleObject, nil
 }
 
-func (sor *SingleObjectRepository) CreateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) (*string, *models.INVError) {
+func (sor *SingleObjectRepository) CreateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) *models.INVError {
 	// Create the query
 	stmt := table.SingleObject.INSERT(
 		table.SingleObject.ItemID,
@@ -58,10 +58,10 @@ func (sor *SingleObjectRepository) CreateSingleObject(tx *sql.Tx, singleObject *
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating single object")
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating single object")
 	}
 
-	return &singleObject.ItemID, nil
+	return nil
 }
 
 func (sor *SingleObjectRepository) DeleteSingleObject(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
