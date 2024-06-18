@@ -1,4 +1,14 @@
 definitions:
+  model.ItemsItemTypes:
+    enum:
+    - book
+    - single_object
+    - sets_of_objects
+    type: string
+    x-enum-varnames:
+    - ItemsItemTypes_Book
+    - ItemsItemTypes_SingleObject
+    - ItemsItemTypes_SetsOfObjects
   model.Keywords:
     properties:
       id:
@@ -104,8 +114,8 @@ definitions:
             type: string
           id:
             type: string
-          itemTypeID:
-            type: string
+          itemTypes:
+            $ref: '#/definitions/model.ItemsItemTypes'
           name:
             type: string
           picture:
@@ -150,7 +160,91 @@ definitions:
       errorMessage:
         type: string
     type: object
-  models.ItemCreate:
+  models.ItemCreateWithBook:
+    properties:
+      BaseQuantityInShelf:
+        type: integer
+      author:
+        type: string
+      classFour:
+        type: boolean
+      classOne:
+        type: boolean
+      classThree:
+        type: boolean
+      classTwo:
+        type: boolean
+      damaged:
+        type: boolean
+      damagedDesc:
+        type: string
+      description:
+        type: string
+      edition:
+        type: string
+      hintText:
+        type: string
+      isbn:
+        type: string
+      itemTypeName:
+        $ref: '#/definitions/model.ItemsItemTypes'
+      name:
+        type: string
+      publisher:
+        type: string
+      regularShelfId:
+        type: string
+    required:
+    - BaseQuantityInShelf
+    - author
+    - edition
+    - isbn
+    - itemTypeName
+    - name
+    - publisher
+    - regularShelfId
+    type: object
+  models.ItemCreateWithSetOfObject:
+    properties:
+      BaseQuantityInShelf:
+        type: integer
+      BrokenObjects:
+        type: integer
+      LostObjects:
+        type: integer
+      TotalObjects:
+        type: integer
+      UsefulObjects:
+        type: integer
+      classFour:
+        type: boolean
+      classOne:
+        type: boolean
+      classThree:
+        type: boolean
+      classTwo:
+        type: boolean
+      damaged:
+        type: boolean
+      damagedDesc:
+        type: string
+      description:
+        type: string
+      hintText:
+        type: string
+      itemTypeName:
+        $ref: '#/definitions/model.ItemsItemTypes'
+      name:
+        type: string
+      regularShelfId:
+        type: string
+    required:
+    - BaseQuantityInShelf
+    - itemTypeName
+    - name
+    - regularShelfId
+    type: object
+  models.ItemCreateWithSingleObject:
     properties:
       BaseQuantityInShelf:
         type: integer
@@ -171,7 +265,7 @@ definitions:
       hintText:
         type: string
       itemTypeName:
-        type: string
+        $ref: '#/definitions/model.ItemsItemTypes'
       name:
         type: string
       regularShelfId:
@@ -219,7 +313,89 @@ definitions:
     - itemID
     - quantity
     type: object
-  models.ItemUpdate:
+  models.ItemUpdateWithBook:
+    properties:
+      QuantityInShelf:
+        type: integer
+      author:
+        type: string
+      classFour:
+        type: boolean
+      classOne:
+        type: boolean
+      classThree:
+        type: boolean
+      classTwo:
+        type: boolean
+      damaged:
+        type: boolean
+      damagedDescription:
+        type: string
+      description:
+        type: string
+      edition:
+        type: string
+      hintText:
+        type: string
+      id:
+        type: string
+      isbn:
+        type: string
+      itemID:
+        type: string
+      itemTypes:
+        $ref: '#/definitions/model.ItemsItemTypes'
+      name:
+        type: string
+      picture:
+        type: string
+      publisher:
+        type: string
+      regularShelfID:
+        type: string
+    type: object
+  models.ItemUpdateWithSetsOfObjects:
+    properties:
+      QuantityInShelf:
+        type: integer
+      brokenObjects:
+        type: integer
+      classFour:
+        type: boolean
+      classOne:
+        type: boolean
+      classThree:
+        type: boolean
+      classTwo:
+        type: boolean
+      damaged:
+        type: boolean
+      damagedDescription:
+        type: string
+      description:
+        type: string
+      hintText:
+        type: string
+      id:
+        type: string
+      itemID:
+        type: string
+      itemTypes:
+        $ref: '#/definitions/model.ItemsItemTypes'
+      lostObjects:
+        type: integer
+      name:
+        type: string
+      picture:
+        type: string
+      regularShelfID:
+        type: string
+      totalObjects:
+        type: integer
+      usefulObjects:
+        type: integer
+    type: object
+  models.ItemUpdateWithSingleObject:
     properties:
       QuantityInShelf:
         type: integer
@@ -233,7 +409,7 @@ definitions:
         type: boolean
       damaged:
         type: boolean
-      damagedDesc:
+      damagedDescription:
         type: string
       description:
         type: string
@@ -241,16 +417,16 @@ definitions:
         type: string
       id:
         type: string
-      itemTypeName:
+      itemID:
         type: string
+      itemTypes:
+        $ref: '#/definitions/model.ItemsItemTypes'
       name:
         type: string
-      regularShelfId:
+      picture:
         type: string
-    required:
-    - itemTypeName
-    - name
-    - regularShelfId
+      regularShelfID:
+        type: string
     type: object
   models.ItemWithEverything:
     properties:
@@ -268,7 +444,7 @@ definitions:
         type: boolean
       damaged:
         type: boolean
-      damagedDesc:
+      damagedDescription:
         type: string
       description:
         type: string
@@ -276,8 +452,8 @@ definitions:
         type: string
       id:
         type: string
-      itemTypeName:
-        type: string
+      itemTypes:
+        $ref: '#/definitions/model.ItemsItemTypes'
       keywords:
         items:
           properties:
@@ -293,7 +469,7 @@ definitions:
         type: string
       quantityInShelf:
         type: integer
-      regularShelfId:
+      regularShelfID:
         type: string
       reservations:
         items:
@@ -403,8 +579,8 @@ definitions:
               type: string
             id:
               type: string
-            itemTypeID:
-              type: string
+            itemTypes:
+              $ref: '#/definitions/model.ItemsItemTypes'
             name:
               type: string
             picture:
@@ -520,8 +696,8 @@ definitions:
               type: string
             id:
               type: string
-            itemTypeID:
-              type: string
+            itemTypes:
+              $ref: '#/definitions/model.ItemsItemTypes'
             name:
               type: string
             picture:
@@ -836,8 +1012,8 @@ paths:
             $ref: '#/definitions/models.INVErrorMessage'
       tags:
       - Users
-  /clear-quick-shelf/:id:
-    post:
+  /clear-quick-shelf/{id}:
+    delete:
       consumes:
       - application/json
       description: Remove all items from quick shelf
@@ -880,62 +1056,6 @@ paths:
       summary: Get items
       tags:
       - Items
-    post:
-      consumes:
-      - application/json
-      description: Create Item
-      parameters:
-      - description: ItemCreate model
-        in: body
-        name: item
-        required: true
-        schema:
-          $ref: '#/definitions/models.ItemCreate'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Create Item
-      tags:
-      - Items
-    put:
-      consumes:
-      - application/json
-      description: Update Item
-      parameters:
-      - description: ItemUpdate model
-        in: body
-        name: item
-        required: true
-        schema:
-          $ref: '#/definitions/models.ItemUpdate'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Update Item
-      tags:
-      - Items
   /items-picture:
     post:
       consumes:
@@ -958,7 +1078,7 @@ paths:
       summary: Upload Img for Item
       tags:
       - Items
-  /items-picture/:id:
+  /items-picture/{id}:
     delete:
       consumes:
       - application/json
@@ -1013,7 +1133,33 @@ paths:
       summary: Get ImagePath For Item
       tags:
       - Items
-  /items/:id:
+  /items/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Item
+      parameters:
+      - description: Item Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Item
+      tags:
+      - Items
     get:
       consumes:
       - application/json
@@ -1094,6 +1240,63 @@ paths:
       summary: Add Subject to item
       tags:
       - Items
+  /items/book:
+    post:
+      consumes:
+      - application/json
+      description: Create Item with book
+      parameters:
+      - description: ItemCreateWithBook model
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemCreateWithBook'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Item with book
+      tags:
+      - Items
+    put:
+      consumes:
+      - application/json
+      description: Update Item with Book
+      parameters:
+      - description: ItemUpdateWithBook model
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemUpdateWithBook'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update Item with Book
+      tags:
+      - Items
   /items/borrow:
     post:
       consumes:
@@ -1119,7 +1322,7 @@ paths:
       tags:
       - Items
   /items/remove-keyword:
-    post:
+    delete:
       consumes:
       - application/json
       description: Remove keyword to item
@@ -1198,7 +1401,7 @@ paths:
       summary: Reserve Item
       tags:
       - Items
-  /items/reserve-cancel/:id:
+  /items/reserve-cancel/{id}:
     post:
       consumes:
       - application/json
@@ -1221,8 +1424,8 @@ paths:
       summary: Cancel Reserve Item
       tags:
       - Items
-  /items/return/:id:
-    post:
+  /items/return/{id}:
+    delete:
       consumes:
       - application/json
       description: Return Reserve Item when logged-in
@@ -1244,7 +1447,121 @@ paths:
       summary: Return Reserve Item
       tags:
       - Items
-  /items/transfer-accept/:id:
+  /items/set-of-objects:
+    post:
+      consumes:
+      - application/json
+      description: Create Item with sets of objects
+      parameters:
+      - description: ItemCreateWithSetOfObject model
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemCreateWithSetOfObject'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Item with sets of objects
+      tags:
+      - Items
+    put:
+      consumes:
+      - application/json
+      description: Update Item
+      parameters:
+      - description: ItemUpdateWithSetsOfObjects model
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemUpdateWithSetsOfObjects'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update Item
+      tags:
+      - Items
+  /items/single-object:
+    post:
+      consumes:
+      - application/json
+      description: Create Item with single object
+      parameters:
+      - description: ItemCreateWithSingleObject model
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemCreateWithSingleObject'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Create Item with single object
+      tags:
+      - Items
+    put:
+      consumes:
+      - application/json
+      description: Update Item with Single Object
+      parameters:
+      - description: ItemUpdateWithSingleObject model
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemUpdateWithSingleObject'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update Item with Single Object
+      tags:
+      - Items
+  /items/transfer-accept/{id}:
     post:
       consumes:
       - application/json
@@ -1399,7 +1716,7 @@ paths:
       summary: Update Keyword
       tags:
       - Keywords
-  /keywords/:id:
+  /keywords/{id}:
     delete:
       consumes:
       - application/json
@@ -1426,7 +1743,7 @@ paths:
       summary: Delete Keyword
       tags:
       - Keywords
-  /quick-shelf/:id:
+  /quick-shelf/{id}:
     get:
       consumes:
       - application/json
@@ -1522,7 +1839,7 @@ paths:
       summary: Update Quick Shelf
       tags:
       - Quick Shelf
-  /quick-shelves/:id:
+  /quick-shelves/{id}:
     delete:
       consumes:
       - application/json
@@ -1567,7 +1884,7 @@ paths:
       tags:
       - Users
   /remove-item-to-quick-shelf:
-    post:
+    delete:
       consumes:
       - application/json
       description: You can only take all quantity of item from quick shelf to return
@@ -1616,6 +1933,33 @@ paths:
       tags:
       - Users
   /roles:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Role
+      parameters:
+      - description: RoleODT model
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Role
+      tags:
+      - Roles
     get:
       consumes:
       - application/json
@@ -1838,6 +2182,32 @@ paths:
       tags:
       - Rooms
   /rooms/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete room
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete room
+      tags:
+      - Rooms
     get:
       consumes:
       - application/json
@@ -2012,6 +2382,32 @@ paths:
       tags:
       - Shelves
   /shelves/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Shelve
+      parameters:
+      - description: Shelve ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete Shelve
+      tags:
+      - Shelves
     get:
       consumes:
       - application/json
@@ -2539,6 +2935,32 @@ paths:
       tags:
       - Warehouses
   /warehouses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete warehouse
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Delete warehouse
+      tags:
+      - Warehouses
     get:
       consumes:
       - application/json

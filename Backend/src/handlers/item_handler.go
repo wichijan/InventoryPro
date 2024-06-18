@@ -204,7 +204,7 @@ func UpdateItemWithBookHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param item body models.ItemUpdate true "ItemUpdate model"
+// @Param item body models.ItemUpdateWithSingleObject true "ItemUpdateWithSingleObject model"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
@@ -233,7 +233,7 @@ func UpdateItemWithSingleObjectHandler(itemCtrl controllers.ItemControllerI) gin
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param item body models.ItemUpdate true "ItemUpdate model"
+// @Param item body models.ItemUpdateWithSetsOfObjects true "ItemUpdateWithSetsOfObjects model"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage

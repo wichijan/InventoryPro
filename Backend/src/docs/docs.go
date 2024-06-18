@@ -357,8 +357,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/clear-quick-shelf/:id": {
-            "post": {
+        "/clear-quick-shelf/{id}": {
+            "delete": {
                 "description": "Remove all items from quick shelf",
                 "consumes": [
                     "application/json"
@@ -422,91 +422,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Update Item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Items"
-                ],
-                "summary": "Update Item",
-                "parameters": [
-                    {
-                        "description": "ItemUpdate model",
-                        "name": "item",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ItemUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create Item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Items"
-                ],
-                "summary": "Create Item",
-                "parameters": [
-                    {
-                        "description": "ItemCreate model",
-                        "name": "item",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ItemCreate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
             }
         },
         "/items-picture": {
@@ -541,7 +456,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items-picture/:id": {
+        "/items-picture/{id}": {
             "get": {
                 "description": "Get ImagePath For Item",
                 "consumes": [
@@ -613,44 +528,6 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/items/:id": {
-            "get": {
-                "description": "Get item by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Items"
-                ],
-                "summary": "Get item by id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "item id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ItemWithEverything"
                         }
                     },
                     "500": {
@@ -748,6 +625,93 @@ const docTemplate = `{
                 }
             }
         },
+        "/items/book": {
+            "put": {
+                "description": "Update Item with Book",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Update Item with Book",
+                "parameters": [
+                    {
+                        "description": "ItemUpdateWithBook model",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemUpdateWithBook"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Item with book",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Create Item with book",
+                "parameters": [
+                    {
+                        "description": "ItemCreateWithBook model",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemCreateWithBook"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/items/borrow": {
             "post": {
                 "description": "Borrow Item when logged-in",
@@ -786,7 +750,7 @@ const docTemplate = `{
             }
         },
         "/items/remove-keyword": {
-            "post": {
+            "delete": {
                 "description": "Remove keyword to item",
                 "consumes": [
                     "application/json"
@@ -908,7 +872,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/reserve-cancel/:id": {
+        "/items/reserve-cancel/{id}": {
             "post": {
                 "description": "Cancel Reserve Item when logged-in",
                 "consumes": [
@@ -943,8 +907,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/return/:id": {
-            "post": {
+        "/items/return/{id}": {
+            "delete": {
                 "description": "Return Reserve Item when logged-in",
                 "consumes": [
                     "application/json"
@@ -978,7 +942,181 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/transfer-accept/:id": {
+        "/items/set-of-objects": {
+            "put": {
+                "description": "Update Item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Update Item",
+                "parameters": [
+                    {
+                        "description": "ItemUpdateWithSetsOfObjects model",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemUpdateWithSetsOfObjects"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Item with sets of objects",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Create Item with sets of objects",
+                "parameters": [
+                    {
+                        "description": "ItemCreateWithSetOfObject model",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemCreateWithSetOfObject"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/single-object": {
+            "put": {
+                "description": "Update Item with Single Object",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Update Item with Single Object",
+                "parameters": [
+                    {
+                        "description": "ItemUpdateWithSingleObject model",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemUpdateWithSingleObject"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Item with single object",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Create Item with single object",
+                "parameters": [
+                    {
+                        "description": "ItemCreateWithSingleObject model",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemCreateWithSingleObject"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/transfer-accept/{id}": {
             "post": {
                 "description": "Accept Transfer Request",
                 "consumes": [
@@ -1086,6 +1224,83 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.TransferRequestSelect"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/{id}": {
+            "get": {
+                "description": "Get item by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get item by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemWithEverything"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Delete Item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Item Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
                         }
                     },
                     "500": {
@@ -1214,7 +1429,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/keywords/:id": {
+        "/keywords/{id}": {
             "delete": {
                 "description": "Delete Keyword",
                 "consumes": [
@@ -1255,7 +1470,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/quick-shelf/:id": {
+        "/quick-shelf/{id}": {
             "get": {
                 "description": "Get all items in quick shelf",
                 "consumes": [
@@ -1401,7 +1616,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/quick-shelves/:id": {
+        "/quick-shelves/{id}": {
             "delete": {
                 "description": "Delete Quick Shelf",
                 "consumes": [
@@ -1469,7 +1684,7 @@ const docTemplate = `{
             }
         },
         "/remove-item-to-quick-shelf": {
-            "post": {
+            "delete": {
                 "description": "You can only take all quantity of item from quick shelf to return it to regular shelf",
                 "consumes": [
                     "application/json"
@@ -1643,6 +1858,47 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Delete Role",
+                "parameters": [
+                    {
+                        "description": "RoleODT model",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RoleODT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1927,6 +2183,45 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Delete room",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Room ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
             }
         },
         "/shelves": {
@@ -2180,6 +2475,45 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Shelve",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shelves"
+                ],
+                "summary": "Delete Shelve",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Shelve ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.INVErrorMessage"
                         }
@@ -2989,6 +3323,45 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete warehouse",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "Delete warehouse",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Warehouse ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
             }
         },
         "/ws": {
@@ -3007,6 +3380,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.ItemsItemTypes": {
+            "type": "string",
+            "enum": [
+                "book",
+                "single_object",
+                "sets_of_objects"
+            ],
+            "x-enum-varnames": [
+                "ItemsItemTypes_Book",
+                "ItemsItemTypes_SingleObject",
+                "ItemsItemTypes_SetsOfObjects"
+            ]
+        },
         "model.Keywords": {
             "type": "object",
             "properties": {
@@ -3170,8 +3556,8 @@ const docTemplate = `{
                         "id": {
                             "type": "string"
                         },
-                        "itemTypeID": {
-                            "type": "string"
+                        "itemTypes": {
+                            "$ref": "#/definitions/model.ItemsItemTypes"
                         },
                         "name": {
                             "type": "string"
@@ -3241,7 +3627,129 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ItemCreate": {
+        "models.ItemCreateWithBook": {
+            "type": "object",
+            "required": [
+                "BaseQuantityInShelf",
+                "author",
+                "edition",
+                "isbn",
+                "itemTypeName",
+                "name",
+                "publisher",
+                "regularShelfId"
+            ],
+            "properties": {
+                "BaseQuantityInShelf": {
+                    "type": "integer"
+                },
+                "author": {
+                    "type": "string"
+                },
+                "classFour": {
+                    "type": "boolean"
+                },
+                "classOne": {
+                    "type": "boolean"
+                },
+                "classThree": {
+                    "type": "boolean"
+                },
+                "classTwo": {
+                    "type": "boolean"
+                },
+                "damaged": {
+                    "type": "boolean"
+                },
+                "damagedDesc": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "edition": {
+                    "type": "string"
+                },
+                "hintText": {
+                    "type": "string"
+                },
+                "isbn": {
+                    "type": "string"
+                },
+                "itemTypeName": {
+                    "$ref": "#/definitions/model.ItemsItemTypes"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "publisher": {
+                    "type": "string"
+                },
+                "regularShelfId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemCreateWithSetOfObject": {
+            "type": "object",
+            "required": [
+                "BaseQuantityInShelf",
+                "itemTypeName",
+                "name",
+                "regularShelfId"
+            ],
+            "properties": {
+                "BaseQuantityInShelf": {
+                    "type": "integer"
+                },
+                "BrokenObjects": {
+                    "type": "integer"
+                },
+                "LostObjects": {
+                    "type": "integer"
+                },
+                "TotalObjects": {
+                    "type": "integer"
+                },
+                "UsefulObjects": {
+                    "type": "integer"
+                },
+                "classFour": {
+                    "type": "boolean"
+                },
+                "classOne": {
+                    "type": "boolean"
+                },
+                "classThree": {
+                    "type": "boolean"
+                },
+                "classTwo": {
+                    "type": "boolean"
+                },
+                "damaged": {
+                    "type": "boolean"
+                },
+                "damagedDesc": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "hintText": {
+                    "type": "string"
+                },
+                "itemTypeName": {
+                    "$ref": "#/definitions/model.ItemsItemTypes"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "regularShelfId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemCreateWithSingleObject": {
             "type": "object",
             "required": [
                 "BaseQuantityInShelf",
@@ -3278,7 +3786,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "itemTypeName": {
-                    "type": "string"
+                    "$ref": "#/definitions/model.ItemsItemTypes"
                 },
                 "name": {
                     "type": "string"
@@ -3344,13 +3852,132 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ItemUpdate": {
+        "models.ItemUpdateWithBook": {
             "type": "object",
-            "required": [
-                "itemTypeName",
-                "name",
-                "regularShelfId"
-            ],
+            "properties": {
+                "QuantityInShelf": {
+                    "type": "integer"
+                },
+                "author": {
+                    "type": "string"
+                },
+                "classFour": {
+                    "type": "boolean"
+                },
+                "classOne": {
+                    "type": "boolean"
+                },
+                "classThree": {
+                    "type": "boolean"
+                },
+                "classTwo": {
+                    "type": "boolean"
+                },
+                "damaged": {
+                    "type": "boolean"
+                },
+                "damagedDescription": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "edition": {
+                    "type": "string"
+                },
+                "hintText": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isbn": {
+                    "type": "string"
+                },
+                "itemID": {
+                    "type": "string"
+                },
+                "itemTypes": {
+                    "$ref": "#/definitions/model.ItemsItemTypes"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "picture": {
+                    "type": "string"
+                },
+                "publisher": {
+                    "type": "string"
+                },
+                "regularShelfID": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemUpdateWithSetsOfObjects": {
+            "type": "object",
+            "properties": {
+                "QuantityInShelf": {
+                    "type": "integer"
+                },
+                "brokenObjects": {
+                    "type": "integer"
+                },
+                "classFour": {
+                    "type": "boolean"
+                },
+                "classOne": {
+                    "type": "boolean"
+                },
+                "classThree": {
+                    "type": "boolean"
+                },
+                "classTwo": {
+                    "type": "boolean"
+                },
+                "damaged": {
+                    "type": "boolean"
+                },
+                "damagedDescription": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "hintText": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "itemID": {
+                    "type": "string"
+                },
+                "itemTypes": {
+                    "$ref": "#/definitions/model.ItemsItemTypes"
+                },
+                "lostObjects": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "picture": {
+                    "type": "string"
+                },
+                "regularShelfID": {
+                    "type": "string"
+                },
+                "totalObjects": {
+                    "type": "integer"
+                },
+                "usefulObjects": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ItemUpdateWithSingleObject": {
+            "type": "object",
             "properties": {
                 "QuantityInShelf": {
                     "type": "integer"
@@ -3370,7 +3997,7 @@ const docTemplate = `{
                 "damaged": {
                     "type": "boolean"
                 },
-                "damagedDesc": {
+                "damagedDescription": {
                     "type": "string"
                 },
                 "description": {
@@ -3382,13 +4009,19 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "itemTypeName": {
+                "itemID": {
                     "type": "string"
+                },
+                "itemTypes": {
+                    "$ref": "#/definitions/model.ItemsItemTypes"
                 },
                 "name": {
                     "type": "string"
                 },
-                "regularShelfId": {
+                "picture": {
+                    "type": "string"
+                },
+                "regularShelfID": {
                     "type": "string"
                 }
             }
@@ -3417,7 +4050,7 @@ const docTemplate = `{
                 "damaged": {
                     "type": "boolean"
                 },
-                "damagedDesc": {
+                "damagedDescription": {
                     "type": "string"
                 },
                 "description": {
@@ -3429,8 +4062,8 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "itemTypeName": {
-                    "type": "string"
+                "itemTypes": {
+                    "$ref": "#/definitions/model.ItemsItemTypes"
                 },
                 "keywords": {
                     "type": "array",
@@ -3455,7 +4088,7 @@ const docTemplate = `{
                 "quantityInShelf": {
                     "type": "integer"
                 },
-                "regularShelfId": {
+                "regularShelfID": {
                     "type": "string"
                 },
                 "reservations": {
@@ -3626,8 +4259,8 @@ const docTemplate = `{
                             "id": {
                                 "type": "string"
                             },
-                            "itemTypeID": {
-                                "type": "string"
+                            "itemTypes": {
+                                "$ref": "#/definitions/model.ItemsItemTypes"
                             },
                             "name": {
                                 "type": "string"
@@ -3804,8 +4437,8 @@ const docTemplate = `{
                             "id": {
                                 "type": "string"
                             },
-                            "itemTypeID": {
-                                "type": "string"
+                            "itemTypes": {
+                                "$ref": "#/definitions/model.ItemsItemTypes"
                             },
                             "name": {
                                 "type": "string"
