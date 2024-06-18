@@ -712,6 +712,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/items/book/{id}": {
+            "get": {
+                "description": "Get book by ItemId",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get book by ItemId",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Books"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/items/borrow": {
             "post": {
                 "description": "Borrow Item when logged-in",
@@ -1029,6 +1067,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/items/set-of-objects/{id}": {
+            "get": {
+                "description": "Get SetsOfObjects by ItemId",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get SetsOfObjects by ItemId",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SetsOfObjects"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/items/single-object": {
             "put": {
                 "description": "Update Item with Single Object",
@@ -1105,6 +1181,44 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/single-object/{id}": {
+            "get": {
+                "description": "Get SingleObject by ItemId",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get SingleObject by ItemId",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SingleObject"
                         }
                     },
                     "500": {
@@ -3380,6 +3494,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.Books": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "edition": {
+                    "type": "string"
+                },
+                "isbn": {
+                    "type": "string"
+                },
+                "itemID": {
+                    "type": "string"
+                },
+                "publisher": {
+                    "type": "string"
+                }
+            }
+        },
         "model.ItemsItemTypes": {
             "type": "string",
             "enum": [
@@ -3451,6 +3585,26 @@ const docTemplate = `{
                 }
             }
         },
+        "model.SetsOfObjects": {
+            "type": "object",
+            "properties": {
+                "brokenObjects": {
+                    "type": "integer"
+                },
+                "itemID": {
+                    "type": "string"
+                },
+                "lostObjects": {
+                    "type": "integer"
+                },
+                "totalObjects": {
+                    "type": "integer"
+                },
+                "usefulObjects": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Shelves": {
             "type": "object",
             "properties": {
@@ -3458,6 +3612,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "roomID": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SingleObject": {
+            "type": "object",
+            "properties": {
+                "itemID": {
                     "type": "string"
                 }
             }

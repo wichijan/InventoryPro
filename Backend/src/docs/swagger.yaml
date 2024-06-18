@@ -1,4 +1,17 @@
 definitions:
+  model.Books:
+    properties:
+      author:
+        type: string
+      edition:
+        type: string
+      isbn:
+        type: string
+      itemID:
+        type: string
+      publisher:
+        type: string
+    type: object
   model.ItemsItemTypes:
     enum:
     - book
@@ -46,11 +59,29 @@ definitions:
       warehouseID:
         type: string
     type: object
+  model.SetsOfObjects:
+    properties:
+      brokenObjects:
+        type: integer
+      itemID:
+        type: string
+      lostObjects:
+        type: integer
+      totalObjects:
+        type: integer
+      usefulObjects:
+        type: integer
+    type: object
   model.Shelves:
     properties:
       id:
         type: string
       roomID:
+        type: string
+    type: object
+  model.SingleObject:
+    properties:
+      itemID:
         type: string
     type: object
   model.Subjects:
@@ -1297,6 +1328,31 @@ paths:
       summary: Update Item with Book
       tags:
       - Items
+  /items/book/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get book by ItemId
+      parameters:
+      - description: item id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Books'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get book by ItemId
+      tags:
+      - Items
   /items/borrow:
     post:
       consumes:
@@ -1504,6 +1560,31 @@ paths:
       summary: Update Item
       tags:
       - Items
+  /items/set-of-objects/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get SetsOfObjects by ItemId
+      parameters:
+      - description: item id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SetsOfObjects'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get SetsOfObjects by ItemId
+      tags:
+      - Items
   /items/single-object:
     post:
       consumes:
@@ -1559,6 +1640,31 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Update Item with Single Object
+      tags:
+      - Items
+  /items/single-object/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get SingleObject by ItemId
+      parameters:
+      - description: item id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SingleObject'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get SingleObject by ItemId
       tags:
       - Items
   /items/transfer-accept/{id}:
