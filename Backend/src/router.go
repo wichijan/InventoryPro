@@ -272,6 +272,9 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	// Items routes
 	publicRoutes.Handle(http.MethodGet, "/items", handlers.GetItemsHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodGet, "/items/book/:id", handlers.GetBookByIdHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodGet, "/items/single-object/:id", handlers.GetSingleObjectByIdHandler(controller.ItemController))
+	publicRoutes.Handle(http.MethodGet, "/items/set-of-objects/:id", handlers.GetSetOfObjectsByIdHandler(controller.ItemController))
 	// Creates item - book or single object or set of objects
 	adminRoutes.Handle(http.MethodPost, "/items/book", handlers.CreateItemWithBookHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodPost, "/items/single-object", handlers.CreateItemWithSingleObjectHandler(controller.ItemController))

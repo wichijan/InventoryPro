@@ -17,6 +17,10 @@ type ItemControllerI interface {
 	GetItems() (*[]models.ItemWithEverything, *models.INVError)
 	GetItemById(itemId *uuid.UUID) (*models.ItemWithEverything, *models.INVError)
 
+	GetBookById(itemId *uuid.UUID) (*model.Books, *models.INVError)
+	GetSingleObjectById(itemId *uuid.UUID) (*model.SingleObject, *models.INVError)
+	GetSetOfObjectsById(itemId *uuid.UUID) (*model.SetsOfObjects, *models.INVError)
+
 	CreateItemWithBook(item *models.ItemCreateWithBook) (*uuid.UUID, *models.INVError)
 	CreateItemWithSingleObject(item *models.ItemCreateWithSingleObject) (*uuid.UUID, *models.INVError)
 	CreateItemWithSetOfObject(item *models.ItemCreateWithSetOfObject) (*uuid.UUID, *models.INVError)
@@ -24,8 +28,6 @@ type ItemControllerI interface {
 	UpdateItemWithBook(item *models.ItemUpdateWithBook) *models.INVError
 	UpdateItemWithSingleObject(item *models.ItemUpdateWithSingleObject) *models.INVError
 	UpdateItemWithSetOfObject(item *models.ItemUpdateWithSetsOfObjects) *models.INVError
-
-
 
 	DeleteItem(itemId *uuid.UUID) *models.INVError
 	AddKeywordToItem(itemKeyword models.ItemWithKeywordName) *models.INVError
@@ -81,6 +83,33 @@ func (ic *ItemController) GetItemById(itemId *uuid.UUID) (*models.ItemWithEveryt
 	}
 
 	return item, nil
+}
+
+func (ic *ItemController) GetBookById(itemId *uuid.UUID) (*model.Books, *models.INVError) {
+	book, inv_error := ic.BookRepo.GetBookById(itemId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	return book, nil
+}
+
+func (ic *ItemController) GetSingleObjectById(itemId *uuid.UUID) (*model.SingleObject, *models.INVError) {
+	singleObject, inv_error := ic.SingleObjectRepo.GetSingleObjectById(itemId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	return singleObject, nil
+}
+
+func (ic *ItemController) GetSetOfObjectsById(itemId *uuid.UUID) (*model.SetsOfObjects, *models.INVError) {
+	setOfObjects, inv_error := ic.SetOfObjectsRepo.GetSetsOfObjectsById(itemId)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	return setOfObjects, nil
 }
 
 func (ic *ItemController) CreateItemWithBook(item *models.ItemCreateWithBook) (*uuid.UUID, *models.INVError) {
@@ -304,7 +333,7 @@ func (ic *ItemController) UpdateItemWithBook(item *models.ItemUpdateWithBook) *m
 	book := model.Books{
 		ItemID:    item.ID,
 		Isbn:      item.Isbn,
-		Author:   item.Author,
+		Author:    item.Author,
 		Publisher: item.Publisher,
 		Edition:   item.Edition,
 	}
@@ -421,11 +450,11 @@ func (ic *ItemController) UpdateItemWithSetOfObject(item *models.ItemUpdateWithS
 	}
 
 	setOfObjects := model.SetsOfObjects{
-		ItemID:    item.ID,
-		TotalObjects: item.TotalObjects,
+		ItemID:        item.ID,
+		TotalObjects:  item.TotalObjects,
 		UsefulObjects: item.UsefulObjects,
 		BrokenObjects: item.BrokenObjects,
-		LostObjects: item.LostObjects,
+		LostObjects:   item.LostObjects,
 	}
 
 	inv_error = ic.SetOfObjectsRepo.UpdateSetsOfObjects(tx, &setOfObjects)
