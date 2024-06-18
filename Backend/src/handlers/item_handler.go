@@ -59,19 +59,19 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
-// @Summary Create Item
-// @Description Create Item
+// @Summary Create Item with book
+// @Description Create Item with book
 // @Tags Items
 // @Accept  json
 // @Produce  json
-// @Param item body models.ItemCreate true "ItemCreate model"
+// @Param item body models.ItemCreateWithBook true "ItemCreateWithBook model"
 // @Success 201 {object} uuid.UUID
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items [post]
-func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+// @Router /items/book [post]
+func CreateItemWithBookHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var item models.ItemCreate
+		var item models.ItemCreateWithBook
 		err := c.ShouldBindJSON(&item)
 		if err != nil || item.Name == "" {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
@@ -86,13 +86,145 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 			return
 		}
 
-		itemId, inv_err := itemCtrl.CreateItem(&item)
+		itemId, inv_err := itemCtrl.CreateItemWithBook(&item)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
 
 		c.JSON(http.StatusCreated, itemId)
+	}
+}
+
+// @Summary Create Item with single object
+// @Description Create Item with single object
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param item body models.ItemCreateWithSingleObject true "ItemCreateWithSingleObject model"
+// @Success 201 {object} uuid.UUID
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/single-object [post]
+func CreateItemWithSingleObjectHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var item models.ItemCreateWithSingleObject
+		err := c.ShouldBindJSON(&item)
+		if err != nil || item.Name == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
+			return
+		}
+		if item.BaseQuantityInShelf < 0 {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid quantity"))
+			return
+		}
+		if item.Name == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid name"))
+			return
+		}
+
+		itemId, inv_err := itemCtrl.CreateItemWithSingleObject(&item)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusCreated, itemId)
+	}
+}
+
+// @Summary Create Item with sets of objects
+// @Description Create Item with sets of objects
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param item body models.ItemCreateWithSetOfObject true "ItemCreateWithSetOfObject model"
+// @Success 201 {object} uuid.UUID
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/set-of-objects [post]
+func CreateItemWithSetOfObjectsHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var item models.ItemCreateWithSetOfObject
+		err := c.ShouldBindJSON(&item)
+		if err != nil || item.Name == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
+			return
+		}
+		if item.BaseQuantityInShelf < 0 {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid quantity"))
+			return
+		}
+		if item.Name == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid name"))
+			return
+		}
+
+		itemId, inv_err := itemCtrl.CreateItemWithSetOfObject(&item)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusCreated, itemId)
+	}
+}
+
+// @Summary Update Item with Book
+// @Description Update Item with Book
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param item body models.ItemUpdateWithBook true "ItemUpdateWithBook model"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/book [put]
+func UpdateItemWithBookHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var item models.ItemUpdateWithBook
+		err := c.ShouldBindJSON(&item)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
+			return
+		}
+
+		inv_err := itemCtrl.UpdateItemWithBook(&item)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Update Item with Single Object
+// @Description Update Item with Single Object
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param item body models.ItemUpdate true "ItemUpdate model"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/single-object [put]
+func UpdateItemWithSingleObjectHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var item models.ItemUpdateWithSingleObject
+		err := c.ShouldBindJSON(&item)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
+			return
+		}
+
+		inv_err := itemCtrl.UpdateItemWithSingleObject(&item)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
 	}
 }
 
@@ -105,17 +237,17 @@ func CreateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
 // @Failure 500 {object} models.INVErrorMessage
-// @Router /items [put]
-func UpdateItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+// @Router /items/set-of-objects [put]
+func UpdateItemWithSetOfObjectsHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var item models.ItemUpdate
+		var item models.ItemUpdateWithSetsOfObjects
 		err := c.ShouldBindJSON(&item)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
 			return
 		}
 
-		inv_err := itemCtrl.UpdateItem(&item)
+		inv_err := itemCtrl.UpdateItemWithSetOfObject(&item)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

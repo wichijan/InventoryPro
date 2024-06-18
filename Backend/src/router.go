@@ -272,8 +272,14 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	// Items routes
 	publicRoutes.Handle(http.MethodGet, "/items", handlers.GetItemsHandler(controller.ItemController))
 	publicRoutes.Handle(http.MethodGet, "/items/:id", handlers.GetItemByIdHandler(controller.ItemController))
-	adminRoutes.Handle(http.MethodPost, "/items", handlers.CreateItemHandler(controller.ItemController))
-	adminRoutes.Handle(http.MethodPut, "/items", handlers.UpdateItemHandler(controller.ItemController))
+	// Creates item - book or single object or set of objects
+	adminRoutes.Handle(http.MethodPost, "/items/book", handlers.CreateItemWithBookHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPost, "/items/single-object", handlers.CreateItemWithSingleObjectHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPost, "/items/set-of-objects", handlers.CreateItemWithSetOfObjectsHandler(controller.ItemController))
+	// Updates item - book or single object or set of objects
+	adminRoutes.Handle(http.MethodPut, "/items/book", handlers.UpdateItemWithBookHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPut, "/items/single-object", handlers.UpdateItemWithSingleObjectHandler(controller.ItemController))
+	adminRoutes.Handle(http.MethodPut, "/items/set-of-objects", handlers.UpdateItemWithSetOfObjectsHandler(controller.ItemController))
 	adminRoutes.Handle(http.MethodDelete, "/items/:id", handlers.DeleteItemHandler(controller.ItemController))
 	// Picture for item
 	adminRoutes.Handle(http.MethodPost, "/items-picture", handlers.UploadImageForItemHandler(controller.ItemController))

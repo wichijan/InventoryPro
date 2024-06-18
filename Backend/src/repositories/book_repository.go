@@ -15,7 +15,7 @@ import (
 
 type BookRepositoryI interface {
 	GetBookById(itemId *uuid.UUID) (*model.Books, *models.INVError)
-	CreateBook(tx *sql.Tx, book *model.Books) (*string, *models.INVError)
+	CreateBook(tx *sql.Tx, book *model.Books) *models.INVError
 	UpdateBook(tx *sql.Tx, book *model.Books) *models.INVError
 	DeleteBook(tx *sql.Tx, bookId *uuid.UUID) *models.INVError
 	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
@@ -47,7 +47,7 @@ func (br *BookRepository) GetBookById(itemId *uuid.UUID) (*model.Books, *models.
 	return &book, nil
 }
 
-func (br *BookRepository) CreateBook(tx *sql.Tx, book *model.Books) (*string, *models.INVError) {
+func (br *BookRepository) CreateBook(tx *sql.Tx, book *model.Books) *models.INVError {
 	// Create the query
 	stmt := table.Books.INSERT(
 		table.Books.ItemID,
@@ -66,10 +66,10 @@ func (br *BookRepository) CreateBook(tx *sql.Tx, book *model.Books) (*string, *m
 	// Execute the query
 	_, err := stmt.Exec(tx)
 	if err != nil {
-		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating book")
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating book")
 	}
 
-	return &book.ItemID, nil
+	return nil
 }
 
 func (br *BookRepository) UpdateBook(tx *sql.Tx, book *model.Books) *models.INVError {
