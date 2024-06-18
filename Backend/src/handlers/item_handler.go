@@ -59,6 +59,84 @@ func GetItemByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get book by ItemId
+// @Description Get book by ItemId
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "item id"
+// @Success 200 {object} model.Books
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/book/{id} [get]
+func GetBookByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+			return
+		}
+
+		book, inv_err := itemCtrl.GetBookById(&id)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, book)
+	}
+}
+
+// @Summary Get SingleObject by ItemId
+// @Description Get SingleObject by ItemId
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "item id"
+// @Success 200 {object} model.SingleObject
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/single-object/{id} [get]
+func GetSingleObjectByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+			return
+		}
+
+		singleObject, inv_err := itemCtrl.GetSingleObjectById(&id)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, singleObject)
+	}
+}
+
+// @Summary Get SetsOfObjects by ItemId
+// @Description Get SetsOfObjects by ItemId
+// @Tags Items
+// @Accept  json
+// @Produce  json
+// @Param id path string true "item id"
+// @Success 200 {object} model.SetsOfObjects
+// @Failure 500 {object} models.INVErrorMessage
+// @Router /items/set-of-objects/{id} [get]
+func GetSetOfObjectsByIdHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+			return
+		}
+
+		setOfObjects, inv_err := itemCtrl.GetSetOfObjectsById(&id)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, setOfObjects)
+	}
+}
+
 // @Summary Create Item with book
 // @Description Create Item with book
 // @Tags Items
