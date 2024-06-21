@@ -2,9 +2,9 @@ import { API_URL } from '$lib/_services/ShelfService';
 
 export const load = async ({ fetch, params }) => {
 
-    async  function getAllShelvesWithItems() {
+    async function getAllShelvesWithItems() {
         return new Promise((resolve, reject) => {
-            fetch(API_URL + 'shelveswithitems', {
+            fetch(API_URL + 'items', {
                 method: 'GET',
                 credentials: 'include',
                 mode: 'cors',
@@ -12,17 +12,18 @@ export const load = async ({ fetch, params }) => {
                     'Content-Type': 'application/json'
                 }
             })
-            .then(async (response) => {
-                if (response.ok) {
-                    await response.json().then((data) => {
-                        resolve(data);
-                    });
-                } else {
-                    reject(response.statusText);
-                }
-            });
+                .then(async (response) => {
+                    if (response.ok) {
+                        await response.json().then((data) => {
+                            console.log(data);
+                            resolve(data);
+                        });
+                    } else {
+                        reject(response.statusText);
+                    }
+                });
         });
     }
 
-    return { shelvesItems: await getAllShelvesWithItems()};
+    return { shelvesItems: await getAllShelvesWithItems() };
 }

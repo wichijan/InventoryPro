@@ -1,14 +1,13 @@
 <script lang="ts">
-  import { API_URL } from "$lib/_services/ShelfService";
   import Spinner from "$lib/templates/Spinner.svelte";
-
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
 
   export let data;
 
-  const shelvesItems: any | unknown[] = data.shelvesItems;
+  const shelvesItems = data; // Assuming the entire dataset is passed as `data`
+  console.log(shelvesItems);
 
   let warehouseName: string = "";
 
@@ -18,58 +17,18 @@
   let latestThreeItems: any[] = [];
   $: latestThreeItems = latestThreeItems;
 
-  onMount(async () => {
-    for (const shelf of shelvesItems) {
-      if (!shelf.Items) continue;
-      for (const item of shelf.Items) {
-        allItems = [
-          ...allItems,
-          {
-            ID: item.ID,
-            Name: item.Name,
-            Description: item.Description,
-            Quantity: item.Quantity,
-            Regal: shelf.ShelveTypeName,
-            Room: await getRoomName(shelf.RoomID),
-            Damaged: item.Damaged,
-          },
-        ];
-      }
-    }
+  onMount(() => {
+    allItems = shelvesItems.shelvesItems;
     itemsCopy = allItems;
-    allItems.forEach((item, index) => {
-      if (index < 3) {
-        latestThreeItems = [...latestThreeItems, item];
-      }
-    });
-    browser ? (warehouseName = localStorage.getItem("warehouse")) : "";
+    latestThreeItems = allItems.slice(0, 3); // Get the latest three items
+    if (browser) {
+      warehouseName = localStorage.getItem("warehouse") || "";
+    }
   });
 
-  async function getRoomName(roomID: number) {
-    return new Promise((resolve, reject) => {
-      fetch(API_URL + "rooms/" + roomID, {
-        method: "GET",
-        credentials: "include",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then(async (response) => {
-        if (response.ok) {
-          await response.json().then((data) => {
-            resolve(data.Name);
-          });
-        } else {
-          reject(response.statusText);
-        }
-      });
-    });
-  }
-
   function search(event) {
-    allItems = [...itemsCopy];
     const query = event.target.value.toLowerCase();
-    allItems = allItems.filter((item) => {
+    allItems = itemsCopy.filter((item) => {
       return item.Name.toLowerCase().includes(query);
     });
   }
@@ -80,7 +39,7 @@
     Zeigt items für das Warehouse: <b>{warehouseName}</b>
   </div>
   <button
-    class="bg-[#d5bdaf] hover:bg-d6ccc2 hover:text-white hover:shadow-lg duration-500 text-black rounded-md ml-3 px-1 "
+    class="bg-[#d5bdaf] hover:bg-d6ccc2 hover:text-white hover:shadow-lg duration-500 text-black rounded-md ml-3 px-1"
     on:click={() => {
       goto("/settings");
     }}
@@ -89,15 +48,17 @@
   </button>
 </div>
 
-{#if shelvesItems.length > 0}
-  <div class="flex min-h-screen items-center flex-col">
+{#if allItems.length > 0}
+  <div class="flex flex-col items-center w-full">
     <div class="mt-10 mb-4">
       <h1 class="text-3xl font-bold text-black">Items</h1>
     </div>
-    <div class="grid grid-cols-3 bg-tertiary rounded">
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-tertiary rounded px-2 py-4"
+    >
       {#each latestThreeItems as item (item.ID)}
         <button
-          class="max-w-sm rounded overflow-hidden shadow-lg m-3 bg-white px-5 py-5 hover:shadow-2xl duration-300 ease-in-out transform hover:scale-[1.02]"
+          class="max-w-sm rounded overflow-hidden shadow-lg m-3 bg-white px-5 py-5 hover:shadow-xl duration-300 ease-in-out transform hover:scale-[102%]"
           on:click={() => {
             goto(`/detail/${item.ID}`);
           }}
@@ -105,7 +66,7 @@
           <img
             class="mx-auto rounded w-12 h-12 object-cover"
             src="https://via.placeholder.com/150"
-            alt="Sunset in the mountains"
+            alt="Image"
           />
           <div class="px-6 py-4">
             <div class="font-bold text-xl mb-2">{item.Name}</div>
@@ -115,35 +76,31 @@
             <span
               class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2"
             >
-              Anzahl: {item.Quantity}
+              Anzahl: {item.QuantityInShelf}
             </span>
             <span
               class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2"
             >
-              Raum: {item.Room}
+              Class One: {item.ClassOne ? "Yes" : "No"}
             </span>
             <span
               class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2"
             >
-              Regal: {item.Regal}
+              Class Two: {item.ClassTwo ? "Yes" : "No"}
             </span>
           </div>
         </button>
       {/each}
     </div>
-    <div class="container mx-auto">
-      <div class="my-2 flex sm:flex-row flex-col">
-        <div class="sm:flex sm:flex-row-reverse mt-2">
-          <div class="flex items-center my-2 sm:mb-0">
-            <div class="relative">
-              <input
-                class="h-10 pl-2 pr-8 rounded-full border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 duration-300 focus:outline-none"
-                type="text"
-                on:input|preventDefault={search}
-                placeholder="Search by name..."
-              />
-            </div>
-          </div>
+    <div class="container mx-auto px-4">
+      <div class="my-2 flex flex-col sm:flex-row justify-between items-center">
+        <div class="relative w-full sm:w-auto mb-2 sm:mb-0">
+          <input
+            class="w-full sm:w-64 h-10 pl-2 pr-8 rounded-full border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 duration-300 focus:outline-none"
+            type="text"
+            on:input|preventDefault={search}
+            placeholder="Search by name..."
+          />
         </div>
       </div>
       <div class="w-full mb-8 overflow-hidden rounded-lg shadow-lg">
@@ -156,8 +113,8 @@
                 <th class="px-4 py-3">Name</th>
                 <th class="px-4 py-3">Beschreibung</th>
                 <th class="px-4 py-3">Anzahl</th>
-                <th class="px-4 py-3">Raum</th>
-                <th class="px-4 py-3">Regal</th>
+                <th class="px-4 py-3">Reserviert</th>
+                <th class="px-4 py-3">Ausgeliehen?</th>
                 <th class="px-4 py-3">Kaputt?</th>
               </tr>
             </thead>
@@ -165,15 +122,17 @@
               {#each allItems as item (item.ID)}
                 <tr
                   class="text-gray-700 hover:bg-tertiary duration-300 cursor-pointer"
-                  on:click={() => {
-                    goto(`/detail/${item.ID}`);
-                  }}
+                  on:click={() => goto(`/detail/${item.ID}`)}
                 >
                   <td class="px-4 py-3 border">{item.Name}</td>
                   <td class="px-4 py-3 border">{item.Description}</td>
-                  <td class="px-4 py-3 border">{item.Quantity}</td>
-                  <td class="px-4 py-3 border">{item.Room}</td>
-                  <td class="px-4 py-3 border">{item.Regal}</td>
+                  <td class="px-4 py-3 border">{item.QuantityInShelf}</td>
+                  <td class="px-4 py-3 border"
+                    >{item.Reservations ? "Ja" : "Nein"}</td
+                  >
+                  <td class="px-4 py-3 border"
+                    >{item.BorrowedByUserID ? "Ja" : "Nein"}</td
+                  >
                   <td class="px-4 py-3 border"
                     >{item.Damaged ? "Ja" : "Nein"}</td
                   >

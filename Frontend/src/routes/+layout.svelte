@@ -152,7 +152,7 @@
         {/key}
       </div>
     {/if}
-    <div class="flex-grow flex-1 overflow-hidden h-full pl-11">
+    <div class="flex-grow flex-1 overflow-hidden pl-12">
       <main>
         <slot />
       </main>

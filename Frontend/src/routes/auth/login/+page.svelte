@@ -104,7 +104,6 @@
       </div>
 
       <button
-        disabled={passwordError}
         type="submit"
         class="bg-[#d5bdaf] hover:bg-d6ccc2 hover:text-black hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 mt-5 w-full"
       >

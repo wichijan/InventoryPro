@@ -14,15 +14,17 @@
 
   const allWarehouses: Warehouse[] = data.warehouses;
 
-  let warehouse: string = "Keins ausgewählt";
-  let oldWarehouse: string = "Keins ausgewählt";
+  allWarehouses.sort((a, b) => a.Name.localeCompare(b.Name));
+
+  let warehouse: string = "Alle";
+  let oldWarehouse: string = "Alle";
 
   onMount(() => {
     warehouse = browser
       ? localStorage.getItem("warehouse") === null
-        ? "Keins ausgewählt"
+        ? "Alle"
         : localStorage.getItem("warehouse")?.toString() || ""
-      : "Keins ausgewählt";
+      : "Alle";
     oldWarehouse = warehouse;
   });
 
@@ -55,6 +57,7 @@
           class="mt-2 w-60 h-10 border border-gray-300 rounded-md"
           bind:value={warehouse}
         >
+          <option value="Alle">Alle</option>
           {#each allWarehouses as warehouse}
             <option value={warehouse.Name}>{warehouse.Name}</option>
           {/each}

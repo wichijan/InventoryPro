@@ -4,20 +4,25 @@ export const load = async ({ fetch, params }) => {
 
     type Item = {
         ID: string;
+        ItemTypes: string;
+        QuantityInShelf: number;
         Name: string;
         Description: string;
+        RegularShelfID: string;
         ClassOne: boolean;
         ClassTwo: boolean;
         ClassThree: boolean;
         ClassFour: boolean;
         Damaged: boolean;
         DamagedDesc: string;
+        Picture: string;
+        HintText: string;
         Quantity: number;
-        Status: string;
-        Keywords: string[];
-        Subject: string;
-        Pictures: string[];
-      };
+        UsersBorrowed: any[];
+        Keywords: any[];
+        Subject: any[];
+        Reservations: any[];
+    };
 
     async function getItem(): Promise<Item> {
         return new Promise((resolve, reject) => {
@@ -42,5 +47,5 @@ export const load = async ({ fetch, params }) => {
     }
 
 
-    return { item: await getItem()};
+    return { item: await getItem() };
 }
