@@ -101,15 +101,19 @@ func (itr *ItemRepository) GetItemById(itemId *uuid.UUID) (*models.ItemWithEvery
 		table.ItemsInShelf.Quantity,
 		table.Users.ID,
 		table.Users.Username,
-		table.ItemSubjects.AllColumns,
-		table.KeywordsForItems.AllColumns,
+		// Subject array
+		table.Subjects.AllColumns,
+		// Keywords array
+		table.Keywords.AllColumns,
 		table.Reservations.AllColumns,
 	).FROM(
 		table.Items.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.Subjects, table.Subjects.ID.EQ(table.ItemSubjects.SubjectID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.Keywords, table.Keywords.ID.EQ(table.KeywordsForItems.KeywordID)).
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)).
 			LEFT_JOIN(table.Reservations, table.Reservations.ItemID.EQ(table.Items.ID)),
 	).WHERE(
