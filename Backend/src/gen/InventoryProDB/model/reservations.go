@@ -15,6 +15,7 @@ type Reservations struct {
 	ReservationID   string `sql:"primary_key"`
 	ItemID          *string
 	UserID          *string
+	Username        *string
 	Quantity        *int32
 	ReservationDate *time.Time
 	TimeFrom        time.Time

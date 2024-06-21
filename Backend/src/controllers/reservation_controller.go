@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"log"
+
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
@@ -19,6 +21,7 @@ type ReservationControllerI interface {
 type ReservationController struct {
 	ReservationRepo repositories.ReservationRepositoryI
 	TransactionRepo repositories.TransactionRepositoryI
+	UserRepo        repositories.UserRepositoryI
 }
 
 func (rc *ReservationController) GetReservationByUserId(userId *uuid.UUID) (*[]model.Reservations, *models.INVError) {
@@ -56,6 +59,18 @@ func (rc *ReservationController) CreateReservation(reservation *models.Reservati
 		return nil, inv_errors.INV_BAD_REQUEST.WithDetails("invalid reservation data")
 	}
 
+	// Get Username
+	userIdUUID, err := uuid.Parse(reservation.UserID)
+	if err != nil {
+		return nil, inv_errors.INV_BAD_REQUEST.WithDetails("invalid user id")
+	}
+	user, inv_error := rc.UserRepo.GetUserById(&userIdUUID)
+	if inv_error != nil {
+		return nil, inv_error
+	}
+
+	reservation.Username = *user.Username
+	log.Print(reservation)
 	reservationID, inv_error := rc.ReservationRepo.CreateReservation(tx, reservation)
 	if inv_error != nil {
 		return nil, inv_error

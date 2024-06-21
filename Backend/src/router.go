@@ -203,6 +203,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		ReservationController: &controllers.ReservationController{
 			ReservationRepo: reservationRepo,
 			TransactionRepo: transactionRepo,
+			UserRepo:        userRepo,
 		},
 		ItemsQuickShelfController: &controllers.ItemQuickShelfController{
 			ItemQuickShelfRepo: itemQuickShelfRepo,

@@ -5,6 +5,7 @@ import "time"
 type ReservationCreate struct {
 	ItemID   string    `alias:"reservations.item_id"`
 	UserID   string    `alias:"reservations.user_id"`
+	Username string    `alias:"reservations.username"`
 	Quantity int       `alias:"reservations.quantity"`
 	TimeFrom time.Time `alias:"reservations.time_from"`
 	TimeTo   time.Time `alias:"reservations.time_to"`

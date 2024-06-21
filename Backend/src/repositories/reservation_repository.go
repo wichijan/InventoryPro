@@ -119,6 +119,7 @@ func (rr *ReservationRepository) CreateReservation(tx *sql.Tx, reservation *mode
 	stmt := table.Reservations.INSERT(
 		table.Reservations.ReservationID,
 		table.Reservations.UserID,
+		table.Reservations.Username,
 		table.Reservations.ItemID,
 		table.Reservations.Quantity,
 		table.Reservations.TimeFrom,
@@ -126,6 +127,7 @@ func (rr *ReservationRepository) CreateReservation(tx *sql.Tx, reservation *mode
 	).VALUES(
 		uuid.String(),
 		reservation.UserID,
+		reservation.Username,
 		reservation.ItemID,
 		reservation.Quantity,
 		reservation.TimeFrom,

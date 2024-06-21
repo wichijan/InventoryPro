@@ -20,6 +20,7 @@ type reservationsTable struct {
 	ReservationID   mysql.ColumnString
 	ItemID          mysql.ColumnString
 	UserID          mysql.ColumnString
+	Username        mysql.ColumnString
 	Quantity        mysql.ColumnInteger
 	ReservationDate mysql.ColumnTimestamp
 	TimeFrom        mysql.ColumnTimestamp
@@ -68,13 +69,14 @@ func newReservationsTableImpl(schemaName, tableName, alias string) reservationsT
 		ReservationIDColumn   = mysql.StringColumn("reservation_id")
 		ItemIDColumn          = mysql.StringColumn("item_id")
 		UserIDColumn          = mysql.StringColumn("user_id")
+		UsernameColumn        = mysql.StringColumn("username")
 		QuantityColumn        = mysql.IntegerColumn("quantity")
 		ReservationDateColumn = mysql.TimestampColumn("reservation_date")
 		TimeFromColumn        = mysql.TimestampColumn("time_from")
 		TimeToColumn          = mysql.TimestampColumn("time_to")
 		IsCancelledColumn     = mysql.BoolColumn("is_cancelled")
-		allColumns            = mysql.ColumnList{ReservationIDColumn, ItemIDColumn, UserIDColumn, QuantityColumn, ReservationDateColumn, TimeFromColumn, TimeToColumn, IsCancelledColumn}
-		mutableColumns        = mysql.ColumnList{ItemIDColumn, UserIDColumn, QuantityColumn, ReservationDateColumn, TimeFromColumn, TimeToColumn, IsCancelledColumn}
+		allColumns            = mysql.ColumnList{ReservationIDColumn, ItemIDColumn, UserIDColumn, UsernameColumn, QuantityColumn, ReservationDateColumn, TimeFromColumn, TimeToColumn, IsCancelledColumn}
+		mutableColumns        = mysql.ColumnList{ItemIDColumn, UserIDColumn, UsernameColumn, QuantityColumn, ReservationDateColumn, TimeFromColumn, TimeToColumn, IsCancelledColumn}
 	)
 
 	return reservationsTable{
@@ -84,6 +86,7 @@ func newReservationsTableImpl(schemaName, tableName, alias string) reservationsT
 		ReservationID:   ReservationIDColumn,
 		ItemID:          ItemIDColumn,
 		UserID:          UserIDColumn,
+		Username:        UsernameColumn,
 		Quantity:        QuantityColumn,
 		ReservationDate: ReservationDateColumn,
 		TimeFrom:        TimeFromColumn,

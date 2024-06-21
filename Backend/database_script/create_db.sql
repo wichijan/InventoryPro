@@ -194,7 +194,8 @@ create table user_items(
 create table reservations (
     reservation_id VARCHAR(36) PRIMARY KEY,
     item_id VARCHAR(36),
-    user_id VARCHAR(36),
+    user_id VARCHAR(100),
+    username VARCHAR(36),
     quantity INT,
     reservation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     time_from TIMESTAMP NOT NULL,
