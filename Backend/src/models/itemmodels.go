@@ -18,9 +18,12 @@ type ItemWThin struct {
 type ItemWithEverything struct {
 	model.Items
 
-	QuantityInShelf    int32  `alias:"items_in_shelf.quantity"`
-	BorrowedByUserID   string `alias:"users.id"`
-	BorrowedByUserName string `alias:"users.username"`
+	QuantityInShelf int32 `alias:"items_in_shelf.quantity"`
+
+	UsersBorrowed []struct {
+		BorrowedByUserID   string `sql:"primary_key" alias:"users.id"`
+		BorrowedByUserName string `alias:"users.username"`
+	}
 
 	Keywords []struct {
 		model.Keywords
