@@ -23,11 +23,11 @@ type ItemWithEverything struct {
 	BorrowedByUserName string `alias:"users.username"`
 
 	Keywords []struct {
-		model.KeywordsForItems
+		model.Keywords
 	}
 
 	Subject []struct {
-		model.ItemSubjects
+		model.Subjects
 	}
 
 	Reservations []struct {

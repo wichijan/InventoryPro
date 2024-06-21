@@ -52,8 +52,10 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 		table.Items.HintText,
 		table.Items.DamagedDescription,
 		table.ItemsInShelf.Quantity,
-		table.ItemSubjects.AllColumns,
-		table.KeywordsForItems.AllColumns,
+		// Subject array
+		table.Subjects.AllColumns,
+		// Keywords array
+		table.Keywords.AllColumns,
 		table.Users.ID,
 		table.Users.Username,
 		table.Reservations.AllColumns,
@@ -62,7 +64,9 @@ func (itr *ItemRepository) GetItems() (*[]models.ItemWithEverything, *models.INV
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.UserItems, table.UserItems.ItemID.EQ(table.Items.ID)).
 			LEFT_JOIN(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.Subjects, table.Subjects.ID.EQ(table.ItemSubjects.SubjectID)).
 			LEFT_JOIN(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(table.Items.ID)).
+			LEFT_JOIN(table.Keywords, table.Keywords.ID.EQ(table.KeywordsForItems.KeywordID)).
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.UserItems.UserID)).
 			LEFT_JOIN(table.Reservations, table.Reservations.ItemID.EQ(table.Items.ID)),
 	)
