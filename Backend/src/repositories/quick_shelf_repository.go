@@ -109,7 +109,7 @@ func (qsr *QuickShelfRepository) CheckIfRoomIdExists(roomId *uuid.UUID) *models.
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if roomId exists in QuickShelves table")
 	}
-	if count <= 0 {
+	if count < 0 {
 		return inv_errors.INV_CONFLICT.WithDetails("QuickShelves still has roomId in it")
 	}
 	return nil
