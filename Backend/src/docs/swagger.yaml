@@ -461,10 +461,6 @@ definitions:
     type: object
   models.ItemWithEverything:
     properties:
-      borrowedByUserID:
-        type: string
-      borrowedByUserName:
-        type: string
       classFour:
         type: boolean
       classOne:
@@ -488,9 +484,9 @@ definitions:
       keywords:
         items:
           properties:
-            itemID:
+            id:
               type: string
-            keywordID:
+            keyword:
               type: string
           type: object
         type: array
@@ -521,14 +517,27 @@ definitions:
               type: string
             userID:
               type: string
+            username:
+              type: string
           type: object
         type: array
       subject:
         items:
           properties:
-            itemID:
+            description:
               type: string
-            subjectID:
+            id:
+              type: string
+            name:
+              type: string
+          type: object
+        type: array
+      usersBorrowed:
+        items:
+          properties:
+            borrowedByUserID:
+              type: string
+            borrowedByUserName:
               type: string
           type: object
         type: array
@@ -846,7 +855,7 @@ paths:
       tags:
       - Quick Shelf
   /auth/accept-registration/:userId:
-    get:
+    post:
       consumes:
       - application/json
       description: Accept User Registration Request
@@ -914,6 +923,29 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Check username
+      tags:
+      - Users
+  /auth/decline-registration/:userId:
+    delete:
+      consumes:
+      - application/json
+      description: Decline User Registration Request
+      parameters:
+      - description: User ID from registration request
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Decline User Registration Request
       tags:
       - Users
   /auth/generate-code:

@@ -53,7 +53,7 @@ const docTemplate = `{
             }
         },
         "/auth/accept-registration/:userId": {
-            "get": {
+            "post": {
                 "description": "Accept User Registration Request",
                 "consumes": [
                     "application/json"
@@ -146,6 +146,41 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.CheckUsernameRequest"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/decline-registration/:userId": {
+            "delete": {
+                "description": "Decline User Registration Request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Decline User Registration Request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID from registration request",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -4191,12 +4226,6 @@ const docTemplate = `{
         "models.ItemWithEverything": {
             "type": "object",
             "properties": {
-                "borrowedByUserID": {
-                    "type": "string"
-                },
-                "borrowedByUserName": {
-                    "type": "string"
-                },
                 "classFour": {
                     "type": "boolean"
                 },
@@ -4232,10 +4261,10 @@ const docTemplate = `{
                     "items": {
                         "type": "object",
                         "properties": {
-                            "itemID": {
+                            "id": {
                                 "type": "string"
                             },
-                            "keywordID": {
+                            "keyword": {
                                 "type": "string"
                             }
                         }
@@ -4281,6 +4310,9 @@ const docTemplate = `{
                             },
                             "userID": {
                                 "type": "string"
+                            },
+                            "username": {
+                                "type": "string"
                             }
                         }
                     }
@@ -4290,10 +4322,27 @@ const docTemplate = `{
                     "items": {
                         "type": "object",
                         "properties": {
-                            "itemID": {
+                            "description": {
                                 "type": "string"
                             },
-                            "subjectID": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "usersBorrowed": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "borrowedByUserID": {
+                                "type": "string"
+                            },
+                            "borrowedByUserName": {
                                 "type": "string"
                             }
                         }

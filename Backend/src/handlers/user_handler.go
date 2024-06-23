@@ -195,7 +195,7 @@ func GetUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 // @Param userId path string true "User ID from registration request"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /auth/accept-registration/:userId [GET]
+// @Router /auth/accept-registration/:userId [POST]
 func AcceptUserRegistrationRequestHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId := c.Param("userId")
@@ -212,6 +212,34 @@ func AcceptUserRegistrationRequestHandler(userCtrl controllers.UserControllerI) 
 		c.JSON(http.StatusOK, nil)
 	}
 }
+
+
+// @Summary Decline User Registration Request
+// @Description Decline User Registration Request
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param userId path string true "User ID from registration request"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /auth/decline-registration/:userId [Delete]
+func DeclineUserRegistrationRequestHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId := c.Param("userId")
+		if userId == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("User ID is empty"))
+			return
+		}
+
+		inv_err := userCtrl.DeclineUserRegistrationRequest(&userId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
 
 func LogoutUserHandler(c *gin.Context) {
 	utils.SetJWTCookies(c, "", "", true)

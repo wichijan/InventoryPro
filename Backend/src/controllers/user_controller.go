@@ -20,6 +20,7 @@ type UserControllerI interface {
 	GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
 
 	AcceptUserRegistrationRequest(userId *string) *models.INVError
+	DeclineUserRegistrationRequest(userId *string) *models.INVError
 	GetRegistrationRequests() (*[]model.RegistrationRequests, *models.INVError)
 
 	ValidateRegistrationCode(code *string) (*bool, *models.INVError)
@@ -184,6 +185,43 @@ func (uc *UserController) AcceptUserRegistrationRequest(userIdString *string) *m
 
 	// Accept user registration request
 	inv_err = uc.UserRepo.AcceptUserRegistrationRequest(tx, userIdString)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	// Delete registration request
+	inv_err = uc.RegistrationRequestRepo.DeleteRequest(tx, &userId)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
+	return nil
+}
+
+func (uc *UserController) DeclineUserRegistrationRequest(userIdString *string) *models.INVError {
+	tx, err := uc.UserRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	userId, inv_error := uuid.Parse(*userIdString)
+	if inv_error != nil {
+		return inv_errors.INV_BAD_REQUEST.WithDetails("Invalid user ID")
+	}
+
+	// Check if user registration request exists
+	_, inv_err := uc.RegistrationRequestRepo.GetRequestByUserId(&userId)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	// Decline user registration request => delete user
+	inv_err = uc.UserRepo.DeleteUser(tx, &userId)
 	if inv_err != nil {
 		return inv_err
 	}

@@ -219,6 +219,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	// user routes
 	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController, hub))
 	adminRoutes.Handle(http.MethodPost, "/auth/accept-registration/:userId", handlers.AcceptUserRegistrationRequestHandler(controller.UserController))
+	adminRoutes.Handle(http.MethodDelete, "/auth/decline-registration/:userId", handlers.DeclineUserRegistrationRequestHandler(controller.UserController))
 	adminRoutes.Handle(http.MethodPost, "/auth/generate-code", handlers.GenerateUserRegistrationCodeHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/register/:code", handlers.RegisterUserWithCodeHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodPost, "/auth/reset-password", handlers.ResetPasswordHandler(controller.UserController))
