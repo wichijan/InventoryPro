@@ -210,7 +210,7 @@ func (sr *ShelveRepository) CheckIfRoomIdExists(roomId *uuid.UUID) *models.INVEr
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if roomId exists in Shelves table")
 	}
-	if count <= 0 {
+	if count < 0 {
 		return inv_errors.INV_CONFLICT.WithDetails("Shelves still has RoomId in it")
 	}
 	return nil
