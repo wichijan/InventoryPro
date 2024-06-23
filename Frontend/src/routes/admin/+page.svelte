@@ -1,20 +1,28 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import {
+    PersonCircle,
+    ListNested,
+    BuildingFill,
+  } from "svelte-bootstrap-icons";
 
   let dashboardItems = [
     {
       name: "Items",
       path: "/admin/items",
+      icon: ListNested,
       description: "Manage items",
     },
     {
       name: "Users",
       path: "/admin/users",
+      icon: PersonCircle,
       description: "Manage users",
     },
     {
       name: "Warehouses",
       path: "/admin/warehouses",
+      icon: BuildingFill,
       description: "Manage warehouses",
     },
   ];
@@ -31,10 +39,9 @@
           goto(`${item.path}`);
         }}
       >
-        <img
-          class="mx-auto rounded w-12 h-12 object-cover"
-          src="https://via.placeholder.com/150"
-          alt="Image"
+        <svelte:component
+          this={item.icon}
+          class="mx-auto rounded w-8 h-8 object-cover"
         />
         <div class="px-6 py-4">
           <div class="font-bold text-xl mb-2">{item.name}</div>

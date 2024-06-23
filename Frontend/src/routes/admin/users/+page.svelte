@@ -30,7 +30,6 @@
               denyButtonText: `Reject`,
             }).then((result) => {
               if (result.isConfirmed) {
-                console.log(user);
                 fetch(`${API_URL}auth/accept-registration/${user.UserID}`, {
                   method: "POST",
                   credentials: "include",
@@ -42,7 +41,16 @@
                   }
                 });
               } else if (result.isDenied) {
-                Swal.fire("This feature is WIP!", "", "info");
+                fetch(`${API_URL}auth/decline-registration/${user.UserID}`, {
+                  method: "DELETE",
+                  credentials: "include",
+                }).then((response) => {
+                  if (response.ok) {
+                    Swal.fire("User abgelehnt!", "", "success");
+                  } else {
+                    Swal.fire("Error denying user", "", "error");
+                  }
+                });
               }
             });
           }}
