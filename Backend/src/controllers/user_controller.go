@@ -220,14 +220,14 @@ func (uc *UserController) DeclineUserRegistrationRequest(userIdString *string) *
 		return inv_err
 	}
 
-	// Decline user registration request => delete user
-	inv_err = uc.UserRepo.DeleteUser(tx, &userId)
+	// Delete registration request
+	inv_err = uc.RegistrationRequestRepo.DeleteRequest(tx, &userId)
 	if inv_err != nil {
 		return inv_err
 	}
 
-	// Delete registration request
-	inv_err = uc.RegistrationRequestRepo.DeleteRequest(tx, &userId)
+	// Decline user registration request => delete user
+	inv_err = uc.UserRepo.DeleteUser(tx, &userId)
 	if inv_err != nil {
 		return inv_err
 	}
