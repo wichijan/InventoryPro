@@ -12,7 +12,9 @@
   $: rooms = rooms;
   $: {
     rooms = rooms.sort((a, b) => {
-      return a.Name.localeCompare(b.Name);
+      let aLength = a.Shelves ? a.Shelves.length : 0;
+      let bLength = b.Shelves ? b.Shelves.length : 0;
+      return bLength - aLength;
     });
   }
 
@@ -61,11 +63,8 @@
         <thead class="text-xs uppercase bg-gray-200 text-gray-700">
           <tr>
             <th scope="col" class="px-6 py-3">Name</th>
-            <th scope="col" class="px-6 py-3">Shelves</th>
-            <th scope="col" class="px-6 py-3">Items</th>
-            <th scope="col" class="px-6 py-3"
-              ><span class="sr-only">Action</span></th
-            >
+            <th scope="col" class="text-center">Shelves</th>
+            <th scope="col" class="px-6 py-3 text-right">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -81,11 +80,10 @@
                 >{room.Name}</th
               >
               {#if room.Shelves}
-                <td class="px-6 py-4">{room.Shelves.length}</td>
+                <td class="text-center">{room.Shelves.length}</td>
               {:else}
-                <td class="px-6 py-4">0</td>
+                <td class="text-center">0</td>
               {/if}
-              <td class="px-6 py-4">0</td>
               <td class="px-6 py-4 text-right">
                 <button
                   on:click|stopPropagation={() =>
