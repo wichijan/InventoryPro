@@ -113,8 +113,8 @@
                 <th class="px-4 py-3">Name</th>
                 <th class="px-4 py-3">Beschreibung</th>
                 <th class="px-4 py-3">Anzahl</th>
-                <th class="px-4 py-3">Reserviert</th>
-                <th class="px-4 py-3">Ausgeliehen?</th>
+                <th class="px-4 py-3">Reservierungen</th>
+                <th class="px-4 py-3">Verfügbar?</th>
                 <th class="px-4 py-3">Kaputt?</th>
               </tr>
             </thead>
@@ -128,10 +128,10 @@
                   <td class="px-4 py-3 border">{item.Description}</td>
                   <td class="px-4 py-3 border">{item.QuantityInShelf}</td>
                   <td class="px-4 py-3 border"
-                    >{item.Reservations ? "Ja" : "Nein"}</td
+                    >{item.Reservations ? item.Reservations.length : 0}</td
                   >
                   <td class="px-4 py-3 border"
-                    >{item.BorrowedByUserID ? "Ja" : "Nein"}</td
+                    >{item.UsersBorrowed ? "Nein" : "Ja"}</td
                   >
                   <td class="px-4 py-3 border"
                     >{item.Damaged ? "Ja" : "Nein"}</td

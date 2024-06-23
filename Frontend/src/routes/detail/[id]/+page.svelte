@@ -17,6 +17,12 @@
   onMount(async () => {
     await getUser().then((res) => {
       user = res;
+      userHasBorrowedItem = item.UsersBorrowed
+        ? item.UsersBorrowed.find(
+            (user_) => user_.BorrowedByUserID === user.ID
+          ) !== null
+        : false;
+      userHasBorrowedItem = userHasBorrowedItem;
     });
   });
 
@@ -70,23 +76,8 @@
     return rValue;
   }
 
-  $: userHasBorrowedItem = () => {
-    if (user) {
-      let rValue = false;
-      if (item.UsersBorrowed) {
-        item.UsersBorrowed.forEach((user_) => {
-          if (user_.ID === user.ID) {
-            rValue = true;
-          }
-        });
-      } else {
-        rValue = false;
-      }
-      return rValue;
-    } else {
-      return false;
-    }
-  };
+  let userHasBorrowedItem = false;
+  $: userHasBorrowedItem = userHasBorrowedItem;
 
   async function borrow() {
     if (!user) {
@@ -97,7 +88,7 @@
       });
       return;
     }
-    if (userHasBorrowedItem()) {
+    if (userHasBorrowedItem) {
       Swal.fire({
         title: "Du hast das Item bereits ausgeliehen",
         icon: "error",
@@ -235,11 +226,11 @@
           <div class="">Name: {item.Name}</div>
           <div class="">Beschreibung: {item.Description}</div>
           <div class="">Menge: {item.QuantityInShelf}</div>
-          {#if userHasBorrowedItem()}
+          {#if userHasBorrowedItem}
             <div class="">
-              Ausgeliehen von: {item.UsersBorrowed.find(
-                (user_) => user_.ID === user.ID
-              ).ID}
+              Ausgeliehen von: {#each item.UsersBorrowed as user}
+                {user.BorrowedByUserName},
+              {/each}
             </div>
           {/if}
           {#if item.Subject}
@@ -261,7 +252,7 @@
               Ausleihen
             </button>
             {#if user}
-              {#if userHasBorrowedItem()}
+              {#if userHasBorrowedItem}
                 <button
                   class="bg-[#d5bdaf] hover:bg-red-500 hover:text-black hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 w-full"
                   on:click={() => {

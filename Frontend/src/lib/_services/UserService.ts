@@ -1,8 +1,14 @@
 import { API_URL } from "./ShelfService";
 
 export function isUserAdmin(): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    resolve(true);
+  return new Promise(async (resolve, reject) => {
+    await getUser().then((user) => {
+      if (user) {
+        resolve(user.Username === "Admin");
+      } else {
+        resolve(false);
+      }
+    });
   });
 }
 export function isUserLoggedIn(): Promise<boolean> {
