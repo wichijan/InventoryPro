@@ -151,12 +151,13 @@ func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *m
 	// Create the query
 	stmt := mysql.SELECT(
 		table.Shelves.ID,
-		table.Shelves.RoomID,
+		table.Rooms.AllColumns,
 		table.Items.AllColumns,
 		table.ItemsInShelf.Quantity,
 	).FROM(
 		table.Shelves.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ShelfID.EQ(table.Shelves.ID)).
+			LEFT_JOIN(table.Rooms, table.Rooms.ID.EQ(table.Shelves.RoomID)).
 			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemsInShelf.ItemID)),
 	)
 
@@ -175,11 +176,12 @@ func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.Shelv
 	// Create the query
 	stmt := mysql.SELECT(
 		table.Shelves.ID,
-		table.Shelves.RoomID,
+		table.Rooms.AllColumns,
 		table.Items.AllColumns,
 	).FROM(
 		table.Shelves.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ShelfID.EQ(table.Shelves.ID)).
+			LEFT_JOIN(table.Rooms, table.Rooms.ID.EQ(table.Shelves.RoomID)).
 			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemsInShelf.ItemID)),
 	).WHERE(
 		table.Shelves.ID.EQ(mysql.String(id.String())),
