@@ -112,7 +112,7 @@
                           }).then(() => {
                             Swal.fire("Deleted!", "", "success");
                             keywords = keywords.filter(
-                              (s) => s.ID !== keyword.ID
+                              (s) => s.ID !== keyword.ID,
                             );
                           });
                         }
@@ -150,7 +150,7 @@
               },
               credentials: "include",
               body: JSON.stringify({
-                Keyword,
+                Name: Keyword,
               }),
             }).then((res) => {
               if (res.ok) {
