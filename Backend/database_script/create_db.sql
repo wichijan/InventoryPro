@@ -26,7 +26,7 @@ CREATE TABLE shelves(
 /* ITEMS */
 CREATE TABLE items(
     id VARCHAR(36) PRIMARY KEY,
-    item_types ENUM('book', 'single_object', 'sets_of_objects') NOT NULL,
+    item_types ENUM('book', 'single_object', 'set_of_objects') NOT NULL,
     name VARCHAR(100),
     description TEXT,
     regular_shelf_id VARCHAR(36),

@@ -10,11 +10,11 @@ package enum
 import "github.com/go-jet/jet/v2/mysql"
 
 var ItemsItemTypes = &struct {
-	Book          mysql.StringExpression
-	SingleObject  mysql.StringExpression
-	SetsOfObjects mysql.StringExpression
+	Book         mysql.StringExpression
+	SingleObject mysql.StringExpression
+	SetOfObjects mysql.StringExpression
 }{
-	Book:          mysql.NewEnumValue("book"),
-	SingleObject:  mysql.NewEnumValue("single_object"),
-	SetsOfObjects: mysql.NewEnumValue("sets_of_objects"),
+	Book:         mysql.NewEnumValue("book"),
+	SingleObject: mysql.NewEnumValue("single_object"),
+	SetOfObjects: mysql.NewEnumValue("set_of_objects"),
 }

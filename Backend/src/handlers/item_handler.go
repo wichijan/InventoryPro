@@ -152,7 +152,7 @@ func CreateItemWithBookHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 	return func(c *gin.Context) {
 		var item models.ItemCreateWithBook
 		err := c.ShouldBindJSON(&item)
-		if err != nil || item.Name == "" {
+		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
 			return
 		}
@@ -189,7 +189,7 @@ func CreateItemWithSingleObjectHandler(itemCtrl controllers.ItemControllerI) gin
 	return func(c *gin.Context) {
 		var item models.ItemCreateWithSingleObject
 		err := c.ShouldBindJSON(&item)
-		if err != nil || item.Name == "" {
+		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
 			return
 		}
@@ -226,7 +226,7 @@ func CreateItemWithSetOfObjectsHandler(itemCtrl controllers.ItemControllerI) gin
 	return func(c *gin.Context) {
 		var item models.ItemCreateWithSetOfObject
 		err := c.ShouldBindJSON(&item)
-		if err != nil || item.Name == "" {
+		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
 			return
 		}

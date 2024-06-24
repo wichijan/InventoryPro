@@ -12,9 +12,9 @@ import "errors"
 type ItemsItemTypes string
 
 const (
-	ItemsItemTypes_Book          ItemsItemTypes = "book"
-	ItemsItemTypes_SingleObject  ItemsItemTypes = "single_object"
-	ItemsItemTypes_SetsOfObjects ItemsItemTypes = "sets_of_objects"
+	ItemsItemTypes_Book         ItemsItemTypes = "book"
+	ItemsItemTypes_SingleObject ItemsItemTypes = "single_object"
+	ItemsItemTypes_SetOfObjects ItemsItemTypes = "set_of_objects"
 )
 
 func (e *ItemsItemTypes) Scan(value interface{}) error {
@@ -33,8 +33,8 @@ func (e *ItemsItemTypes) Scan(value interface{}) error {
 		*e = ItemsItemTypes_Book
 	case "single_object":
 		*e = ItemsItemTypes_SingleObject
-	case "sets_of_objects":
-		*e = ItemsItemTypes_SetsOfObjects
+	case "set_of_objects":
+		*e = ItemsItemTypes_SetOfObjects
 	default:
 		return errors.New("jet: Invalid scan value '" + enumValue + "' for ItemsItemTypes enum")
 	}
