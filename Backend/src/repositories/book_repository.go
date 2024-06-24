@@ -18,7 +18,7 @@ type BookRepositoryI interface {
 	CreateBook(tx *sql.Tx, book *model.Books) *models.INVError
 	UpdateBook(tx *sql.Tx, book *model.Books) *models.INVError
 	DeleteBook(tx *sql.Tx, bookId *uuid.UUID) *models.INVError
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -130,13 +130,13 @@ func (br *BookRepository) DeleteBook(tx *sql.Tx, bookId *uuid.UUID) *models.INVE
 	return nil
 }
 
-func (br *BookRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (br *BookRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.Books, table.Books.ItemID.EQ(mysql.String(itemId.String())), br.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Book table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Book table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("Book still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

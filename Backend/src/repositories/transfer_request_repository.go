@@ -20,7 +20,7 @@ type TransferRequestRepositoryI interface {
 	DeleteTransferRequest(tx *sql.Tx, trans *uuid.UUID) *models.INVError
 	DeleteTransferRequestsForItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -151,13 +151,13 @@ func (trr *TransferRequestRepository) DeleteTransferRequestsForItem(tx *sql.Tx, 
 	return nil
 }
 
-func (trr *TransferRequestRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (trr *TransferRequestRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool,*models.INVError) {
 	count, err := utils.CountStatement(table.TransferRequests, table.TransferRequests.ItemID.EQ(mysql.String(itemId.String())), trr.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in TransferRequests table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in TransferRequests table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("TransferRequests still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

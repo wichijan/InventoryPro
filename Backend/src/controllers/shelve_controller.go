@@ -95,8 +95,12 @@ func (sc *ShelveController) DeleteShelve(shelveId *uuid.UUID) *models.INVError {
 	}
 
 	// Check if shelve exists in items_in_shelf
-	if err := sc.ItemInShelve.CheckIfShelfIdExists(shelveId); err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error deleting shelve")
+	ok, inv_err := sc.ItemInShelve.CheckIfShelfIdExists(shelveId)
+	if inv_err != nil {
+		return inv_err
+	}
+	if !ok {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Shelve is in use")
 	}
 
 	// Delete

@@ -19,7 +19,7 @@ type SetsOfObjectsRepositoryI interface {
 	UpdateSetsOfObjects(tx *sql.Tx, setsOfObjects *model.SetsOfObjects) *models.INVError
 	DeleteSetsOfObjects(tx *sql.Tx, setsOfObjectsId *uuid.UUID) *models.INVError
 
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -113,13 +113,13 @@ func (sor *SetsOfObjectsRepository) DeleteSetsOfObjects(tx *sql.Tx, setsOfObject
 	return nil
 }
 
-func (sor *SetsOfObjectsRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (sor *SetsOfObjectsRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.SetsOfObjects, table.SetsOfObjects.ItemID.EQ(mysql.String(itemId.String())), sor.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Sets_Of_Objects table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Sets_Of_Objects table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("Sets_Of_Objects still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

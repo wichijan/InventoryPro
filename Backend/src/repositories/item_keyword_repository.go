@@ -20,7 +20,7 @@ type ItemKeywordRepositoryI interface {
 	DeleteKeywordsForItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 	CheckIfKeywordAndItemExists(keywordAndItem models.ItemWithKeyword) *models.INVError
 
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -135,13 +135,13 @@ func (kfir *ItemKeywordRepository) CheckIfKeywordAndItemExists(keywordAndItem mo
 	return nil
 }
 
-func (kfir *ItemKeywordRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (kfir *ItemKeywordRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.KeywordsForItems, table.KeywordsForItems.ItemID.EQ(mysql.String(itemId.String())), kfir.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in KeywordsForItems table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in KeywordsForItems table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("KeywordsForItems still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

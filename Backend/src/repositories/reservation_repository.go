@@ -22,7 +22,7 @@ type ReservationRepositoryI interface {
 	DeleteReservation(tx *sql.Tx, userId *uuid.UUID, reservationID *uuid.UUID) *models.INVError
 	DeleteReservationForItems(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -174,13 +174,13 @@ func (rr *ReservationRepository) DeleteReservationForItems(tx *sql.Tx, itemId *u
 	return nil
 }
 
-func (rr *ReservationRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (rr *ReservationRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.Reservations, table.Reservations.ItemID.EQ(mysql.String(itemId.String())), rr.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Reservations table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Reservations table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("Reservations still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

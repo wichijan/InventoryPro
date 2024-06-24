@@ -18,7 +18,7 @@ type SingleObjectRepositoryI interface {
 	CreateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) *models.INVError
 	// UpdateSingleObject(tx *sql.Tx, singleObject *model.SingleObject) *models.INVError // Not needed because there are not attributes
 	DeleteSingleObject(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -79,13 +79,15 @@ func (sor *SingleObjectRepository) DeleteSingleObject(tx *sql.Tx, itemId *uuid.U
 	return nil
 }
 
-func (sor *SingleObjectRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (sor *SingleObjectRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.SingleObject, table.SingleObject.ItemID.EQ(mysql.String(itemId.String())), sor.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Single_Object table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in Single_Object table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("Single_Object still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }
+
+

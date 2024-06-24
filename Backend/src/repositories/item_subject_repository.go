@@ -20,7 +20,7 @@ type ItemSubjectRepositoryI interface {
 	DeleteSubjectsForItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 	CheckIfSubjectAndItemExists(subjectAndItem models.ItemWithSubject) *models.INVError
 
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -101,7 +101,6 @@ func (isjr *ItemSubjectRepository) DeleteSubjectForItem(tx *sql.Tx, keyword *mod
 	return nil
 }
 
-
 func (isjr *ItemSubjectRepository) DeleteSubjectsForItem(tx *sql.Tx, itemId *uuid.UUID) *models.INVError {
 	deleteQuery := table.ItemSubjects.DELETE().WHERE(
 		table.ItemSubjects.ItemID.EQ(mysql.String(itemId.String())),
@@ -136,13 +135,13 @@ func (isjr *ItemSubjectRepository) CheckIfSubjectAndItemExists(subjectAndItem mo
 	return nil
 }
 
-func (isjr *ItemSubjectRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (isjr *ItemSubjectRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.ItemSubjects, table.ItemSubjects.ItemID.EQ(mysql.String(itemId.String())), isjr.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in ItemSubjects table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in ItemSubjects table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("ItemSubjects still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

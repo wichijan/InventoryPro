@@ -25,7 +25,7 @@ type UserItemRepositoryI interface {
 
 	GetQuantityFromUserItem(itemId *uuid.UUID) (*int32, *models.INVError)
 
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -179,13 +179,13 @@ func (uir *UserItemRepository) ReduceQuantityOfUserItem(tx *sql.Tx, userId *uuid
 	return nil
 }
 
-func (uir *UserItemRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (uir *UserItemRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.UserItems, table.UserItems.ItemID.EQ(mysql.String(itemId.String())), uir.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in UserItems table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in UserItems table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("UserItems still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

@@ -28,7 +28,7 @@ type ItemQuickShelfRepositoryI interface {
 
 	CheckIfItemAlreadyInQuickShelf(itemId *uuid.UUID, quickShelfId *uuid.UUID) (*bool, *models.INVError)
 
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -205,13 +205,13 @@ func (qsr *ItemQuickShelfRepository) CheckIfItemAlreadyInQuickShelf(itemId *uuid
 	return &varFalse, nil
 }
 
-func (qsr *ItemQuickShelfRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (qsr *ItemQuickShelfRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.ItemQuickShelf, table.ItemQuickShelf.ItemID.EQ(mysql.String(itemId.String())), qsr.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in ItemQuickShelf table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in ItemQuickShelf table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("ItemQuickShelf still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

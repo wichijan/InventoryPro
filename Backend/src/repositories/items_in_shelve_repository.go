@@ -22,8 +22,8 @@ type ItemInShelveRepositoryI interface {
 	GetQuantityInShelve(itemId *uuid.UUID) (*int32, *models.INVError)
 	UpdateQuantityInShelve(tx *sql.Tx, itemId *string, quantity *int32) *models.INVError
 
-	CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError
-	CheckIfShelfIdExists(shelfId *uuid.UUID) *models.INVError
+	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
+	CheckIfShelfIdExists(shelfId *uuid.UUID) (bool, *models.INVError)
 
 	managers.DatabaseManagerI
 }
@@ -205,24 +205,25 @@ func (iisr *ItemInShelveRepository) UpdateQuantityInShelve(tx *sql.Tx, itemId *s
 	return nil
 }
 
-func (iisr *ItemInShelveRepository) CheckIfItemIdExists(itemId *uuid.UUID) *models.INVError {
+func (iisr *ItemInShelveRepository) CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.ItemsInShelf, table.ItemsInShelf.ItemID.EQ(mysql.String(itemId.String())), iisr.GetDatabaseConnection())
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in ItemsInShelf table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if itemId exists in ItemsInShelf table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("ItemsInShelf still has items in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }
 
-func (iisr *ItemInShelveRepository) CheckIfShelfIdExists(shelfId *uuid.UUID) *models.INVError {
+func (iisr *ItemInShelveRepository) CheckIfShelfIdExists(shelfId *uuid.UUID) (bool, *models.INVError) {
 	count, err := utils.CountStatement(table.ItemsInShelf, table.ItemsInShelf.ShelfID.EQ(mysql.String(shelfId.String())), iisr.GetDatabaseConnection())
+
 	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if ShelfID exists in ItemsInShelf table")
+		return false, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error checking if ShelfID exists in ItemsInShelf table")
 	}
-	if count <= 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("ItemsInShelf still has shelfId in it")
+	if count == 0 {
+		return false, nil
 	}
-	return nil
+	return true, nil
 }

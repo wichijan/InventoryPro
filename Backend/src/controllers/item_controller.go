@@ -478,83 +478,103 @@ func (ic *ItemController) DeleteItem(itemId *uuid.UUID) *models.INVError {
 
 	// Check if item exists in other tables
 	// Book
-	if inv_error := ic.BookRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error := ic.BookRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.BookRepo.DeleteBook(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.BookRepo.DeleteBook(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// SingleObject
-	if inv_error := ic.SingleObjectRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.SingleObjectRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.SingleObjectRepo.DeleteSingleObject(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.SingleObjectRepo.DeleteSingleObject(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// SetOfObjects
-	if inv_error := ic.SetOfObjectsRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.SetOfObjectsRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.SetOfObjectsRepo.DeleteSetsOfObjects(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.SetOfObjectsRepo.DeleteSetsOfObjects(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// ItemKeyword
-	if inv_error := ic.ItemKeywordRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.ItemKeywordRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.ItemKeywordRepo.DeleteKeywordsForItem(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.ItemKeywordRepo.DeleteKeywordsForItem(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// ItemSubject
-	if inv_error := ic.ItemSubjectRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.ItemSubjectRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.ItemSubjectRepo.DeleteSubjectsForItem(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.ItemSubjectRepo.DeleteSubjectsForItem(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// ItemsInShelve
-	if inv_error := ic.ItemInShelveRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.ItemInShelveRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.ItemInShelveRepo.DeleteItemsInShelve(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.ItemInShelveRepo.DeleteItemsInShelve(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// Items Quick Shelf
-	if inv_error := ic.ItemsQuickShelfRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.ItemsQuickShelfRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.ItemsQuickShelfRepo.DeleteItemsQuickShelf(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.ItemsQuickShelfRepo.DeleteItemsQuickShelf(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// UserItem
-	if inv_error := ic.UserItemRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.UserItemRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.UserItemRepo.DeleteItemUsers(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.UserItemRepo.DeleteItemUsers(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// Reservation
-	if inv_error := ic.ReservationRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.ReservationRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.ReservationRepo.DeleteReservationForItems(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.ReservationRepo.DeleteReservationForItems(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// Transfer Request
-	if inv_error := ic.TransferRequestRepo.CheckIfItemIdExists(itemId); inv_error != nil {
+	ok, inv_error = ic.TransferRequestRepo.CheckIfItemIdExists(itemId)
+	if inv_error != nil {
 		return inv_error
-	}
-	if inv_error := ic.TransferRequestRepo.DeleteTransferRequest(tx, itemId); inv_error != nil {
-		return inv_error
+	} else if ok {
+		if inv_error := ic.TransferRequestRepo.DeleteTransferRequest(tx, itemId); inv_error != nil {
+			return inv_error
+		}
 	}
 
 	// Item itself
