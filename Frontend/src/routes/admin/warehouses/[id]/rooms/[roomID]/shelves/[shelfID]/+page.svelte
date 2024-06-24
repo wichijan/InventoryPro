@@ -79,4 +79,14 @@
   {:else}
     <div class="text-center text-gray-700 mt-4">No items found</div>
   {/if}
+  <button
+    class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+    on:click={() => {
+      goto(
+        `/admin/warehouses/${warehouseID}/rooms/${roomID}/shelves/${shelfID}/items/create`
+      );
+    }}
+  >
+    Create Item
+  </button>
 </div>

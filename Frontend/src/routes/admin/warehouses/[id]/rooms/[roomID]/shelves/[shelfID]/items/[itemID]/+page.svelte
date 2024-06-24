@@ -129,34 +129,38 @@
         <div class="mb-4">
           <label class="block text-gray-700">Reservation Details</label>
           <ul class="list-disc ml-6">
-            {#each item.Reservations as reservation}
-              <li class="mt-2">
-                <div>
-                  <strong>Username:</strong>
-                  {reservation.Username}
-                </div>
-                <div>
-                  <strong>Quantity:</strong>
-                  {reservation.Quantity}
-                </div>
-                <div>
-                  <strong>Reservation Date:</strong>
-                  {new Date(reservation.ReservationDate).toLocaleString()}
-                </div>
-                <div>
-                  <strong>Time From:</strong>
-                  {new Date(reservation.TimeFrom).toLocaleString()}
-                </div>
-                <div>
-                  <strong>Time To:</strong>
-                  {new Date(reservation.TimeTo).toLocaleString()}
-                </div>
-                <div>
-                  <strong>Is Cancelled:</strong>
-                  {reservation.IsCancelled ? "Yes" : "No"}
-                </div>
-              </li>
-            {/each}
+            {#if item.Reservations}
+              {#each item.Reservations as reservation}
+                <li class="mt-2">
+                  <div>
+                    <strong>Username:</strong>
+                    {reservation.Username}
+                  </div>
+                  <div>
+                    <strong>Quantity:</strong>
+                    {reservation.Quantity}
+                  </div>
+                  <div>
+                    <strong>Reservation Date:</strong>
+                    {new Date(reservation.ReservationDate).toLocaleString()}
+                  </div>
+                  <div>
+                    <strong>Time From:</strong>
+                    {new Date(reservation.TimeFrom).toLocaleString()}
+                  </div>
+                  <div>
+                    <strong>Time To:</strong>
+                    {new Date(reservation.TimeTo).toLocaleString()}
+                  </div>
+                  <div>
+                    <strong>Is Cancelled:</strong>
+                    {reservation.IsCancelled ? "Yes" : "No"}
+                  </div>
+                </li>
+              {/each}
+            {:else}
+              <li>No reservations</li>
+            {/if}
           </ul>
         </div>
 
