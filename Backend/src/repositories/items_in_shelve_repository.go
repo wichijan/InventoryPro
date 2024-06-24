@@ -96,18 +96,9 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(tx *sql.Tx, itemInShelve 
 		AND(table.ItemsInShelf.ShelfID.EQ(mysql.String(itemInShelve.ShelfID))))
 
 	// Execute the query
-	rows, err := updateQuery.Exec(tx)
+	_, err := updateQuery.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating item in shelve")
-	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating item in shelve")
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_CONFLICT.WithDetails("Item and Shelve combination not found")
 	}
 
 	return nil
