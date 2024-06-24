@@ -34,21 +34,10 @@ type Controllers struct {
 }
 
 func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
-	router := gin.Default()
-
-	// Attach Middleware
-	router.Use(middlewares.CorsMiddleware())
-
-	// Create api groups, with special middleware
-	publicRoutes := router.Group("/")
-	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
-
 	// Create managers and repositories
 	databaseManager := &managers.DatabaseManager{
 		Connection: dbConnection,
 	}
-
-	adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware(databaseManager))
 
 	// Create repositories
 	warehouseRepo := &repositories.WarehouseRepository{
@@ -216,6 +205,16 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 		},
 	}
 
+	router := gin.Default()
+
+	// Attach Middleware
+	router.Use(middlewares.CorsMiddleware())
+
+	// Create api groups, with special middleware
+	publicRoutes := router.Group("/")
+	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
+	adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware(controller.UserController))
+
 	// user routes
 	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController, hub))
 	adminRoutes.Handle(http.MethodPost, "/auth/accept-registration/:userId", handlers.AcceptUserRegistrationRequestHandler(controller.UserController))
@@ -229,6 +228,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
+	publicRoutes.Handle(http.MethodGet, "/auth/is-Admin", handlers.IsAdmin(controller.UserController))
 
 	adminRoutes.Handle(http.MethodGet, "/registration-requests", handlers.GetRegistrationRequestsHandler(controller.UserController))
 

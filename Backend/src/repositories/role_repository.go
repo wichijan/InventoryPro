@@ -20,6 +20,8 @@ type RoleRepositoryI interface {
 	UpdateRole(tx *sql.Tx, role *model.Roles) *models.INVError
 	DeleteRole(tx *sql.Tx, roleName *string) *models.INVError
 
+	GetRolesForUser(userId *uuid.UUID) (*models.UserRoleWithName, *models.INVError)
+
 	managers.DatabaseManagerI
 }
 
@@ -130,4 +132,27 @@ func (rr *RoleRepository) DeleteRole(tx *sql.Tx, roleName *string) *models.INVEr
 	}
 
 	return nil
+}
+
+func (rr *RoleRepository) GetRolesForUser(userId *uuid.UUID) (*models.UserRoleWithName, *models.INVError) {
+	var roles models.UserRoleWithName
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.UserRoles.UserID,
+		table.Roles.RoleName,
+	).FROM(
+		table.UserRoles.
+			LEFT_JOIN(table.Roles, table.Roles.ID.EQ(table.UserRoles.RoleID)),
+	).WHERE(
+		table.UserRoles.UserID.EQ(mysql.String(userId.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(rr.GetDatabaseConnection(), &roles)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading roles")
+	}
+
+	return &roles, nil
 }

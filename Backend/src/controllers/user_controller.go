@@ -19,6 +19,7 @@ type UserControllerI interface {
 	CheckUsername(username string) *models.INVError
 	GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
 	GetUsers() (*[]models.Users, *models.INVError)
+	IsAdmin(userId *uuid.UUID) (bool, *models.INVError)
 
 	AcceptUserRegistrationRequest(userId *string) *models.INVError
 	DeclineUserRegistrationRequest(userId *string) *models.INVError
@@ -39,6 +40,7 @@ type UserController struct {
 	UserTypeRepo            repositories.UserTypeRepositoryI
 	RegistrationRequestRepo repositories.RegistrationRequestRepositoryI
 	RegistrationCodeRepo    repositories.RegistrationCodeRepositoryI
+	RoleRepo                repositories.RoleRepositoryI
 }
 
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) *models.INVError {
@@ -426,4 +428,19 @@ func (uc *UserController) RemoveImageIdFromUser(userId *uuid.UUID) *models.INVEr
 	}
 
 	return nil
+}
+
+func (uc *UserController) IsAdmin(userId *uuid.UUID) (bool, *models.INVError) {
+	userRoles, inv_err := uc.RoleRepo.GetRolesForUser(userId)
+	if inv_err != nil {
+		return false, inv_err
+	}
+
+	for _, a := range userRoles.UserNames {
+		if a.RoleName == "Admin" {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

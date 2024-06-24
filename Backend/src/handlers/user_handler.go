@@ -352,6 +352,33 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 	}
 }
 
+// @Summary Is Admin Check
+// @Description Is Admin
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /auth/is-admin [get]
+func IsAdmin(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		isAdmin, inv_err := userCtrl.IsAdmin(userId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, isAdmin)
+	}
+
+}
+
 // @Summary Logged in
 // @Description Check if user is logged in
 // @Tags Users
