@@ -89,18 +89,9 @@ func (br *BookRepository) UpdateBook(tx *sql.Tx, book *model.Books) *models.INVE
 	)
 
 	// Execute the query
-	rows, err := stmt.Exec(tx)
+	_, err := stmt.Exec(tx)
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error updating book")
-	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error: No changes on entry")
-	}
-
-	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND.WithDetails("Book Id not found")
 	}
 
 	return nil
