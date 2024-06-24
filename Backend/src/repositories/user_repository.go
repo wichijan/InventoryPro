@@ -74,10 +74,11 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, 
 func (ur *UserRepository) GetUsers() (*[]models.Users, *models.INVError) {
 	var users []models.Users
 	stmt := mysql.SELECT(
-		table.Users.ID,
-		table.Users.Username,
+		table.Users.AllColumns,
+		table.UserTypes.TypeName,
 	).FROM(
-		table.Users,
+		table.Users.
+			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
 	)
 
 	err := stmt.Query(ur.GetDatabaseConnection(), &users)
@@ -87,7 +88,6 @@ func (ur *UserRepository) GetUsers() (*[]models.Users, *models.INVError) {
 
 	return &users, nil
 }
-
 
 func (ur *UserRepository) GetUserByNameClean(username *string) (*model.Users, *models.INVError) {
 	var user model.Users

@@ -32,8 +32,15 @@ type UserWithTypeName struct {
 }
 
 type Users struct {
-	ID       string `alias:"users.id"`
-	Username string `alias:"users.username"`
+	ID             string  `alias:"users.id"`
+	Username       string  `alias:"users.username"`
+	Email          string  `alias:"users.email"`
+	FirstName      string  `alias:"users.first_name"`
+	LastName       string  `alias:"users.last_name"`
+	JobTitle       string  `alias:"users.job_title"`
+	PhoneNumber    string  `alias:"users.phone_number"`
+	UserTypeName   *string `alias:"user_types.type_name"`
+	ProfilePicture *string `alias:"users.profile_picture"`
 }
 
 type LoginRequest struct {
