@@ -13,6 +13,7 @@ export const load = async ({ fetch, params }) => {
             }
         });
         const data = await response.json();
+        console.log(data);
         return data;
     }
 

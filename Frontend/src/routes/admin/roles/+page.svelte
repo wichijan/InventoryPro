@@ -46,7 +46,7 @@
             </tr>
           </thead>
           <tbody>
-            {#each roles as RoleName (RoleName.ID)}
+            {#each roles as role}
               <tr
                 class="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-300 transition-colors cursor-pointer"
                 on:click={() => {
@@ -56,14 +56,14 @@
                         <input
                           id="RoleName"
                           class="swal2-input"
-                          value="${RoleName.RoleName}"
+                          value="${role.RoleName}"
                         />
                       `,
                     showCancelButton: true,
                     confirmButtonText: `Update`,
                   }).then((result) => {
                     if (result.isConfirmed) {
-                      const RoleName =
+                      const roleName =
                         document.getElementById("RoleName").value;
 
                       fetch(API_URL + "roles", {
@@ -73,16 +73,16 @@
                         },
                         credentials: "include",
                         body: JSON.stringify({
-                          ID: RoleName.ID,
-                          RoleName: RoleName,
+                          ID: role.ID,
+                          RoleName: roleName,
                         }),
                       }).then(() => {
                         Swal.fire("Updated!", "", "success");
                         roles = roles.map((s) => {
-                          if (s.ID === RoleName.ID) {
+                          if (s.ID === role.ID) {
                             return {
                               ...s,
-                              RoleName: RoleName,
+                              RoleName: roleName,
                             };
                           }
                           return s;
@@ -95,7 +95,7 @@
                 <th
                   scope="row"
                   class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                  >{RoleName.RoleName}</th
+                  >{role.RoleName}</th
                 >
                 <td class="px-6 py-4 text-right">
                   <button
@@ -107,12 +107,12 @@
                         confirmButtonText: `Delete`,
                       }).then((result) => {
                         if (result.isConfirmed) {
-                          fetch(API_URL + "roles/" + RoleName.ID, {
+                          fetch(API_URL + "roles/" + role.ID, {
                             method: "DELETE",
                             credentials: "include",
                           }).then(() => {
                             Swal.fire("Deleted!", "", "success");
-                            roles = roles.filter((s) => s.ID !== RoleName.ID);
+                            roles = roles.filter((s) => s.ID !== role.ID);
                           });
                         }
                       });
@@ -140,7 +140,7 @@
           confirmButtonText: `Create`,
         }).then((result) => {
           if (result.isConfirmed) {
-            const RoleName = document.getElementById("RoleName").value;
+            const roleName = document.getElementById("RoleName").value;
 
             fetch(API_URL + "roles", {
               method: "POST",
@@ -149,7 +149,7 @@
               },
               credentials: "include",
               body: JSON.stringify({
-                RoleName,
+                roleName,
               }),
             }).then((res) => {
               if (res.ok) {
@@ -159,7 +159,7 @@
                   ...roles,
                   {
                     ID: newRoleName.ID,
-                    RoleName: RoleName,
+                    RoleName: roleName,
                   },
                 ];
               }
