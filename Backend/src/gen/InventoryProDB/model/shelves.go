@@ -9,5 +9,6 @@ package model
 
 type Shelves struct {
 	ID     string `sql:"primary_key"`
+	Name   string
 	RoomID *string
 }

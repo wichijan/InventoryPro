@@ -160,7 +160,7 @@ func UpdateRoomHandle(roomCtrl controllers.RoomControllerI) gin.HandlerFunc {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
-		if utils.ContainsEmptyString(*room.Name) {
+		if utils.ContainsEmptyString(room.Name) {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room id"))
 			return
 		}

@@ -126,6 +126,10 @@ func CreateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFu
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
+		if shelve.Name == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid shelve name"))
+			return
+		}
 
 		shelveId, inv_err := shelveCtrl.CreateShelve(&shelve)
 		if inv_err != nil {
@@ -153,6 +157,10 @@ func UpdateShelveHandler(shelveCtrl controllers.ShelveControllerI) gin.HandlerFu
 		err := c.ShouldBindJSON(&shelve)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if shelve.Name == "" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid shelve name"))
 			return
 		}
 

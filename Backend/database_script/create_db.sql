@@ -12,13 +12,14 @@ CREATE TABLE warehouses(
 
 CREATE TABLE rooms(
     id VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(100),
+    name VARCHAR(100) NOT NULL,
     warehouse_id VARCHAR(36),
     FOREIGN KEY (warehouse_id) REFERENCES warehouses(id)
 );
 
 CREATE TABLE shelves(
     id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
     room_id VARCHAR(36),
     FOREIGN KEY (room_id) REFERENCES rooms(id)
 );

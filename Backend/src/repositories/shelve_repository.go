@@ -38,6 +38,7 @@ func (sr *ShelveRepository) GetShelves() (*[]model.Shelves, *models.INVError) {
 	// Create the query
 	stmt := mysql.SELECT(
 		table.Shelves.ID,
+		table.Shelves.Name,
 		table.Shelves.RoomID,
 	).FROM(
 		table.Shelves,
@@ -58,6 +59,7 @@ func (sr *ShelveRepository) GetShelveById(id *uuid.UUID) (*model.Shelves, *model
 	// Create the query
 	stmt := mysql.SELECT(
 		table.Shelves.ID,
+		table.Shelves.Name,
 		table.Shelves.RoomID,
 	).FROM(
 		table.Shelves,
@@ -80,9 +82,11 @@ func (sr *ShelveRepository) CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uu
 	// Create the insert statement
 	insertQuery := table.Shelves.INSERT(
 		table.Shelves.ID,
+		table.Shelves.Name,
 		table.Shelves.RoomID,
 	).VALUES(
 		uuid.String(),
+		shelve.Name,
 		shelve.RoomID,
 	)
 
@@ -107,8 +111,10 @@ func (sr *ShelveRepository) CreateShelve(tx *sql.Tx, shelve *model.Shelves) (*uu
 func (sr *ShelveRepository) UpdateShelve(tx *sql.Tx, shelve *model.Shelves) *models.INVError {
 	// Create the update statement
 	updateQuery := table.Shelves.UPDATE(
+		table.Shelves.Name,
 		table.Shelves.RoomID,
 	).SET(
+		shelve.Name,
 		shelve.RoomID,
 	).WHERE(table.Shelves.ID.EQ(mysql.String(shelve.ID)))
 
@@ -151,6 +157,7 @@ func (sr *ShelveRepository) GetShelvesWithItems() (*[]models.ShelveWithItems, *m
 	// Create the query
 	stmt := mysql.SELECT(
 		table.Shelves.ID,
+		table.Shelves.Name,
 		table.Rooms.AllColumns,
 		table.Items.AllColumns,
 		table.ItemsInShelf.Quantity,
@@ -176,6 +183,7 @@ func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.Shelv
 	// Create the query
 	stmt := mysql.SELECT(
 		table.Shelves.ID,
+		table.Shelves.Name,
 		table.Rooms.AllColumns,
 		table.Items.AllColumns,
 	).FROM(

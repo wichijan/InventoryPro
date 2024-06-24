@@ -111,15 +111,17 @@ values
     );
 
 Insert into
-    shelves(id, room_id)
+    shelves(id, name, room_id)
 values
     (
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
+        "Elias Shelf",
         "62144dad-ea04-4591-921c-a37c85ed9226"
         /* Room 1 */
     ),
     (
         UUID(),
+        "Jan Shelf",
         "30ed1352-4d0b-4508-8470-2cf7a4362414"
         /* Hall */
     );

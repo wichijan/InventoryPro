@@ -45,6 +45,7 @@ func (sc *ShelveController) CreateShelve(shelve *models.ShelveOTD) (*uuid.UUID, 
 
 	var newShelve model.Shelves
 	newShelve.RoomID = &shelve.RoomID
+	newShelve.Name = shelve.Name
 
 	shelveId, inv_error := sc.ShelveRepo.CreateShelve(tx, &newShelve)
 	if inv_error != nil {

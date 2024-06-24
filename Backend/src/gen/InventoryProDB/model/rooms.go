@@ -9,6 +9,6 @@ package model
 
 type Rooms struct {
 	ID          string `sql:"primary_key"`
-	Name        *string
+	Name        string
 	WarehouseID *string
 }
