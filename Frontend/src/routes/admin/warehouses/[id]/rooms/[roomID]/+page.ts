@@ -39,6 +39,8 @@ export const load = async ({ fetch, params }) => {
         return shelvesWithItems;
     }
     return {
-        shelves: await getShelvesWithItems()
+        shelves: await getShelvesWithItems(),
+        warehouseID: params.id,
+        roomID: params.roomID
     };
 }
