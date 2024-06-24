@@ -11,7 +11,7 @@
 
   let itemType = item.ItemTypes;
   function handleSave() {
-    let type = item.ItemTypes.replace("_", "-");
+    let type = item.ItemTypes.replaceAll("_", "-");
 
     let body = {
       ID: item.ID,
@@ -27,7 +27,7 @@
       ClassTwo: item.ClassTwo,
       ClassThree: item.ClassThree,
       ClassFour: item.ClassFour,
-      itemTypes: item.ItemTypes.replace("_", "-"),
+      itemTypes: item.ItemTypes,
     };
 
     if (itemType === "book") {
@@ -41,6 +41,7 @@
       body.TotalObjects = item.TotalObjects;
       body.UsefulObjects = item.UsefulObjects;
     }
+    console.log(type, body);
 
     fetch(`${API_URL}items/${type}`, {
       method: "PUT",
@@ -225,6 +226,7 @@
               >
               <input
                 type="number"
+                bind:value={item.BrokenObjects}
                 id="brokenObjects"
                 class="w-full p-2 border border-gray-300 rounded mt-1"
               />
@@ -235,6 +237,7 @@
               >
               <input
                 type="number"
+                bind:value={item.LostObjects}
                 id="lostObjects"
                 class="w-full p-2 border border-gray-300 rounded mt-1"
               />
@@ -246,6 +249,7 @@
               <input
                 type="number"
                 id="totalObjects"
+                bind:value={item.TotalObjects}
                 class="w-full p-2 border border-gray-300 rounded mt-1"
               />
             </div>
@@ -255,6 +259,7 @@
               >
               <input
                 type="number"
+                bind:value={item.UsefulObjects}
                 id="usefulObjects"
                 class="w-full p-2 border border-gray-300 rounded mt-1"
               />

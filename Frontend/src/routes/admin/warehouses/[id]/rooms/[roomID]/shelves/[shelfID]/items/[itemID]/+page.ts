@@ -43,7 +43,9 @@ export const load = async ({ fetch, params }) => {
         let data = await response.json();
 
 
+
         data = { ...item, ...data };
+
 
         return data;
     }

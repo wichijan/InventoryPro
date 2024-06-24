@@ -4,6 +4,9 @@
     PersonCircle,
     ListNested,
     BuildingFill,
+    PeopleFill,
+    ArchiveFill,
+    Backpack2Fill,
   } from "svelte-bootstrap-icons";
 
   let dashboardItems = [
@@ -19,10 +22,34 @@
       icon: BuildingFill,
       description: "Manage warehouses",
     },
+    {
+      name: "Keywords",
+      path: "/admin/keywords",
+      icon: ListNested,
+      description: "Manage keywords",
+    },
+    {
+      name: "Roles",
+      path: "/admin/roles",
+      icon: PeopleFill,
+      description: "Manage roles",
+    },
+    {
+      name: "Subjects",
+      path: "/admin/subjects",
+      icon: Backpack2Fill,
+      description: "Manage Subjects",
+    },
+    {
+      name: "Usertypes",
+      path: "/admin/usertypes",
+      icon: ArchiveFill,
+      description: "Manage usertypes",
+    },
   ];
 </script>
 
-<div class="flex flex-col items-center w-ful mt-5">
+<div class="flex flex-col items-center w-ful mt-5 mb-12">
   <div class="my-3 flex flex-col">
     <h1 class="text-4xl font-bold text-gray-900 mx-auto">Admin Dashboard</h1>
     <p class="text-gray-700 text-base mt-2">
