@@ -18,6 +18,7 @@ type UserControllerI interface {
 	CheckEmail(email string) *models.INVError
 	CheckUsername(username string) *models.INVError
 	GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
+	GetUsers() (*[]models.Users, *models.INVError)
 
 	AcceptUserRegistrationRequest(userId *string) *models.INVError
 	DeclineUserRegistrationRequest(userId *string) *models.INVError
@@ -155,6 +156,10 @@ func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.Logi
 
 func (uc *UserController) CheckEmail(email string) *models.INVError {
 	return uc.UserRepo.CheckIfEmailExists(email)
+}
+
+func (uc *UserController) GetUsers() (*[]models.Users, *models.INVError) {
+	return uc.UserRepo.GetUsers()
 }
 
 func (uc *UserController) CheckUsername(username string) *models.INVError {

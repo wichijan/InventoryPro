@@ -166,7 +166,7 @@ func GenerateUserRegistrationCodeHandler(userCtrl controllers.UserControllerI) g
 // @Tags Users
 // @Accept  json
 // @Produce  json
-// @Success 201 {object} models.UserWithTypeName
+// @Success 200 {object} models.UserWithTypeName
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /users/get-me [GET]
 func GetUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
@@ -184,6 +184,25 @@ func GetUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, user)
+	}
+}
+
+// @Summary Get Users
+// @Description Get Users
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.Users
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /users [GET]
+func GetUsersHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		users, inv_err := userCtrl.GetUsers()
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, users)
 	}
 }
 

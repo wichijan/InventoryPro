@@ -22,6 +22,7 @@ type UserRepositoryI interface {
 	DeleteUser(tx *sql.Tx, userId *uuid.UUID) *models.INVError
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
+	GetUsers() (*[]models.Users, *models.INVError)
 
 	StoreUserPicture(tx *sql.Tx, userId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetPictureIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError)
@@ -69,6 +70,24 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, 
 
 	return &user, nil
 }
+
+func (ur *UserRepository) GetUsers() (*[]models.Users, *models.INVError) {
+	var users []models.Users
+	stmt := mysql.SELECT(
+		table.Users.ID,
+		table.Users.Username,
+	).FROM(
+		table.Users,
+	)
+
+	err := stmt.Query(ur.GetDatabaseConnection(), &users)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading users")
+	}
+
+	return &users, nil
+}
+
 
 func (ur *UserRepository) GetUserByNameClean(username *string) (*model.Users, *models.INVError) {
 	var user model.Users

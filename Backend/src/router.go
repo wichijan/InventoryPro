@@ -233,6 +233,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	adminRoutes.Handle(http.MethodGet, "/registration-requests", handlers.GetRegistrationRequestsHandler(controller.UserController))
 
 	securedRoutes.Handle(http.MethodGet, "/users/get-me", handlers.GetUserHandler(controller.UserController))
+	securedRoutes.Handle(http.MethodGet, "/users", handlers.GetUsersHandler(controller.UserController))
 	// Picture for Users
 	securedRoutes.Handle(http.MethodPost, "/users-picture", handlers.UploadImageForUserHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodGet, "/users-picture", handlers.GetImagePathForUserHandler(controller.UserController))
