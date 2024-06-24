@@ -336,8 +336,8 @@ func UpdateItemWithSetOfObjectsHandler(itemCtrl controllers.ItemControllerI) gin
 			return
 		}
 
-		if strings.ToLower(item.ItemTypes.String()) != "sets_of_objects" {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Not a sets_of_objects"))
+		if strings.ToLower(item.ItemTypes.String()) != "set_of_objects" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Not a set_of_objects"))
 			return
 		}
 
