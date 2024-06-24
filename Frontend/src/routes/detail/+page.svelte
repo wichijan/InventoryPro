@@ -7,7 +7,6 @@
   export let data;
 
   const shelvesItems = data; // Assuming the entire dataset is passed as `data`
-  console.log(shelvesItems);
 
   let warehouseName: string = "";
 

@@ -15,7 +15,7 @@ export const load = async ({ fetch, params }) => {
                 .then(async (response) => {
                     if (response.ok) {
                         await response.json().then((data) => {
-                            console.log(data);
+
                             resolve(data);
                         });
                     } else {

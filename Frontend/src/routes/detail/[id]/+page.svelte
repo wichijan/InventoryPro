@@ -64,7 +64,6 @@
           curentDate.getTime() >= timeFrom.getTime() &&
           curentDate.getTime() <= timeTo.getTime()
         ) {
-          console.log(Math.abs(reservation.Quantity - item.QuantityInShelf));
           rValue = Math.abs(reservation.Quantity - item.QuantityInShelf) === 0;
         } else {
           rValue = false;
