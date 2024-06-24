@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -267,6 +268,11 @@ func UpdateItemWithBookHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 			return
 		}
 
+		if strings.ToLower(item.ItemTypes.String()) != "book" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Not a book"))
+			return
+		}
+
 		inv_err := itemCtrl.UpdateItemWithBook(&item)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
@@ -296,6 +302,11 @@ func UpdateItemWithSingleObjectHandler(itemCtrl controllers.ItemControllerI) gin
 			return
 		}
 
+		if strings.ToLower(item.ItemTypes.String()) != "single_object" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Not a single_object"))
+			return
+		}
+
 		inv_err := itemCtrl.UpdateItemWithSingleObject(&item)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
@@ -322,6 +333,11 @@ func UpdateItemWithSetOfObjectsHandler(itemCtrl controllers.ItemControllerI) gin
 		err := c.ShouldBindJSON(&item)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item object"))
+			return
+		}
+
+		if strings.ToLower(item.ItemTypes.String()) != "sets_of_objects" {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Not a sets_of_objects"))
 			return
 		}
 
