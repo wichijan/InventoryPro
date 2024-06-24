@@ -173,6 +173,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			UserTypeRepo:            userTypeRepo,
 			RegistrationRequestRepo: registrationRequestRepo,
 			RegistrationCodeRepo:    registrationCodeRepo,
+			RoleRepo:                roleRepo,
 		},
 		UserRoleController: &controllers.UserRoleController{
 			UserRoleRepo: userRoleRepo,
@@ -228,7 +229,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
-	publicRoutes.Handle(http.MethodGet, "/auth/is-Admin", handlers.IsAdmin(controller.UserController))
+	securedRoutes.Handle(http.MethodGet, "/auth/is-Admin", handlers.IsAdmin(controller.UserController))
 
 	adminRoutes.Handle(http.MethodGet, "/registration-requests", handlers.GetRegistrationRequestsHandler(controller.UserController))
 

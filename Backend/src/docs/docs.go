@@ -241,6 +241,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/is-admin": {
+            "get": {
+                "description": "Is Admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Is Admin Check",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/logged-in": {
             "get": {
                 "description": "Check if user is logged in",
@@ -4801,7 +4827,28 @@ const docTemplate = `{
         "models.Users": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "string"
+                },
+                "jobTitle": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "profilePicture": {
+                    "type": "string"
+                },
+                "userTypeName": {
                     "type": "string"
                 },
                 "username": {

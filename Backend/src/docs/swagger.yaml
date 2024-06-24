@@ -815,7 +815,21 @@ definitions:
     type: object
   models.Users:
     properties:
+      email:
+        type: string
+      firstName:
+        type: string
       id:
+        type: string
+      jobTitle:
+        type: string
+      lastName:
+        type: string
+      phoneNumber:
+        type: string
+      profilePicture:
+        type: string
+      userTypeName:
         type: string
       username:
         type: string
@@ -995,6 +1009,23 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
+      tags:
+      - Users
+  /auth/is-admin:
+    get:
+      consumes:
+      - application/json
+      description: Is Admin
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Is Admin Check
       tags:
       - Users
   /auth/logged-in:
