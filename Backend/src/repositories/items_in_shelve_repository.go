@@ -107,7 +107,7 @@ func (iisr *ItemInShelveRepository) UpdateItemInShelve(tx *sql.Tx, itemInShelve 
 	}
 
 	if rowsAff == 0 {
-		return inv_errors.INV_NOT_FOUND.WithDetails("Item and Shelve combination not found")
+		return inv_errors.INV_CONFLICT.WithDetails("Item and Shelve combination not found")
 	}
 
 	return nil
