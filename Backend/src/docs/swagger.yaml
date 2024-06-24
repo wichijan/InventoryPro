@@ -16,12 +16,12 @@ definitions:
     enum:
     - book
     - single_object
-    - sets_of_objects
+    - set_of_objects
     type: string
     x-enum-varnames:
     - ItemsItemTypes_Book
     - ItemsItemTypes_SingleObject
-    - ItemsItemTypes_SetsOfObjects
+    - ItemsItemTypes_SetOfObjects
   model.Keywords:
     properties:
       id:
@@ -75,6 +75,8 @@ definitions:
   model.Shelves:
     properties:
       id:
+        type: string
+      name:
         type: string
       roomID:
         type: string
@@ -697,6 +699,8 @@ definitions:
           properties:
             id:
               type: string
+            name:
+              type: string
             roomID:
               type: string
           type: object
@@ -748,8 +752,17 @@ definitions:
               type: string
           type: object
         type: array
-      roomID:
+      name:
         type: string
+      room:
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          warehouseID:
+            type: string
+        type: object
     type: object
   models.TransferRequestResponse:
     properties:
@@ -796,6 +809,13 @@ definitions:
       registrationTime:
         type: string
       userTypeName:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Users:
+    properties:
+      id:
         type: string
       username:
         type: string
@@ -2832,6 +2852,27 @@ paths:
       summary: Update UserType
       tags:
       - UserTypes
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get Users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Users'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get Users
+      tags:
+      - Users
   /users-picture:
     delete:
       consumes:
@@ -2916,8 +2957,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.UserWithTypeName'
         "400":

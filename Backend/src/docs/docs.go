@@ -3062,6 +3062,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/users": {
+            "get": {
+                "description": "Get Users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get Users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Users"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/users-picture": {
             "get": {
                 "description": "Get ImagePath For User Profile Picture",
@@ -3189,8 +3221,8 @@ const docTemplate = `{
                 ],
                 "summary": "Get User Data",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.UserWithTypeName"
                         }
@@ -3554,12 +3586,12 @@ const docTemplate = `{
             "enum": [
                 "book",
                 "single_object",
-                "sets_of_objects"
+                "set_of_objects"
             ],
             "x-enum-varnames": [
                 "ItemsItemTypes_Book",
                 "ItemsItemTypes_SingleObject",
-                "ItemsItemTypes_SetsOfObjects"
+                "ItemsItemTypes_SetOfObjects"
             ]
         },
         "model.Keywords": {
@@ -3644,6 +3676,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "roomID": {
@@ -4588,6 +4623,9 @@ const docTemplate = `{
                             "id": {
                                 "type": "string"
                             },
+                            "name": {
+                                "type": "string"
+                            },
                             "roomID": {
                                 "type": "string"
                             }
@@ -4666,8 +4704,22 @@ const docTemplate = `{
                         }
                     }
                 },
-                "roomID": {
+                "name": {
                     "type": "string"
+                },
+                "room": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "warehouseID": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -4739,6 +4791,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userTypeName": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Users": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "string"
                 },
                 "username": {

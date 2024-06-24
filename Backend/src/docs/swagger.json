@@ -3051,6 +3051,38 @@
                 }
             }
         },
+        "/users": {
+            "get": {
+                "description": "Get Users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get Users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Users"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/users-picture": {
             "get": {
                 "description": "Get ImagePath For User Profile Picture",
@@ -3178,8 +3210,8 @@
                 ],
                 "summary": "Get User Data",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.UserWithTypeName"
                         }
@@ -3543,12 +3575,12 @@
             "enum": [
                 "book",
                 "single_object",
-                "sets_of_objects"
+                "set_of_objects"
             ],
             "x-enum-varnames": [
                 "ItemsItemTypes_Book",
                 "ItemsItemTypes_SingleObject",
-                "ItemsItemTypes_SetsOfObjects"
+                "ItemsItemTypes_SetOfObjects"
             ]
         },
         "model.Keywords": {
@@ -3633,6 +3665,9 @@
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "roomID": {
@@ -4577,6 +4612,9 @@
                             "id": {
                                 "type": "string"
                             },
+                            "name": {
+                                "type": "string"
+                            },
                             "roomID": {
                                 "type": "string"
                             }
@@ -4655,8 +4693,22 @@
                         }
                     }
                 },
-                "roomID": {
+                "name": {
                     "type": "string"
+                },
+                "room": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "warehouseID": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -4728,6 +4780,17 @@
                     "type": "string"
                 },
                 "userTypeName": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Users": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "string"
                 },
                 "username": {
