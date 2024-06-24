@@ -84,11 +84,9 @@
             text: "Item has been created",
             icon: "success",
           }).then(() => {
-            Swal.fire({
-              title: "Success",
-              text: "Item has been created",
-              icon: "success",
-            }).then(() => {});
+            goto(
+              `/admin/warehouses/${data.warehouseID}/rooms/${data.roomID}/shelves/${data.shelfID}`
+            );
           });
         } else {
           Swal.fire({
@@ -155,6 +153,47 @@
             class="w-full p-2 border border-gray-300 rounded mt-1"
             bind:value={newItem.BaseQuantityInShelf}
           />
+        </div>
+        <div class="flex gap-5">
+          <div class="mb-4">
+            <label class="block text-gray-700" for="classOne">Class One</label>
+            <input
+              type="checkbox"
+              id="classOne"
+              class="mr-2"
+              bind:checked={newItem.ClassOne}
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700" for="classTwo">Class Two</label>
+            <input
+              type="checkbox"
+              id="classTwo"
+              class="mr-2"
+              bind:checked={newItem.ClassTwo}
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700" for="classThree"
+              >Class Three</label
+            >
+            <input
+              type="checkbox"
+              id="classThree"
+              class="mr-2"
+              bind:checked={newItem.ClassThree}
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700" for="classFour">Class Four</label
+            >
+            <input
+              type="checkbox"
+              id="classFour"
+              class="mr-2"
+              bind:checked={newItem.ClassFour}
+            />
+          </div>
         </div>
 
         <div class="mb-4">

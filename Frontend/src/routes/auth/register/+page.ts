@@ -15,7 +15,7 @@ export const load = async ({ fetch, params }) => {
             }).then(async (response) => {
                 if (response.ok) {
                     await response.json().then((data) => {
-                        console.log(data);
+
                         resolve(data);
                     });
                 } else {
@@ -26,5 +26,6 @@ export const load = async ({ fetch, params }) => {
     }
 
     return {
-        userTypes: await getUserTypes() };
+        userTypes: await getUserTypes()
+    };
 }

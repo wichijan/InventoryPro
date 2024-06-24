@@ -8,12 +8,6 @@
 
   let dashboardItems = [
     {
-      name: "Items",
-      path: "/admin/items",
-      icon: ListNested,
-      description: "Manage items",
-    },
-    {
       name: "Users",
       path: "/admin/users",
       icon: PersonCircle,
@@ -29,8 +23,14 @@
 </script>
 
 <div class="flex flex-col items-center w-ful mt-5">
+  <div class="my-3 flex flex-col">
+    <h1 class="text-4xl font-bold text-gray-900 mx-auto">Admin Dashboard</h1>
+    <p class="text-gray-700 text-base mt-2">
+      Welcome to the admin dashboard. Here you can manage users and warehouses.
+    </p>
+  </div>
   <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-tertiary rounded px-2 py-4"
+    class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4 bg-tertiary rounded px-2 py-4"
   >
     {#each dashboardItems as item}
       <button

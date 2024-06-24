@@ -12,8 +12,7 @@
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6">
   <div class="flex flex-col mt-10 mb-4 text-center">
-    <div class="text-4xl font-bold text-gray-900">{shelves.Name}</div>
-    <div class="text-gray-700 text-base mt-2">{shelves.Description}</div>
+    <div class="text-4xl font-bold text-gray-900">{shelves[0].Room.Name}</div>
   </div>
 
   {#if shelves}
@@ -88,4 +87,44 @@
   {:else}
     <div class="text-lg">No shelves</div>
   {/if}
+  <!-- Create new shelf-->
+  <button
+    class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+    on:click={() => {
+      Swal.fire({
+        title: "Create Shelf",
+        html: `
+          <input id="name" class="swal2-input" placeholder="Name" />
+        `,
+        showCancelButton: true,
+        confirmButtonText: "Create",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const name = document.getElementById("name").value;
+          fetch(API_URL + "shelves", {
+            method: "POST",
+            credentials: "include",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              Name: name,
+              RoomID: roomID,
+            }),
+          }).then(async (response) => {
+            if (response.ok) {
+              Swal.fire("Shelf created!", "", "success").then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire("Error creating shelf", "", "error");
+            }
+          });
+        }
+      });
+    }}
+  >
+    Create Shelf
+  </button>
 </div>

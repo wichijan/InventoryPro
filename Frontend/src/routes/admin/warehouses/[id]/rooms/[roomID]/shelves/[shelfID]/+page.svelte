@@ -14,7 +14,6 @@
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6">
   <div class="flex flex-col mt-10 mb-4 text-center">
     <div class="text-4xl font-bold text-gray-900">{shelf.Name}</div>
-    <div class="text-gray-700 text-base mt-2">{shelf.Description}</div>
   </div>
 
   {#if items.length > 0}
@@ -55,8 +54,9 @@
                       confirmButtonText: `Delete`,
                     }).then((result) => {
                       if (result.isConfirmed) {
-                        fetch(`${API_URL}/items/${item.ID}`, {
+                        fetch(`${API_URL}items/${item.ID}`, {
                           method: "DELETE",
+                          credentials: "include",
                         }).then((response) => {
                           if (response.ok) {
                             Swal.fire("Deleted!", "", "success");

@@ -9,6 +9,7 @@
   const copyItem = JSON.parse(JSON.stringify(item));
   $: item = item;
 
+  let itemType = item.ItemTypes;
   function handleSave() {
     let type = item.ItemTypes.replace("_", "-");
 
@@ -26,8 +27,21 @@
       ClassTwo: item.ClassTwo,
       ClassThree: item.ClassThree,
       ClassFour: item.ClassFour,
-      ItemTypes: item.ItemTypes,
+      itemTypes: item.ItemTypes.replace("_", "-"),
     };
+
+    if (itemType === "book") {
+      body.Publisher = item.Publisher;
+      body.Isbn = item.Isbn;
+      body.Edition = item.Edition;
+      body.Author = item.Author;
+    } else {
+      body.BrokenObjects = item.BrokenObjects;
+      body.LostObjects = item.LostObjects;
+      body.TotalObjects = item.TotalObjects;
+      body.UsefulObjects = item.UsefulObjects;
+    }
+
     fetch(`${API_URL}items/${type}`, {
       method: "PUT",
       credentials: "include",
@@ -42,11 +56,7 @@
             title: "Success",
             text: "Item has been updated",
             icon: "success",
-          }).then(() => {
-            goto(
-              `/admin/warehouses/${item.WarehouseID}/rooms/${item.RoomID}/shelves/${item.ShelfID}`
-            );
-          });
+          }).then(() => {});
         } else {
           Swal.fire({
             title: "Error",
@@ -103,6 +113,48 @@
           />
         </div>
 
+        <div class="flex gap-5">
+          <div class="mb-4">
+            <label class="block text-gray-700" for="classOne">Class One</label>
+            <input
+              type="checkbox"
+              id="classOne"
+              class="mr-2"
+              bind:checked={item.ClassOne}
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700" for="classTwo">Class Two</label>
+            <input
+              type="checkbox"
+              id="classTwo"
+              class="mr-2"
+              bind:checked={item.ClassTwo}
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700" for="classThree"
+              >Class Three</label
+            >
+            <input
+              type="checkbox"
+              id="classThree"
+              class="mr-2"
+              bind:checked={item.ClassThree}
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700" for="classFour">Class Four</label
+            >
+            <input
+              type="checkbox"
+              id="classFour"
+              class="mr-2"
+              bind:checked={item.ClassFour}
+            />
+          </div>
+        </div>
+
         <div class="mb-4">
           <label class="block text-gray-700" for="damaged">Damaged</label>
           <input
@@ -125,6 +177,90 @@
             ></textarea>
           </div>
         {/if}
+
+        <div class="mb-4 w-full ring-2 ring-gray-500 rounded-md py-2 px-2">
+          {#if itemType === "book"}
+            <div class="mb-4">
+              <label class="block text-gray-700" for="publisher"
+                >Publisher</label
+              >
+              <input
+                type="text"
+                id="publisher"
+                bind:value={item.Publisher}
+                class="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700" for="isbn">ISBN</label>
+              <input
+                type="text"
+                id="isbn"
+                bind:value={item.Isbn}
+                class="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700" for="edition">Edition</label>
+              <input
+                type="text"
+                bind:value={item.Edition}
+                id="edition"
+                class="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700" for="author">Author</label>
+              <input
+                type="text"
+                id="author"
+                bind:value={item.Author}
+                class="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+          {:else}
+            <div class="mb-4">
+              <label class="block text-gray-700" for="brokenObjects"
+                >Broken Objects</label
+              >
+              <input
+                type="number"
+                id="brokenObjects"
+                class="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700" for="lostObjects"
+                >Lost Objects</label
+              >
+              <input
+                type="number"
+                id="lostObjects"
+                class="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700" for="totalObjects"
+                >Total Objects</label
+              >
+              <input
+                type="number"
+                id="totalObjects"
+                class="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700" for="usefulObjects"
+                >Useful Objects</label
+              >
+              <input
+                type="number"
+                id="usefulObjects"
+                class="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+          {/if}
+        </div>
 
         <div class="mb-4">
           <label class="block text-gray-700">Reservation Details</label>
