@@ -39,18 +39,18 @@ type ItemWithEverything struct {
 }
 
 type ItemCreateWithBook struct {
-	Name                string               `json:"name" binding:"required"`
-	Description         string               `json:"description"`
-	ItemTypeName        model.ItemsItemTypes `json:"itemTypeName" binding:"required"`
-	RegularShelfId      uuid.UUID            `json:"regularShelfId" binding:"required"`
-	ClassOne            bool                 `json:"classOne"`
-	ClassTwo            bool                 `json:"classTwo"`
-	ClassThree          bool                 `json:"classThree"`
-	ClassFour           bool                 `json:"classFour"`
-	Damaged             bool                 `json:"damaged"`
-	DamagedDesc         string               `json:"damagedDesc"`
-	HintText            string               `json:"hintText"`
-	BaseQuantityInShelf int32                `json:"BaseQuantityInShelf" binding:"required"`
+	Name                string `binding:"required"`
+	Description         string
+	ItemTypeName        model.ItemsItemTypes `binding:"required"`
+	RegularShelfId      uuid.UUID            `binding:"required"`
+	ClassOne            bool
+	ClassTwo            bool
+	ClassThree          bool
+	ClassFour           bool
+	Damaged             bool
+	DamagedDesc         string
+	HintText            string
+	BaseQuantityInShelf int32 `binding:"required"`
 
 	Isbn      string `json:"isbn" binding:"required"`
 	Author    string `json:"author" binding:"required"`
