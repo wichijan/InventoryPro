@@ -44,7 +44,8 @@
         ClassThree: newItem.ClassThree,
         ClassFour: newItem.ClassFour,
         HintText: newItem.HintText,
-        ItemTypes: "book",
+        Author: document.getElementById("author").value,
+        itemTypeName: "book",
         RegularShelfId: data.shelfID,
       };
     } else {
@@ -54,16 +55,16 @@
         BaseQuantityInShelf: newItem.BaseQuantityInShelf,
         Damaged: newItem.Damaged,
         DamagedDesc: newItem.DamagedDesc,
-        BrokenObjects: document.getElementById("brokenObjects").value,
-        LostObjects: document.getElementById("lostObjects").value,
-        TotalObjects: document.getElementById("totalObjects").value,
-        UsefulObjects: document.getElementById("usefulObjects").value,
+        BrokenObjects: Number(document.getElementById("brokenObjects").value),
+        LostObjects: Number(document.getElementById("lostObjects").value),
+        TotalObjects: Number(document.getElementById("totalObjects").value),
+        UsefulObjects: Number(document.getElementById("usefulObjects").value),
         ClassOne: newItem.ClassOne,
         ClassTwo: newItem.ClassTwo,
         ClassThree: newItem.ClassThree,
         ClassFour: newItem.ClassFour,
         HintText: newItem.HintText,
-        ItemTypes: "set-of-objects",
+        itemTypeName: "set_of_objects",
         RegularShelfId: data.shelfID,
       };
     }
