@@ -6,6 +6,7 @@
     People,
     GraphUpArrow,
     ListCheck,
+    DoorOpen,
   } from "svelte-bootstrap-icons";
 
   import Sidebar from "./Sidebar.svelte";
@@ -68,6 +69,13 @@
             active: active.includes("dashboard"),
           });
       }
+      if (!items.some((item) => item.name === "Logout"))
+        items.push({
+          name: "Logout",
+          link: "/auth/logout",
+          icon: DoorOpen,
+          active: active.includes("logout"),
+        });
     } else {
       if (!items.some((item) => item.name === "Login"))
         items.push({

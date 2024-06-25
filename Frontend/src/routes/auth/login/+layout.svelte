@@ -1,6 +1,5 @@
 <script>
   import { browser } from "$app/environment";
-  import { API_URL } from "$lib/_services/ShelfService";
   import { isUserLoggedIn } from "$lib/_services/UserService";
 
   import { onMount } from "svelte";
