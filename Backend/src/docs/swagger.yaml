@@ -808,6 +808,15 @@ definitions:
         type: boolean
       registrationTime:
         type: string
+      roles:
+        items:
+          properties:
+            id:
+              type: string
+            roleName:
+              type: string
+          type: object
+        type: array
       userTypeName:
         type: string
       username:
@@ -821,6 +830,8 @@ definitions:
         type: string
       id:
         type: string
+      isActive:
+        type: boolean
       jobTitle:
         type: string
       lastName:
@@ -829,6 +840,15 @@ definitions:
         type: string
       profilePicture:
         type: string
+      roles:
+        items:
+          properties:
+            id:
+              type: string
+            roleName:
+              type: string
+          type: object
+        type: array
       userTypeName:
         type: string
       username:
@@ -1112,7 +1132,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.RegistrationRequest'
+          $ref: '#/definitions/models.PasswordReset'
       produces:
       - application/json
       responses:

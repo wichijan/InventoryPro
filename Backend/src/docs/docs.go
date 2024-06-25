@@ -398,7 +398,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RegistrationRequest"
+                            "$ref": "#/definitions/models.PasswordReset"
                         }
                     }
                 ],
@@ -4816,6 +4816,20 @@ const docTemplate = `{
                 "registrationTime": {
                     "type": "string"
                 },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "roleName": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
                 "userTypeName": {
                     "type": "string"
                 },
@@ -4836,6 +4850,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "isActive": {
+                    "type": "boolean"
+                },
                 "jobTitle": {
                     "type": "string"
                 },
@@ -4847,6 +4864,20 @@ const docTemplate = `{
                 },
                 "profilePicture": {
                     "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "roleName": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 },
                 "userTypeName": {
                     "type": "string"

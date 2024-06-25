@@ -65,7 +65,7 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 // @Accept  json
 // @Produce  json
 // @Param code path string true "Registration Code"
-// @Param user body models.RegistrationRequest true "User data"
+// @Param user body models.PasswordReset true "User data"
 // @Success 201 {object} models.LoginResponse
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /auth/register/:code [post]

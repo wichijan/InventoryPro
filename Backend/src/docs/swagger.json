@@ -387,7 +387,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RegistrationRequest"
+                            "$ref": "#/definitions/models.PasswordReset"
                         }
                     }
                 ],
@@ -4805,6 +4805,20 @@
                 "registrationTime": {
                     "type": "string"
                 },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "roleName": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
                 "userTypeName": {
                     "type": "string"
                 },
@@ -4825,6 +4839,9 @@
                 "id": {
                     "type": "string"
                 },
+                "isActive": {
+                    "type": "boolean"
+                },
                 "jobTitle": {
                     "type": "string"
                 },
@@ -4836,6 +4853,20 @@
                 },
                 "profilePicture": {
                     "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "roleName": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 },
                 "userTypeName": {
                     "type": "string"
