@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/google/uuid"
+	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 )
 
 type RegistrationRequest struct {
@@ -29,6 +30,10 @@ type UserWithTypeName struct {
 	RegistrationTime     *string `alias:"users.registration_time"`
 	RegistrationAccepted *bool   `alias:"users.registration_accepted"`
 	IsActive             *bool   `alias:"users.is_active"`
+
+	Roles []struct {
+		model.Roles
+	}
 }
 
 type Users struct {
@@ -42,6 +47,10 @@ type Users struct {
 	UserTypeName   *string `alias:"user_types.type_name"`
 	ProfilePicture *string `alias:"users.profile_picture"`
 	IsActive       bool    `alias:"users.is_active"`
+
+	Roles []struct {
+		model.Roles
+	}
 }
 
 type LoginRequest struct {

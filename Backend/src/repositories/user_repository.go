@@ -54,9 +54,13 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, 
 		table.Users.RegistrationTime,
 		table.Users.RegistrationAccepted,
 		table.Users.IsActive,
+
+		table.Roles.AllColumns,
 	).FROM(
 		table.Users.
-			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
+			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)).
+			LEFT_JOIN(table.UserRoles, table.UserRoles.UserID.EQ(table.Users.ID)).
+			LEFT_JOIN(table.Roles, table.Roles.ID.EQ(table.UserRoles.RoleID)),
 	).WHERE(
 		table.Users.ID.EQ(utils.MySqlString(id.String())),
 	)
@@ -76,9 +80,12 @@ func (ur *UserRepository) GetUsers() (*[]models.Users, *models.INVError) {
 	stmt := mysql.SELECT(
 		table.Users.AllColumns,
 		table.UserTypes.TypeName,
+		table.Roles.AllColumns,
 	).FROM(
 		table.Users.
-			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
+			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)).
+			LEFT_JOIN(table.UserRoles, table.UserRoles.UserID.EQ(table.Users.ID)).
+			LEFT_JOIN(table.Roles, table.Roles.ID.EQ(table.UserRoles.RoleID)),
 	)
 
 	err := stmt.Query(ur.GetDatabaseConnection(), &users)
@@ -137,9 +144,13 @@ func (ur *UserRepository) GetUserByUsername(username string) (*models.UserWithTy
 		table.Users.RegistrationTime,
 		table.Users.RegistrationAccepted,
 		table.Users.IsActive,
+
+		table.Roles.AllColumns,
 	).FROM(
 		table.Users.
-			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)),
+			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)).
+			LEFT_JOIN(table.UserRoles, table.UserRoles.UserID.EQ(table.Users.ID)).
+			LEFT_JOIN(table.Roles, table.Roles.ID.EQ(table.UserRoles.RoleID)),
 	).WHERE(
 		table.Users.Username.EQ(mysql.String(username)),
 	)
