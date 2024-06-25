@@ -229,7 +229,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	securedRoutes.Handle(http.MethodPost, "/auth/logout", handlers.LogoutUserHandler)
 	securedRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
-	securedRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
+	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
 	securedRoutes.Handle(http.MethodGet, "/auth/is-Admin", handlers.IsAdmin(controller.UserController))
 
 	adminRoutes.Handle(http.MethodGet, "/registration-requests", handlers.GetRegistrationRequestsHandler(controller.UserController))
@@ -338,7 +338,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 	adminRoutes.Handle(http.MethodDelete, "/user-roles/remove-role", handlers.RemoveRoleFromUserHandler(controller.UserRoleController))
 
 	// User type routes
-	securedRoutes.Handle(http.MethodGet, "/user-types", handlers.GetUserTypesHandler(controller.UserTypeController))
+	publicRoutes.Handle(http.MethodGet, "/user-types", handlers.GetUserTypesHandler(controller.UserTypeController))
 	adminRoutes.Handle(http.MethodPost, "/user-types", handlers.CreateUserTypeHandler(controller.UserTypeController))
 	adminRoutes.Handle(http.MethodPut, "/user-types", handlers.UpdateUserTypeHandler(controller.UserTypeController))
 	adminRoutes.Handle(http.MethodDelete, "/user-types/:id", handlers.DeleteUserTypeHandler(controller.UserTypeController))
