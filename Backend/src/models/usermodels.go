@@ -41,6 +41,7 @@ type Users struct {
 	PhoneNumber    string  `alias:"users.phone_number"`
 	UserTypeName   *string `alias:"user_types.type_name"`
 	ProfilePicture *string `alias:"users.profile_picture"`
+	IsActive       bool    `alias:"users.is_active"`
 }
 
 type LoginRequest struct {
