@@ -82,6 +82,10 @@ type PasswordReset struct {
 	Password string  `json:"password"`
 }
 
+type RegistrationCode struct {
+	Password string `json:"password" binding:"required"`
+}
+
 type UserPicture struct {
 	PictureId string `alias:"users.profile_picture"`
 }
