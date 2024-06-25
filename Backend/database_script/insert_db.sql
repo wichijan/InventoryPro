@@ -196,6 +196,17 @@ values
     );
 
 Insert into
+    books(item_id, ISBN, author, publisher, edition)
+values
+    (
+        "d2b6b0f5-a9b9-4ab5-9644-75407c9e9dfb",
+        "978-3-16-148410-0",
+        "J. K. Rowling",
+        "Bloomsbury",
+        "1"
+    );
+
+Insert into
     items_in_shelf(item_id, shelf_id, quantity)
 values
     (

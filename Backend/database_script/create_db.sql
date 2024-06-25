@@ -44,7 +44,7 @@ CREATE TABLE items(
 
 CREATE TABLE books(
     item_id VARCHAR(36) PRIMARY KEY,
-    ISBN VARCHAR(13) UNIQUE NOT NULL,
+    ISBN VARCHAR(50) UNIQUE NOT NULL,
     author VARCHAR(100),
     publisher VARCHAR(100),
     edition VARCHAR(100),
