@@ -186,6 +186,7 @@ func (sr *ShelveRepository) GetShelveByIdWithItems(id *uuid.UUID) (*models.Shelv
 		table.Shelves.Name,
 		table.Rooms.AllColumns,
 		table.Items.AllColumns,
+		table.ItemsInShelf.Quantity,
 	).FROM(
 		table.Shelves.
 			LEFT_JOIN(table.ItemsInShelf, table.ItemsInShelf.ShelfID.EQ(table.Shelves.ID)).
