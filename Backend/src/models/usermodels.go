@@ -17,7 +17,7 @@ type RegistrationRequest struct {
 }
 
 type UserWithTypeName struct {
-	ID                   string  `alias:"users.id"`
+	ID                   string  `alias:"users.id" sql:"primary_key"`
 	FirstName            *string `alias:"users.first_name"`
 	LastName             *string `alias:"users.last_name"`
 	Username             *string `alias:"users.username"`
@@ -37,7 +37,7 @@ type UserWithTypeName struct {
 }
 
 type Users struct {
-	ID             string  `alias:"users.id"`
+	ID             string  `alias:"users.id" sql:"primary_key"`
 	Username       string  `alias:"users.username"`
 	Email          string  `alias:"users.email"`
 	FirstName      string  `alias:"users.first_name"`
