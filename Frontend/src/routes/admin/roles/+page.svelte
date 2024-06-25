@@ -28,7 +28,7 @@
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6 mb-10">
   <div class="flex flex-col mt-10 mb-4 text-center">
-    <div class="text-4xl font-bold text-gray-900">roles</div>
+    <div class="text-4xl font-bold text-gray-900">Roles</div>
   </div>
 
   {#if roles}

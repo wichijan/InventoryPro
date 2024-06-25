@@ -28,7 +28,7 @@
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6 mb-10">
   <div class="flex flex-col mt-10 mb-4 text-center">
-    <div class="text-4xl font-bold text-gray-900">usertypes</div>
+    <div class="text-4xl font-bold text-gray-900">Usertypes</div>
   </div>
 
   {#if usertypes}
@@ -41,7 +41,7 @@
         <table class="w-full text-sm text-left text-gray-700">
           <thead class="text-xs uppercase bg-gray-200 text-gray-700">
             <tr>
-              <th scope="col" class="px-6 py-3">typeName</th>
+              <th scope="col" class="px-6 py-3">TypeName</th>
               <th scope="col" class="px-6 py-3 text-right">Action</th>
             </tr>
           </thead>
