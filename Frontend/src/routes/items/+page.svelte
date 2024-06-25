@@ -66,7 +66,6 @@
                 ) {
                   showItems = defaultItems;
                 } else {
-                  //check if input string is in any of the fields
                   showItems = showItems.filter((item) => {
                     let damaged = item.Damaged ? "Kaputt" : "Unversehen";
                     return (
@@ -97,7 +96,7 @@
               name="sort"
               id="sort"
               on:change={(e) => {
-                items = items.sort((a, b) => {
+                showItems = showItems.sort((a, b) => {
                   if (e.target.value === "name") {
                     if (sort === 0) {
                       return a.Name < b.Name ? -1 : 1;
@@ -129,7 +128,7 @@
               on:click={() => {
                 sort = sort === 0 ? 1 : 0;
                 let e = document.getElementById("sort");
-                items = items.sort((a, b) => {
+                showItems = showItems.sort((a, b) => {
                   if (e.value === "name") {
                     if (sort === 0) {
                       return a.Name < b.Name ? -1 : 1;

@@ -46,9 +46,6 @@
                 class="hover:underline">Github</a
               >
             </li>
-            <li>
-              <a href="/" class="hover:underline">TBA</a>
-            </li>
           </ul>
         </div>
         <div>
