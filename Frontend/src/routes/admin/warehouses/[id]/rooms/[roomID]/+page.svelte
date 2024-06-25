@@ -9,6 +9,7 @@
   let room = data.room;
   let warehouseID = data.warehouseID;
   let roomID = data.roomID;
+  console.log(shelves);
 </script>
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6">
