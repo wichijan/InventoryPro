@@ -227,8 +227,8 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 
 	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodPost, "/auth/logout", handlers.LogoutUserHandler)
-	securedRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
-	securedRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
 	securedRoutes.Handle(http.MethodGet, "/auth/is-Admin", handlers.IsAdmin(controller.UserController))
 
