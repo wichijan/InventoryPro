@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
   import { API_URL } from "$lib/_services/ShelfService";
   import Spinner from "$lib/templates/Spinner.svelte";
@@ -63,10 +64,9 @@
                     confirmButtonText: `Update`,
                   }).then((result) => {
                     if (result.isConfirmed) {
-                      const typeName =
-                        document.getElementById("typeName").value;
+                      const tn = document.getElementById("typeName").value;
 
-                      fetch(API_URL + "usertypes", {
+                      fetch(API_URL + "user-types", {
                         method: "PUT",
                         headers: {
                           "Content-Type": "application/json",
@@ -74,19 +74,11 @@
                         credentials: "include",
                         body: JSON.stringify({
                           ID: typeName.ID,
-                          typeName: typeName,
+                          typeName: tn,
                         }),
                       }).then(() => {
                         Swal.fire("Updated!", "", "success");
-                        usertypes = usertypes.map((s) => {
-                          if (s.ID === typeName.ID) {
-                            return {
-                              ...s,
-                              typeName: typeName,
-                            };
-                          }
-                          return s;
-                        });
+                        browser ? location.reload() : null;
                       });
                     }
                   });
@@ -107,7 +99,7 @@
                         confirmButtonText: `Delete`,
                       }).then((result) => {
                         if (result.isConfirmed) {
-                          fetch(API_URL + "usertypes/" + typeName.ID, {
+                          fetch(API_URL + "user-types/" + typeName.ID, {
                             method: "DELETE",
                             credentials: "include",
                           }).then(() => {
@@ -144,24 +136,24 @@
           if (result.isConfirmed) {
             const typeName = document.getElementById("typeName").value;
 
-            fetch(API_URL + "usertypes", {
+            fetch(API_URL + "user-types", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               credentials: "include",
               body: JSON.stringify({
-                typeName,
+                Name: typeName,
               }),
-            }).then((res) => {
+            }).then(async (res) => {
               if (res.ok) {
-                const newtypeName = res.json();
+                const newtypeName = await res.json();
                 Swal.fire("Created!", "", "success");
                 usertypes = [
                   ...usertypes,
                   {
-                    ID: newtypeName.ID,
-                    typeName: typeName,
+                    ID: newtypeName,
+                    TypeName: typeName,
                   },
                 ];
               }

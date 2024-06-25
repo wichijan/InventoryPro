@@ -2,6 +2,7 @@
   import Swal from "sweetalert2";
   import { API_URL } from "$lib/_services/ShelfService";
   import { goto } from "$app/navigation";
+  import { browser } from "$app/environment";
 
   export let data;
 
@@ -33,6 +34,9 @@
           }).then((result) => {
             if (result.isConfirmed) {
               let inputOptions = {};
+              if (!user.Roles) {
+                user.Roles = [];
+              }
               roles.forEach((role) => {
                 if (!user.Roles.find((r) => r.ID === role.ID))
                   inputOptions[role.ID] = role.RoleName;
@@ -63,6 +67,7 @@
                     }).then((response) => {
                       if (response.ok) {
                         Swal.fire("Role hinzugefügt!", "", "success");
+                        browser ? location.reload() : null;
                       } else {
                         Swal.fire("Error adding role", "", "error");
                       }
@@ -81,6 +86,9 @@
               }
 
               let inputOptions = {};
+              if (!user.Roles) {
+                user.Roles = [];
+              }
               user.Roles.forEach((role) => {
                 inputOptions[role.ID] = role.RoleName;
               });
@@ -110,6 +118,7 @@
                     }).then((response) => {
                       if (response.ok) {
                         Swal.fire("Role entfernt!", "", "success");
+                        browser ? location.reload() : null;
                       } else {
                         Swal.fire("Error removing role", "", "error");
                       }
@@ -148,10 +157,21 @@
           <p class="text-gray-700 text-base">
             {user.Username}
           </p>
+          {#if user.Roles}
+            <div class="mt-5 w-full text-left">
+              <p class="text-gray-700 text-base">Roles:</p>
+              <div class="text-gray-700 text-base">
+                {#each user.Roles as role}
+                  {role.RoleName}
+                  {#if role !== user.Roles[user.Roles.length - 1]},
+                  {/if}
+                {/each}
+              </div>
+            </div>
+          {/if}
         </div>
       </button>
     {/each}
-    <!--ADD a user with a one time code-->
     <button
       class="max-w-sm rounded overflow-hidden shadow-lg m-3 bg-white px-5 py-5 hover:shadow-xl duration-300 ease-in-out transform hover:scale-[102%] flex flex-col"
       on:click={() => {
@@ -195,6 +215,7 @@
                 }).then((response) => {
                   if (response.ok) {
                     Swal.fire("User angenommen!", "", "success");
+                    browser ? location.reload() : null;
                   } else {
                     Swal.fire("Error accepting user", "", "error");
                   }

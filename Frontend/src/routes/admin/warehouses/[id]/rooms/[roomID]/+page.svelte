@@ -6,13 +6,14 @@
   export let data;
 
   let shelves: any = data.shelves;
+  let room = data.room;
   let warehouseID = data.warehouseID;
   let roomID = data.roomID;
 </script>
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6">
   <div class="flex flex-col mt-10 mb-4 text-center">
-    <div class="text-4xl font-bold text-gray-900">{shelves[0].Room.Name}</div>
+    <div class="text-4xl font-bold text-gray-900">{room.Name}</div>
   </div>
 
   {#if shelves}

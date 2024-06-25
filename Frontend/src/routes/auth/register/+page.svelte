@@ -3,6 +3,7 @@
   import { ArrowRight } from "svelte-bootstrap-icons";
   import Swal from "sweetalert2";
   import { fly } from "svelte/transition";
+  import { goto } from "$app/navigation";
 
   export let data;
 
@@ -26,6 +27,7 @@
   let phonenumber: string = "";
   let usertypename: string = "";
   let passwordError: string = "";
+  let telephoneError: string = "";
 
   const validatePassword = () => {
     const regex =
@@ -33,6 +35,13 @@
     passwordError = regex.test(password)
       ? ""
       : "Invalid password! Password should contain at least one uppercase letter, one lowercase letter, one number, one special character and should be at least 8 characters long.";
+  };
+
+  const validatePhonenumber = () => {
+    const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+    telephoneError = regex.test(phonenumber)
+      ? ""
+      : "Invalid phone number! Phone number should be in the format +1234567890 or 1234567890.";
   };
 
   let step = 0;
@@ -91,6 +100,7 @@
           showConfirmButton: false,
           timer: 1500,
         });
+        goto("/auth/login");
       } else {
         Swal.fire({
           position: "top-end",
@@ -267,12 +277,14 @@
             <div class="mt-1 rounded-md shadow-sm">
               <input
                 bind:value={phonenumber}
+                on:input={validatePhonenumber}
                 type="text"
                 class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
                 placeholder="Telefonnummer"
                 required
               />
             </div>
+            <p class="text-red-500 text-sm mt-2">{telephoneError}</p>
           </div>
           <div>
             <label for="jobtitle" class="text-white text-lg font-bold">

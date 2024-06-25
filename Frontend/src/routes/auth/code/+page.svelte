@@ -4,6 +4,15 @@
 
   let code = "";
   let password = "";
+  let passwordError = "";
+
+  const validatePassword = () => {
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    passwordError = regex.test(password)
+      ? ""
+      : "Invalid password! Password should contain at least one uppercase letter, one lowercase letter, one number, one special character and should be at least 8 characters long.";
+  };
 
   async function finalRegister() {
     const response = await fetch(`${API_URL}auth/register/${code}`, {
@@ -52,9 +61,11 @@
         <input
           type="password"
           id="password"
+          on:input={validatePassword}
           bind:value={password}
           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
+        <p class="text-red-500 text-sm mt-2">{passwordError}</p>
       </div>
       <button
         class="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

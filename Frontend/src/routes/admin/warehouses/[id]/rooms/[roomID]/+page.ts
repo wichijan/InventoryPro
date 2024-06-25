@@ -38,9 +38,23 @@ export const load = async ({ fetch, params }) => {
         const shelvesWithItems = await Promise.all(shelvesPromises);
         return shelvesWithItems;
     }
+    async function getRoom(): Promise<any> {
+        const response = await fetch(API_URL + 'rooms/' + params.roomID, {
+            method: 'GET',
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        return data;
+
+    }
     return {
         shelves: await getShelvesWithItems(),
         warehouseID: params.id,
-        roomID: params.roomID
+        roomID: params.roomID,
+        room: await getRoom()
     };
 }
