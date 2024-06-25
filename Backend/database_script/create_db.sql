@@ -118,7 +118,7 @@ CREATE TABLE users(
     id VARCHAR(36) PRIMARY KEY,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
-    username VARCHAR(100),
+    username VARCHAR(100) UNIQUE,
     email VARCHAR(100),
     password VARCHAR(100),
     job_title VARCHAR(100),

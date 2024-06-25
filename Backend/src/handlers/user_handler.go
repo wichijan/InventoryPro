@@ -65,7 +65,7 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 // @Accept  json
 // @Produce  json
 // @Param code path string true "Registration Code"
-// @Param user body models.PasswordReset true "User data"
+// @Param user body models.RegistrationCode true "Registration code"
 // @Success 201 {object} models.LoginResponse
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /auth/register/:code [post]
@@ -78,32 +78,22 @@ func RegisterUserWithCodeHandler(userCtrl controllers.UserControllerI) gin.Handl
 		}
 
 		// Validate code
-		ok, inv_err := userCtrl.ValidateRegistrationCode(&code)
+		userIdStr, inv_err := userCtrl.ValidateRegistrationCode(&code)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
 		}
-		if !*ok {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid code"))
-			return
-		}
 
 		// Register user
-		var newPassword models.PasswordReset
+		var newPassword models.RegistrationCode
 		err := c.ShouldBind(&newPassword)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
 			return
 		}
-		if utils.ContainsEmptyString(
-			newPassword.Password, *newPassword.Username,
-		) {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
-			return
-		}
 
 		// user is logged in after registration
-		inv_err = userCtrl.UpdateUserPassword(newPassword.Username, newPassword.Password)
+		inv_err = userCtrl.UpdateUserPassword(userIdStr, newPassword.Password)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

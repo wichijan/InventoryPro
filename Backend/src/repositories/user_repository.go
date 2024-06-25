@@ -15,6 +15,7 @@ import (
 
 type UserRepositoryI interface {
 	GetUserById(id *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
+	GetUserPureById(id *uuid.UUID) (*model.Users, *models.INVError)
 	GetUserByNameClean(username *string) (*model.Users, *models.INVError)
 	GetUserByUsername(username string) (*models.UserWithTypeName, *models.INVError)
 	CreateUser(tx *sql.Tx, user model.Users) *models.INVError
@@ -61,6 +62,26 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*models.UserWithTypeName, 
 			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)).
 			LEFT_JOIN(table.UserRoles, table.UserRoles.UserID.EQ(table.Users.ID)).
 			LEFT_JOIN(table.Roles, table.Roles.ID.EQ(table.UserRoles.RoleID)),
+	).WHERE(
+		table.Users.ID.EQ(utils.MySqlString(id.String())),
+	)
+	err := stmt.Query(ur.GetDatabaseConnection(), &user)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_USER_NOT_FOUND.WithDetails("User not found")
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading user")
+	}
+
+	return &user, nil
+}
+
+func (ur *UserRepository) GetUserPureById(id *uuid.UUID) (*model.Users, *models.INVError) {
+	var user model.Users
+	stmt := mysql.SELECT(
+		table.Users.AllColumns,
+	).FROM(
+		table.Users,
 	).WHERE(
 		table.Users.ID.EQ(utils.MySqlString(id.String())),
 	)

@@ -636,6 +636,13 @@ definitions:
       roomId:
         type: string
     type: object
+  models.RegistrationCode:
+    properties:
+      password:
+        type: string
+    required:
+    - password
+    type: object
   models.RegistrationRequest:
     properties:
       email:
@@ -1127,12 +1134,12 @@ paths:
         name: code
         required: true
         type: string
-      - description: User data
+      - description: Registration code
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.PasswordReset'
+          $ref: '#/definitions/models.RegistrationCode'
       produces:
       - application/json
       responses:
