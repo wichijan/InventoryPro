@@ -393,12 +393,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "User data",
+                        "description": "Registration code",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.PasswordReset"
+                            "$ref": "#/definitions/models.RegistrationCode"
                         }
                     }
                 ],
@@ -4550,6 +4550,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "roomId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RegistrationCode": {
+            "type": "object",
+            "required": [
+                "password"
+            ],
+            "properties": {
+                "password": {
                     "type": "string"
                 }
             }
