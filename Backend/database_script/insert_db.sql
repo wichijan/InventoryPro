@@ -166,7 +166,7 @@ values
         0,
         NULL,
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
-        "single_object"
+        "set_of_objects"
     ),
     (
         "7791a294-94de-4cbf-9243-3f7210664f92",
@@ -179,7 +179,7 @@ values
         0,
         NULL,
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
-        "single_object"
+        "set_of_objects"
     ),
     (
         "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
@@ -192,7 +192,7 @@ values
         0,
         NULL,
         "0a75123a-9736-4c60-a10c-16e76aced3d2",
-        "single_object"
+        "set_of_objects"
     );
 
 Insert into
@@ -204,6 +204,37 @@ values
         "J. K. Rowling",
         "Bloomsbury",
         "1"
+    );
+
+insert into
+    sets_of_objects(
+        item_id,
+        total_objects,
+        useful_objects,
+        broken_objects,
+        lost_objects
+    )
+values
+    (
+        "2cbdabf2-f8f4-4aab-8d2e-59ef464abf6c",
+        1,
+        1,
+        0,
+        0
+    ),
+    (
+        "7791a294-94de-4cbf-9243-3f7210664f92",
+        1,
+        1,
+        0,
+        0
+    ),
+    (
+        "9f78d8b6-8605-4f58-bdee-b64bc8fde0cb",
+        1,
+        1,
+        0,
+        0
     );
 
 Insert into
