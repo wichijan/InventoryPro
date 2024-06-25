@@ -13,7 +13,6 @@
   let items = data.items;
   const defaultItems = JSON.parse(JSON.stringify(items));
 
-
   let showItems = items;
   $: showItems = showItems;
 
@@ -37,11 +36,11 @@
   }
 
   let sort = 0;
-
-
 </script>
 
-<div class=" min-h-screen text-gray-900 flex flex-col items-center p-6 mb-10">
+<div
+  class=" min-h-screen text-gray-900 flex flex-col items-center p-7 mb-10 w-full h-full"
+>
   <div class="flex flex-col mt-10 mb-4 text-center">
     <div class="text-4xl font-bold text-gray-900">Items</div>
   </div>
@@ -51,9 +50,8 @@
       <div class="text-center text-gray-700">No items found</div>
     {:else}
       <div
-        class="relative overflow-x-auto shadow-lg rounded-lg w-full max-w-4xl bg-white"
+        class="relative overflow-x-auto shadow-lg rounded-lg w-full mt-5 ml-1 bg-white"
       >
-        <!-- filter icon and sort icon should be here-->
         <div class="flex justify-between items-center p-4">
           <div class="flex items-center">
             <input
@@ -92,9 +90,6 @@
                 }
               }}
             />
-            <!-- <button class="ml-2">
-              <Filter class="h-6 w-6 text-gray-500" />
-            </button> -->
           </div>
           <div class="flex items-center">
             <select
@@ -134,7 +129,6 @@
               on:click={() => {
                 sort = sort === 0 ? 1 : 0;
                 let e = document.getElementById("sort");
-                //sort the items in the right way
                 items = items.sort((a, b) => {
                   if (e.value === "name") {
                     if (sort === 0) {

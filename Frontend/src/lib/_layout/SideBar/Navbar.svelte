@@ -33,7 +33,7 @@
         name: "Items",
         link: "/items",
         icon: ListCheck,
-        active: active.includes("/items") && active.length === 1,
+        active: active.includes("items"),
       },
       {
         name: "Overview",

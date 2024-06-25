@@ -8,6 +8,7 @@
     ArchiveFill,
     Backpack2Fill,
     FilesAlt,
+    Speedometer2,
   } from "svelte-bootstrap-icons";
 
   let dashboardItems = [
@@ -52,6 +53,12 @@
       path: "/admin/items",
       icon: FilesAlt,
       description: "Manage items",
+    },
+    {
+      name: "Quickshelf",
+      path: "/admin/quickshelf",
+      icon: Speedometer2,
+      description: "Manage quickshelf",
     },
   ];
 </script>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { API_URL } from "$lib/_services/ShelfService";
   import Swal from "sweetalert2";
 
@@ -36,6 +37,7 @@
           showConfirmButton: false,
           timer: 1500,
         });
+        goto("/dashboard");
       } else {
         Swal.fire({
           position: "top-end",

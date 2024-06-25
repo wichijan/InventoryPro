@@ -6,7 +6,7 @@
 
   onMount(async () => {
     await isUserAdmin().then((res) => {
-      console.log(res);
+  
       if (!res) goto("/dashboard");
     });
   });

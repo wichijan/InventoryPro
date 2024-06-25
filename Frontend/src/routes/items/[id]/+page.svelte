@@ -24,6 +24,9 @@
         : false;
       userHasBorrowedItem = userHasBorrowedItem;
     });
+
+    const mI = await getMoreInformation();
+    item = { ...item, ...mI };
   });
 
   type Item = {
@@ -48,7 +51,7 @@
     Reservations: any[];
   };
 
-  const item: Item = data.item;
+  let item: Item = data.item;
 
   let errorText = "";
   $: errorText = errorText;
@@ -202,6 +205,19 @@
       },
     });
   }
+
+  async function getMoreInformation() {
+    let url = item.ItemTypes === "book" ? "book" : "set-of-objects";
+    const response = await fetch(`${API_URL}items/${url}/${item.ID}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    let data = await response.json();
+    return data;
+  }
 </script>
 
 {#if item}
@@ -233,10 +249,15 @@
             </div>
           {/if}
           {#if item.Subject}
-            <div class="">Fächer</div>
+            <div class="flex flex-col mt-2">Fächer</div>
             {#each item.Subject as subject}
-              -
-              <div class="text-[#344e41]">{subject.Name}</div>
+              <div class="text-[#344e41]">- {subject.Name}</div>
+            {/each}
+          {/if}
+          {#if item.Keywords}
+            <div class="flex flex-col mt-2">Schlüsselwörter</div>
+            {#each item.Keywords as keyword}
+              <div class="text-[#344e41] capitalize">- {keyword.Keyword}</div>
             {/each}
           {/if}
 
@@ -308,10 +329,13 @@
               <div class="text-green-600">In Ordnung</div>
             {/if}
           </div>
-          {#if item.DamagedDesc}
+          {#if item.DamagedDescription}
             <br />
             <hr />
-            <div class="mt-5">Beschreibung: <br /> {item.DamagedDesc}</div>
+            <div class="mt-5">
+              Beschreibung: <br />
+              {item.DamagedDescription}
+            </div>
           {/if}
         </div>
       </div>
@@ -335,6 +359,47 @@
               Klasse 4
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="flex flex-col bg-tertiary px-5 py-5 mt-5 ml-10 mr-5 rounded-md"
+      id="specificInformation"
+    >
+      <div class="mx-auto font-semibold text-xl" id="header">
+        Spezifische Informationen für {item.ItemTypes === "book"
+          ? "Buch"
+          : "Normal"}
+      </div>
+      <div class="w-full">
+        <div class="flex flex-col">
+          {#if item.ItemTypes === "book"}
+            <div class="flex flex-col">
+              <div class="text-[#344e41]">Autor: {item.Author}</div>
+              <div class="text-[#344e41]">Edition: {item.Edition}</div>
+              <div class="text-[#344e41]">ISBN: {item.Isbn}</div>
+              <div class="text-[#344e41]">Verlag: {item.Publisher}</div>
+            </div>
+          {:else}
+            <div class="flex flex-col">
+              <div class="text-[#344e41]">
+                Anzahl Objekte: {item.TotalObjects}
+              </div>
+              <div class="text-[#344e41]">
+                Anzahl defekte Objekte: {item.BrokenObjects}
+              </div>
+              <div class="text-[#344e41]">
+                Anzahl verlorene Objekte: {item.LostObjects}
+              </div>
+              <div class="text-[#344e41]">
+                Anzahl der nutzbaren Objekte: {item.UsefulObjects}
+              </div>
+            </div>
+          {/if}
+          {#if item.HintText}
+            <div class="flex flex-col mt-5">Hinweis</div>
+            <div class="text-[#344e41]">{item.HintText}</div>
+          {/if}
         </div>
       </div>
     </div>
