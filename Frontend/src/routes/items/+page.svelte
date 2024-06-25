@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { API_URL } from "$lib/_services/ShelfService";
+  import { onMount } from "svelte";
   import {
     SortDown,
     SortUp,
@@ -13,7 +13,6 @@
   let items = data.items;
   const defaultItems = JSON.parse(JSON.stringify(items));
 
-  console.log(items);
 
   let showItems = items;
   $: showItems = showItems;
@@ -21,7 +20,6 @@
   let cutOffDescription = 40;
 
   function buildClassString(item: any) {
-    //add comma if there two classes or more but remove trailing
     let classes = "";
     if (item.ClassOne) {
       classes += "1";
@@ -39,6 +37,8 @@
   }
 
   let sort = 0;
+
+
 </script>
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6 mb-10">

@@ -40,12 +40,6 @@
         icon: CardList,
         active: active.includes("overview"),
       },
-      {
-        name: "Settings",
-        link: "/settings",
-        icon: Gear,
-        active: active.includes("settings"),
-      },
     ];
 
     getLoginDashboardItems();
