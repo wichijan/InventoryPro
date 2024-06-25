@@ -41,7 +41,6 @@
       body.TotalObjects = item.TotalObjects;
       body.UsefulObjects = item.UsefulObjects;
     }
-    console.log(type, body);
 
     fetch(`${API_URL}items/${type}`, {
       method: "PUT",

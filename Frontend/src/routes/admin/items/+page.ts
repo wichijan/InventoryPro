@@ -3,8 +3,8 @@ import { API_URL } from '$lib/_services/ShelfService';
 export const load = async ({ fetch, params }) => {
 
 
-    async function getRoles(): Promise<any> {
-        const response = await fetch(API_URL + 'roles', {
+    async function getItems(): Promise<any> {
+        const response = await fetch(API_URL + 'items', {
             method: 'GET',
             credentials: 'include',
             mode: 'cors',
@@ -17,6 +17,6 @@ export const load = async ({ fetch, params }) => {
     }
 
     return {
-        roles: await getRoles()
+        items: await getItems()
     };
 }

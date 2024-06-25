@@ -65,10 +65,12 @@
           </h2>
           <ul class="text-black text-sm sm:text-md">
             <li class="">
-              <a href="/" class="hover:underline">Privacy Policy</a>
+              <a href="/dsgvo" class="hover:underline">Privacy Policy</a>
             </li>
             <li>
-              <a href="/" class="hover:underline">Terms &amp; Conditions</a>
+              <a href="/impressum" class="hover:underline"
+                >Terms &amp; Conditions</a
+              >
             </li>
           </ul>
         </div>

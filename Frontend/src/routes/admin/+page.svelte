@@ -7,6 +7,7 @@
     PeopleFill,
     ArchiveFill,
     Backpack2Fill,
+    FilesAlt,
   } from "svelte-bootstrap-icons";
 
   let dashboardItems = [
@@ -46,6 +47,12 @@
       icon: ArchiveFill,
       description: "Manage usertypes",
     },
+    {
+      name: "Items",
+      path: "/admin/items",
+      icon: FilesAlt,
+      description: "Manage items",
+    },
   ];
 </script>
 
@@ -57,7 +64,7 @@
     </p>
   </div>
   <div
-    class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4 bg-tertiary rounded px-2 py-4"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-tertiary rounded px-2 py-4"
   >
     {#each dashboardItems as item}
       <button
