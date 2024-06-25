@@ -4,10 +4,11 @@
   import "../app.css";
 
   import { page } from "$app/stores";
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { API_URL } from "$lib/_services/ShelfService";
   import Footer from "$lib/_layout/Footer.svelte";
+  import { isUserLoggedIn } from "$lib/_services/UserService";
 
   let url: string;
 
@@ -27,7 +28,24 @@
     await setBreadcrumbs().then((data) => {
       breadcrumbs = data;
     });
+    checkLog();
   });
+
+  afterNavigate(async (event) => {
+    checkLog();
+  });
+
+  async function checkLog() {
+    const logIn = await isUserLoggedIn();
+    if (
+      !logIn &&
+      url !== "/auth/login" &&
+      url !== "/auth/register" &&
+      url !== "/auth/code"
+    ) {
+      goto("/auth/login");
+    }
+  }
 
   async function setBreadcrumbs(): Promise<any> {
     return new Promise(async (resolve, reject) => {

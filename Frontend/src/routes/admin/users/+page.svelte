@@ -1,6 +1,7 @@
 <script>
   import Swal from "sweetalert2";
   import { API_URL } from "$lib/_services/ShelfService";
+  import { goto } from "$app/navigation";
 
   export let data;
 
@@ -150,6 +151,20 @@
         </div>
       </button>
     {/each}
+    <!--ADD a user with a one time code-->
+    <button
+      class="max-w-sm rounded overflow-hidden shadow-lg m-3 bg-white px-5 py-5 hover:shadow-xl duration-300 ease-in-out transform hover:scale-[102%] flex flex-col"
+      on:click={() => {
+        goto("/admin/users/add");
+      }}
+    >
+      <div
+        class="flex flex-col px-6 py-4 w-full ring-1 rounded-md ring-gray-500 items-start my-auto"
+      >
+        <div class="font-bold text-xl mb-2">Add User</div>
+        <p class="text-gray-700 text-base">Add a new user</p>
+      </div>
+    </button>
   </div>
 
   <div class="mt-10 mb-4">

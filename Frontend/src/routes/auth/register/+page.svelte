@@ -85,8 +85,9 @@
       if (response.ok) {
         Swal.fire({
           position: "top-end",
-          icon: "success",
-          title: "Registration successful!",
+          icon: "info",
+          title:
+            "Deine Registrierung war erfolgreich! Ein Admin muss dich jetzt freischalten.",
           showConfirmButton: false,
           timer: 1500,
         });
@@ -174,13 +175,20 @@
         <div class="flex justify-between">
           <div class="flex flex-row w-max gap-1">
             <input type="checkbox" class="mx-auto my-auto rounded" />
-            <label for="remember" class="text-white text-sm font-bold my-auto"
+            <label
+              for="remember"
+              class="text-gray-700 text-sm font-bold my-auto"
               >Angemeldet bleiben?</label
             >
           </div>
           <a
+            href="/auth/code"
+            class="text-gray-700 text-sm font-bold hover:text-blue-400 duration-300"
+            >Anmelden mit code</a
+          >
+          <a
             href="/auth/login"
-            class="text-white text-sm font-bold hover:text-blue-400 duration-300"
+            class="text-gray-700 text-sm font-bold hover:text-blue-400 duration-300"
             >Bereits ein Account?</a
           >
         </div>
