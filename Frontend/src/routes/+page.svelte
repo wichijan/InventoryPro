@@ -1,7 +1,8 @@
 <script>
-  import LandingPage from "$lib/_layout/LandingPage.svelte";
-  import { fade } from "svelte/transition";
+  import { goto } from "$app/navigation";
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    goto("/items");
+  });
 </script>
-
-
-<LandingPage />

@@ -1,13 +1,13 @@
 <script lang="ts">
+  import CookieConsent from "$lib/_layout/CookieConsent.svelte";
+  import Navbar from "$lib/_layout/SideBar/Navbar.svelte";
   import "../app.css";
-  import Footer from "$lib/_layout/Footer.svelte";
-  import { crossfade } from "svelte/transition";
-  import { quadInOut } from "svelte/easing";
+
   import { page } from "$app/stores";
-  import SideBar from "$lib/_layout/SideBar/SideBar.svelte";
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import { API_URL } from "$lib/_services/ShelfService";
+  import Footer from "$lib/_layout/Footer.svelte";
 
   let url: string;
 
@@ -73,7 +73,7 @@
               if (name && breadcrumbs[breadcrumbs.length - 1]?.text !== name) {
                 breadcrumbs.push({
                   text: name,
-                  href: `/detail/${part}`,
+                  href: `/items/${part}`,
                 });
               }
             } catch (error) {
@@ -129,34 +129,30 @@
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-screen min-h-screen bg-primary"
+  class="relative flex flex-col justify-between min-w-screen min-h-screen bg-gradient-to-br from-gray-100 to-gray-200"
 >
-  <div class="">
-    {#if url !== "/"}
-      <div class="sticky top-0">
-        <SideBar />
-      </div>
-      <div
-        class=" mt-3 bg-tertiary px-5 py-1 rounded-md ml-[5.25rem] mr-5"
-        id="breadcrumbs"
-      >
-        {#key breadcrumbs}
-          {#each breadcrumbs as breadcrumb, index}
-            <a
-              href={breadcrumb.href}
-              class="text-[#344e41] hover:text-blue-500 duration-300"
-              >{breadcrumb.text}</a
-            >
-            {index < breadcrumbs.length - 1 ? "/ " : " "}
-          {/each}
-        {/key}
-      </div>
-    {/if}
-    <div class="flex-grow flex-1 overflow-hidden pl-12">
-      <main>
-        <slot />
-      </main>
-    </div>
+  <div class="z-50">
+    <Navbar />
+  </div>
+  <div
+    class=" mt-3 bg-tertiary px-5 py-1 rounded-md ml-[5.25rem] mr-5"
+    id="breadcrumbs"
+  >
+    {#key breadcrumbs}
+      {#each breadcrumbs as breadcrumb, index}
+        <a
+          href={breadcrumb.href}
+          class="text-[#344e41] hover:text-blue-500 duration-300"
+          >{breadcrumb.text}</a
+        >
+        {index < breadcrumbs.length - 1 ? "/ " : " "}
+      {/each}
+    {/key}
+  </div>
+  <div class="flex-grow flex-1 overflow-hidden pl-12">
+    <slot />
   </div>
   <div class="flex min-w-screen h-full"><Footer /></div>
 </div>
+
+<CookieConsent />
