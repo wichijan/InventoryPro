@@ -7,6 +7,9 @@
 
   export let data;
 
+  let keywords = data.keywords;
+  let subjects = data.subjects;
+
   let selectedType = "none";
 
   $: selectedType = selectedType;
@@ -77,8 +80,11 @@
       },
       body: JSON.stringify(body),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
+          const data = await response.json();
+          uploadRest(newItem.keywords, newItem.subjects, data);
+
           Swal.fire({
             title: "Success",
             text: "Item has been created",
@@ -103,6 +109,36 @@
           icon: "error",
         });
       });
+  }
+
+  async function uploadRest(keywords, subjects, data) {
+    const aKeyWordPromises = keywords.map((keyword) => {
+      return fetch(`${API_URL}items/add-keyword`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ItemID: data,
+          KeywordName: keyword,
+        }),
+      });
+    });
+    const aSubjectPromises = subjects.map((subject) => {
+      return fetch(`${API_URL}items/add-subject`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ItemID: data,
+          SubjectName: subject,
+        }),
+      });
+    });
+    Promise.all([...aKeyWordPromises, ...aSubjectPromises]);
   }
 
   function handleSubjectChange(event) {
@@ -316,47 +352,31 @@
         </div>
         <div class="mb-4">
           <label class="block text-gray-700" for="subjects">Subjects</label>
-          <input
-            type="text"
+          <select
             id="subjects"
+            multiple
+            bind:value={newItem.subjects}
             class="w-full p-2 border border-gray-300 rounded mt-1"
-            placeholder="Enter subjects separated by commas"
-            on:change={handleSubjectChange}
-          />
+          >
+            {#each subjects as subject}
+              <option value={subject.Name}>{subject.Name}</option>
+            {/each}
+          </select>
         </div>
-
-        {#if newItem.subjects.length > 0}
-          <div class="mb-4">
-            <label class="block text-gray-700">Selected Subjects:</label>
-            <ul>
-              {#each newItem.subjects as subject, index}
-                <li key={index} class="text-gray-700">{subject}</li>
-              {/each}
-            </ul>
-          </div>
-        {/if}
 
         <div class="mb-4">
           <label class="block text-gray-700" for="keywords">Keywords</label>
-          <input
-            type="text"
-            id="keywords"
+          <select
+            multiple
+            id="subjects"
+            bind:value={newItem.keywords}
             class="w-full p-2 border border-gray-300 rounded mt-1"
-            placeholder="Enter keywords separated by commas"
-            on:change={handleKeywordChange}
-          />
+          >
+            {#each keywords as keyword}
+              <option value={keyword.Keyword}>{keyword.Keyword}</option>
+            {/each}
+          </select>
         </div>
-
-        {#if newItem.keywords.length > 0}
-          <div class="mb-4">
-            <label class="block text-gray-700">Selected Keywords:</label>
-            <ul>
-              {#each newItem.keywords as keyword, index}
-                <li key={index} class="text-gray-700">{keyword}</li>
-              {/each}
-            </ul>
-          </div>
-        {/if}
 
         <div class="flex justify-end gap-5">
           <button

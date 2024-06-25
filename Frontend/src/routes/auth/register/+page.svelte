@@ -305,14 +305,6 @@
               Usertyp
             </label>
             <div class="mt-1 rounded-md shadow-sm">
-              <!-- <input
-                bind:value={usertypename}
-                type="text"
-                class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
-                placeholder="Usertyp"
-                required
-              /> -->
-              <!--Dropdown menu for user-types-->
               <select
                 bind:value={usertypename}
                 class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"

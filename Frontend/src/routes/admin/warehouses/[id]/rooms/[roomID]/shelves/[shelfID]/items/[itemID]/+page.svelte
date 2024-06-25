@@ -1,13 +1,18 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { API_URL } from "$lib/_services/ShelfService";
+  import { onMount } from "svelte";
   import Swal from "sweetalert2";
 
   export let data;
 
   let item = data.item;
   const copyItem = JSON.parse(JSON.stringify(item));
+
   $: item = item;
+
+  let subjects = data.subjects;
+  let keywords = data.keywords;
 
   let itemType = item.ItemTypes;
   function handleSave() {
@@ -50,8 +55,9 @@
       },
       body: JSON.stringify(body),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
+          setRest(item.Keywords, item.Subject);
           Swal.fire({
             title: "Success",
             text: "Item has been updated",
@@ -72,6 +78,83 @@
           icon: "error",
         });
       });
+  }
+
+  let addableSubjects = [];
+  let addableKeywords = [];
+
+  onMount(async () => {
+    addableSubjects = subjects.filter(
+      (subject) => !item.Subject.find((s) => s.ID === subject.ID)
+    );
+    addableKeywords = keywords.filter(
+      (keyword) => !item.Keywords.find((k) => k.ID === keyword.ID)
+    );
+    addableSubjects.sort((a, b) => a.Name.localeCompare(b.Name));
+    addableKeywords.sort((a, b) => a.Keyword.localeCompare(b.Keyword));
+  });
+
+  function setRest(keywords, subjects) {
+    const aKeyWordPromises = keywords.map((keyword) => {
+      return fetch(`${API_URL}items/add-keyword`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ItemID: item.ID,
+          KeywordName: keyword.Keyword,
+        }),
+      });
+    });
+    const aSubjectPromises = subjects.map((subject) => {
+      return fetch(`${API_URL}items/add-subject`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ItemID: item.ID,
+          SubjectName: subject.Name,
+        }),
+      });
+    });
+
+    const aRemoveKeyWordPromises = addableKeywords.map((keyword) => {
+      return fetch(`${API_URL}items/remove-keyword`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ItemID: item.ID,
+          KeywordName: keyword.Keyword,
+        }),
+      });
+    });
+    const aRemoveSubjectPromises = addableSubjects.map((subject) => {
+      return fetch(`${API_URL}items/remove-subject`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ItemID: item.ID,
+          SubjectName: subject.Name,
+        }),
+      });
+    });
+
+    Promise.all([
+      ...aKeyWordPromises,
+      ...aSubjectPromises,
+      ...aRemoveKeyWordPromises,
+      ...aRemoveSubjectPromises,
+    ]);
   }
 </script>
 
@@ -267,68 +350,150 @@
         </div>
 
         <div class="mb-4">
-          <label class="block text-gray-700">Reservation Details</label>
-          <ul class="list-disc ml-6">
-            {#if item.Reservations}
-              {#each item.Reservations as reservation}
-                <li class="mt-2">
-                  <div>
-                    <strong>Username:</strong>
-                    {reservation.Username}
-                  </div>
-                  <div>
-                    <strong>Quantity:</strong>
-                    {reservation.Quantity}
-                  </div>
-                  <div>
-                    <strong>Reservation Date:</strong>
-                    {new Date(reservation.ReservationDate).toLocaleString()}
-                  </div>
-                  <div>
-                    <strong>Time From:</strong>
-                    {new Date(reservation.TimeFrom).toLocaleString()}
-                  </div>
-                  <div>
-                    <strong>Time To:</strong>
-                    {new Date(reservation.TimeTo).toLocaleString()}
-                  </div>
-                  <div>
-                    <strong>Is Cancelled:</strong>
-                    {reservation.IsCancelled ? "Yes" : "No"}
-                  </div>
-                </li>
-              {/each}
-            {:else}
-              <li>No reservations</li>
-            {/if}
-          </ul>
-        </div>
+          <label class="block text-gray-700" for="subjects"
+            >Subjects (hinzugefügt)</label
+          >
+          <div class="w-full p-2 border border-gray-300 rounded mt-1">
+            {#each item.Subject as subject}
+              <button
+                type="button"
+                on:click={() => {
+                  item.Subject = item.Subject.filter(
+                    (s) => s.ID !== subject.ID
+                  );
+                  addableSubjects.push(subject);
+                }}
+                class="bg-blue-500 text-white px-2 py-1 rounded mr-2"
+              >
+                {subject.Name}
+              </button>
+            {/each}
+          </div>
+          <label class="block text-gray-700" for="subjects"
+            >Subjects (können hinzugefügt werden)</label
+          >
+          <div class="w-full p-2 border border-gray-300 rounded mt-1">
+            {#each addableSubjects as subject}
+              <button
+                type="button"
+                on:click={() => {
+                  item.Subject.push(subject);
+                  addableSubjects = addableSubjects.filter(
+                    (s) => s.ID !== subject.ID
+                  );
+                }}
+                class="bg-blue-500 text-white px-2 py-1 rounded mr-2"
+              >
+                {subject.Name}
+              </button>
+            {/each}
+          </div>
 
-        <div class="flex justify-end gap-5">
-          <button
-            type="button"
-            on:click={() => {
-              Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to cancel editing this item?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  item = copyItem;
-                }
-              });
-            }}
-            class="bg-red-500 text-white px-4 py-2 rounded shadow-md"
-            >Abbrechen</button
-          >
-          <button
-            type="submit"
-            class="bg-blue-500 text-white px-4 py-2 rounded shadow-md"
-            >Save</button
-          >
+          <div class="mb-4">
+            <label class="block text-gray-700" for="keywords"
+              >Keywords (hinzugefügt)</label
+            >
+            <div class="w-full p-2 border border-gray-300 rounded mt-1">
+              {#each item.Keywords as keyword}
+                <button
+                  type="button"
+                  on:click={() => {
+                    item.Keywords = item.Keywords.filter(
+                      (k) => k.ID !== keyword.ID
+                    );
+                    addableKeywords.push(keyword);
+                  }}
+                  class="bg-blue-500 text-white px-2 py-1 rounded mr-2"
+                >
+                  {keyword.Keyword}
+                </button>
+              {/each}
+            </div>
+            <label class="block text-gray-700" for="subjects"
+              >Keywords (können hinzugefügt werden)</label
+            >
+            <div class="w-full p-2 border border-gray-300 rounded mt-1">
+              {#each addableKeywords as keyword}
+                <button
+                  type="button"
+                  on:click={() => {
+                    item.Keywords.push(keyword);
+                    addableKeywords = addableKeywords.filter(
+                      (k) => k.ID !== keyword.ID
+                    );
+                  }}
+                  class="bg-blue-500 text-white px-2 py-1 rounded mr-2"
+                >
+                  {keyword.Keyword}
+                </button>
+              {/each}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-gray-700">Reservation Details</label>
+            <ul class="list-disc ml-6">
+              {#if item.Reservations}
+                {#each item.Reservations as reservation}
+                  <li class="mt-2">
+                    <div>
+                      <strong>Username:</strong>
+                      {reservation.Username}
+                    </div>
+                    <div>
+                      <strong>Quantity:</strong>
+                      {reservation.Quantity}
+                    </div>
+                    <div>
+                      <strong>Reservation Date:</strong>
+                      {new Date(reservation.ReservationDate).toLocaleString()}
+                    </div>
+                    <div>
+                      <strong>Time From:</strong>
+                      {new Date(reservation.TimeFrom).toLocaleString()}
+                    </div>
+                    <div>
+                      <strong>Time To:</strong>
+                      {new Date(reservation.TimeTo).toLocaleString()}
+                    </div>
+                    <div>
+                      <strong>Is Cancelled:</strong>
+                      {reservation.IsCancelled ? "Yes" : "No"}
+                    </div>
+                  </li>
+                {/each}
+              {:else}
+                <li>No reservations</li>
+              {/if}
+            </ul>
+          </div>
+
+          <div class="flex justify-end gap-5">
+            <button
+              type="button"
+              on:click={() => {
+                Swal.fire({
+                  title: "Are you sure?",
+                  text: "Do you want to cancel editing this item?",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonText: "Yes",
+                  cancelButtonText: "No",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    item = copyItem;
+                  }
+                });
+              }}
+              class="bg-red-500 text-white px-4 py-2 rounded shadow-md"
+              >Abbrechen</button
+            >
+            <button
+              type="submit"
+              class="bg-blue-500 text-white px-4 py-2 rounded shadow-md"
+              >Save</button
+            >
+          </div>
         </div>
       </form>
     </div>

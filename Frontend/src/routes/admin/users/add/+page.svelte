@@ -63,6 +63,9 @@
       });
     }
   }
+
+  export let data;
+  let userTypes = data.userTypes;
 </script>
 
 <main class="p-6 bg-gray-100 min-h-screen">
@@ -150,13 +153,15 @@
     <label for="usertypename" class="block text-sm font-medium text-gray-700"
       >User Type:</label
     >
-    <input
-      id="usertypename"
-      type="text"
-      required
+    <select
       bind:value={usertypename}
-      class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-    />
+      class="block w-full p-2 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
+      required
+    >
+      {#each userTypes as type}
+        <option value={type.TypeName}>{type.TypeName}</option>
+      {/each}
+    </select>
   </div>
 
   <button
