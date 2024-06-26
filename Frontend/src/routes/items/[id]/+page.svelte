@@ -2,9 +2,6 @@
   import { API_URL } from "$lib/_services/ShelfService";
   import { goto } from "$app/navigation";
   import { getUser } from "$lib/_services/UserService";
-  import Spinner from "$lib/templates/Spinner.svelte";
-  import { fade } from "svelte/transition";
-
   import Swal from "sweetalert2";
   import { onMount } from "svelte";
   import { browser } from "$app/environment";

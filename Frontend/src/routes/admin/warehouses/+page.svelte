@@ -7,6 +7,9 @@
   export let data;
 
   let warehouse = data.allWarehouses;
+  if (!warehouse) {
+    warehouse = [];
+  }
   $: warehouse = warehouse;
   $: {
     warehouse = warehouse.sort((a, b) => {
