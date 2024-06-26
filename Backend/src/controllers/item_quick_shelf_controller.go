@@ -26,7 +26,6 @@ type ItemQuickShelfController struct {
 	ItemsInShelfRepo   repositories.ItemInShelveRepositoryI
 }
 
-
 func (iqsc *ItemQuickShelfController) GetItemsInQuickShelf(quickShelfId *uuid.UUID) (*[]models.GetQuickShelf, *models.INVError) {
 	return iqsc.ItemQuickShelfRepo.GetItemsInQuickShelf(quickShelfId)
 }
@@ -39,10 +38,8 @@ func (iqsc *ItemQuickShelfController) InsertItemInQuickShelf(itemQuickShelf *mod
 	defer tx.Rollback()
 
 	// Remove item from user => User_item_table
-	currentQuantityOfUserItem, inv_error := iqsc.UserItemRepo.GetQuantityFromUserItem(&itemQuickShelf.ItemID)
-	if inv_error == inv_errors.INV_NOT_FOUND {
-		return inv_errors.INV_CONFLICT.WithDetails("Item is not borrowed from user")
-	} else if inv_error != nil {
+	currentQuantityOfUserItem, inv_error := iqsc.UserItemRepo.GetQuantityFromUserItem(&itemQuickShelf.ItemID, &itemQuickShelf.UserID)
+	if inv_error != nil {
 		return inv_error
 	}
 

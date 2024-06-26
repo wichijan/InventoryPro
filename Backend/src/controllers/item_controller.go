@@ -843,7 +843,7 @@ func (ic *ItemController) ReturnItem(userId *uuid.UUID, itemId *uuid.UUID) *mode
 	}
 
 	// Get quantity from user_items
-	quantityReservedItem, inv_error := ic.UserItemRepo.GetQuantityFromUserItem(itemId)
+	quantityReservedItem, inv_error := ic.UserItemRepo.GetQuantityFromUserItem(itemId, userId)
 	if inv_error != nil {
 		return inv_error
 	}

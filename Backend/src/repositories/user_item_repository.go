@@ -23,7 +23,7 @@ type UserItemRepositoryI interface {
 	DeleteItemUsers(tx *sql.Tx, itemId *uuid.UUID) *models.INVError
 	ReduceQuantityOfUserItem(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, newQuantity *int32) *models.INVError
 
-	GetQuantityFromUserItem(itemId *uuid.UUID) (*int32, *models.INVError)
+	GetQuantityFromUserItem(itemId *uuid.UUID, userId *uuid.UUID) (*int32, *models.INVError)
 
 	CheckIfItemIdExists(itemId *uuid.UUID) (bool, *models.INVError)
 
@@ -59,7 +59,7 @@ func (uir *UserItemRepository) GetUserItemByUserIdAndItemId(userId *uuid.UUID, i
 	return &userItem, nil
 }
 
-func (uir *UserItemRepository) GetQuantityFromUserItem(itemId *uuid.UUID) (*int32, *models.INVError) {
+func (uir *UserItemRepository) GetQuantityFromUserItem(itemId *uuid.UUID, userId *uuid.UUID) (*int32, *models.INVError) {
 	var quantity models.GetQuantityReserved
 
 	// Create the query
@@ -68,14 +68,15 @@ func (uir *UserItemRepository) GetQuantityFromUserItem(itemId *uuid.UUID) (*int3
 	).FROM(
 		table.UserItems,
 	).WHERE(
-		table.UserItems.ItemID.EQ(mysql.String(itemId.String())),
+		table.UserItems.ItemID.EQ(mysql.String(itemId.String())).
+			AND(table.UserItems.UserID.EQ(mysql.String(userId.String()))),
 	)
 
 	// Execute the query
 	err := stmt.Query(uir.GetDatabaseConnection(), &quantity)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, inv_errors.INV_NOT_FOUND.WithDetails("Item not found")
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("User has not borrow")
 		}
 		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading quantity of item")
 	}
