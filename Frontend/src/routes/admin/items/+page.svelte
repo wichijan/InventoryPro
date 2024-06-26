@@ -18,7 +18,7 @@
     for (let warehouse of warehouses) {
       if (warehouse.Rooms) {
         for (let room of warehouse.Rooms) {
-          if (room.ID === quickshelf.roomId) {
+          if (room.ID === quickshelf.RoomID) {
             return {
               warehouseName: warehouse.Name,
               roomName: room.Name,
@@ -34,7 +34,30 @@
 
   let sort = 0;
 
-  async function redirectToItem(item) {}
+  async function redirectToItem(item) {
+    let regularShelfID = item.RegularShelfID;
+    const getRoom = await fetch(API_URL + "shelves/" + regularShelfID, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const room = await getRoom.json();
+    let roomID = room.RoomID;
+    const getWarehouse = await fetch(API_URL + "rooms/" + roomID, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const warehouse = await getWarehouse.json();
+    const warehouseID = warehouse.WarehouseID;
+    goto(
+      `/admin/warehouses/${warehouseID}/rooms/${roomID}/shelves/${regularShelfID}/items/${item.ID}`
+    );
+  }
 </script>
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6 mb-10">
@@ -49,7 +72,7 @@
       </div>
     {:else}
       <div
-        class="relative overflow-x-auto shadow-lg rounded-lg w-full max-w-4xl bg-white"
+        class="relative overflow-x-auto shadow-lg rounded-lg w-full ml-3 bg-white"
       >
         <div class="flex justify-between items-center p-4">
           <div class="flex items-center">
@@ -188,7 +211,7 @@
                 <td class="px-6 py-4 text-right">
                   <button
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm"
-                    on:click={() => {
+                    on:click|stopPropagation={() => {
                       Swal.fire({
                         title: "Schnellregal",
                         html: `
@@ -196,7 +219,7 @@
                             ${quickshelves
                               .map(
                                 (quickshelf) =>
-                                  `<option value="${quickshelf.quickShelfId}">${getWarehouseAndRoomName(quickshelf).warehouseName} - ${getWarehouseAndRoomName(quickshelf).roomName}</option>`
+                                  `<option value="${quickshelf.QuickShelfID}">${getWarehouseAndRoomName(quickshelf).warehouseName} - ${getWarehouseAndRoomName(quickshelf).roomName}</option>`
                               )
                               .join("")}
                           </select>
@@ -210,7 +233,7 @@
                         confirmButtonText: `Update`,
                       }).then((result) => {
                         if (result.isConfirmed) {
-                          const quickshelf =
+                          const quickshelfID =
                             document.getElementById("quickshelf").value;
                           const quantity =
                             document.getElementById("quantity").value;
@@ -238,7 +261,7 @@
                               "Content-Type": "application/json",
                             },
                             body: JSON.stringify({
-                              quickShelfId: quickshelf,
+                              QuickShelfId: quickshelfID,
                               ItemID: item.ID,
                               Quantity: Number(quantity),
                             }),

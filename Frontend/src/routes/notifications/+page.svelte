@@ -15,7 +15,6 @@
       notificationCount = value.requests.length;
     });
   });
-  $: console.log(notifications);
 
   function getObject(notificationType) {
     if (notificationType === "Registration Request for Admins!") {

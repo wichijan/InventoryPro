@@ -12,7 +12,7 @@
     for (let warehouse of warehouses) {
       if (warehouse.Rooms) {
         for (let room of warehouse.Rooms) {
-          if (room.ID === quickshelf.roomId) {
+          if (room.ID === quickshelf.RoomID) {
             return {
               warehouseName: warehouse.Name,
               roomName: room.Name,
@@ -24,7 +24,7 @@
     return null;
   }
 
-  async function deleteQuickShelf(quickshelfId) {
+  async function deleteQuickShelf(quickShelfID) {
     Swal.fire({
       title: "Bist du sicher?",
       text: "Diese Aktion ist irreversibel!",
@@ -35,7 +35,7 @@
       confirmButtonText: "Ja, lösche es!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`${API_URL}quick-shelves/${quickshelfId}`, {
+        fetch(`${API_URL}quick-shelves/${quickShelfID}`, {
           method: "DELETE",
           credentials: "include",
           headers: {
@@ -71,7 +71,7 @@
       confirmButtonText: "Ja, leere es!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`${API_URL}clear-quick-shelves/${quickshelf.quickshelfId}`, {
+        fetch(`${API_URL}clear-quick-shelves/${quickshelf.QuickShelfID}`, {
           method: "DELETE",
           credentials: "include",
           headers: {
@@ -135,7 +135,7 @@
               <button
                 class="bg-red-500 text-white rounded-lg py-2 px-2 shadow-lg hover:bg-red-400 duration-300"
                 on:click={() => {
-                  deleteQuickShelf(quickshelf.quickShelfId);
+                  deleteQuickShelf(quickshelf.QuickShelfID);
                 }}
               >
                 Löschen

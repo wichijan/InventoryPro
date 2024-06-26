@@ -8,11 +8,12 @@
   let quickshelves = data.quickshelves;
   let warehouses = data.warehouses;
 
+
   function getWarehouseAndRoomName(quickshelf) {
     for (let warehouse of warehouses) {
       if (warehouse.Rooms) {
         for (let room of warehouse.Rooms) {
-          if (room.ID === quickshelf.roomId) {
+          if (room.ID === quickshelf.RoomID) {
             return {
               warehouseName: warehouse.Name,
               roomName: room.Name,
@@ -46,7 +47,7 @@
           <button
             class="bg-white rounded-lg shadow-lg w-full text-left"
             on:click={() => {
-              goto(`/quickshelves/${quickshelf.quickShelfId}`);
+              goto(`/quickshelves/${quickshelf.QuickShelfID}`);
             }}
           >
             <div class="p-4 space-y-2">

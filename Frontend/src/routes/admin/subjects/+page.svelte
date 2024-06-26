@@ -105,7 +105,7 @@
                   on:click|stopPropagation={() => {
                     Swal.fire({
                       title: "Delete Fach",
-                      text: "Bist du sicher, dass du das Fach löschen möchtest?"
+                      text: "Bist du sicher, dass du das Fach löschen möchtest?",
                       showCancelButton: true,
                       confirmButtonText: `Delete`,
                     }).then((result) => {

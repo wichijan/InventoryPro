@@ -4,5 +4,4 @@
   const quickshelves = data.quickShelf;
   const warehouses = data.warehouses;
 
-  console.log(quickshelves);
 </script>

@@ -318,7 +318,7 @@
         <div class="flex-shrink-0 w-1/3">
           <img
             src="{API_URL}items-picture/{item.ID}"
-            alt="item"
+            alt="{item.Name} Bild"
             class="rounded-lg shadow-md w-full object-cover"
           />
         </div>

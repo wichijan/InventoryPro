@@ -17,13 +17,6 @@
       rooms: warehouseRooms,
     };
   });
-
-  let isAdmin = false;
-  onMount(() => {
-    isUserAdmin().then((res) => {
-      isAdmin = res;
-    });
-  });
 </script>
 
 <div
@@ -37,14 +30,15 @@
           : ''} border-gray-600 p-4"
       >
         <div class="bg-white rounded-md p-4 hover:shadow-lg duration-300">
-          <div
-            class="px-4 py-2 bg-[#a3b18a] text-black rounded-md hover:shadow-md duration-300"
-          >
+          <div class="px-4 py-2 ring-2 ring-gray-400 text-black rounded-md">
             <h1 class="text-2xl font-bold">{warehouse.Name}</h1>
             <p>{warehouse.Description}</p>
           </div>
 
-          <div class="mt-4 flex flex-col" class:hidden={warehouse.rooms.length === 0}>
+          <div
+            class="mt-4 flex flex-col"
+            class:hidden={warehouse.rooms.length === 0}
+          >
             <h2 class="text-xl font-bold mx-auto underline">Räume</h2>
             {#each warehouse.rooms as room}
               <div class="mt-4">

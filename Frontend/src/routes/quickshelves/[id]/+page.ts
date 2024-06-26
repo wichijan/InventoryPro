@@ -4,7 +4,7 @@ export const load = async ({ fetch, params }) => {
 
 
     async function getQuickShelf(): Promise<any> {
-        const response = await fetch(API_URL + 'quick-shelf/' + params.id, {
+        const response = await fetch(API_URL + 'quick-shelves/' + params.id, {
             method: 'GET',
             credentials: 'include',
             mode: 'cors',
