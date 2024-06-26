@@ -42,8 +42,8 @@
           //returns a code
           Swal.fire({
             icon: "success",
-            title: "User created, the code is: " + code.RegistrationCode,
-            footer: "The code has been copied to your clipboard",
+            title: "User wurde erstellt, der einladungscode lautet:"+ code.RegistrationCode,,
+            footer: "Der Code wurde in die Zwischenablage kopiert",
           });
           //copy it to clipboard
           browser ? navigator.clipboard.writeText(code.RegistrationCode) : null;
@@ -59,7 +59,7 @@
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Please fill in all the fields",
+        text: "Bitte fülle alle Felder aus."
       });
     }
   }
@@ -69,7 +69,7 @@
 </script>
 
 <main class="p-6 bg-gray-100 min-h-screen">
-  <h1 class="text-2xl font-bold mb-6 text-center">Create a New User</h1>
+  <h1 class="text-2xl font-bold mb-6 text-center">Erstelle einen neuen User</h1>
 
   <div class="mb-4">
     <label for="email" class="block text-sm font-medium text-gray-700"
@@ -166,6 +166,6 @@
 
   <button
     class="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-    on:click={createUser}>Create User</button
+    on:click={createUser}>Erstelle den User</button
   >
 </main>

@@ -60,7 +60,7 @@
           setRest(item.Keywords, item.Subject);
           Swal.fire({
             title: "Success",
-            text: "Item has been updated",
+            text: "Item wurde erfolgreich aktualisiert",
             icon: "success",
           }).then(() => {});
         } else {
@@ -175,7 +175,7 @@
 
         <div class="mb-4">
           <label class="block text-gray-700" for="description"
-            >Description</label
+            >Beschreibung</label
           >
           <textarea
             id="description"
@@ -186,7 +186,7 @@
 
         <div class="mb-4">
           <label class="block text-gray-700" for="quantity"
-            >Quantity In Shelf</label
+            >Anzahl im Regal</label
           >
           <input
             id="quantity"
@@ -198,7 +198,7 @@
 
         <div class="flex gap-5">
           <div class="mb-4">
-            <label class="block text-gray-700" for="classOne">Class One</label>
+            <label class="block text-gray-700" for="classOne">Klasse 1</label>
             <input
               type="checkbox"
               id="classOne"
@@ -207,7 +207,7 @@
             />
           </div>
           <div class="mb-4">
-            <label class="block text-gray-700" for="classTwo">Class Two</label>
+            <label class="block text-gray-700" for="classTwo">Klasse 2</label>
             <input
               type="checkbox"
               id="classTwo"
@@ -216,9 +216,7 @@
             />
           </div>
           <div class="mb-4">
-            <label class="block text-gray-700" for="classThree"
-              >Class Three</label
-            >
+            <label class="block text-gray-700" for="classThree">Klasse 3</label>
             <input
               type="checkbox"
               id="classThree"
@@ -227,8 +225,7 @@
             />
           </div>
           <div class="mb-4">
-            <label class="block text-gray-700" for="classFour">Class Four</label
-            >
+            <label class="block text-gray-700" for="classFour">Klasse 4</label>
             <input
               type="checkbox"
               id="classFour"
@@ -239,7 +236,7 @@
         </div>
 
         <div class="mb-4">
-          <label class="block text-gray-700" for="damaged">Damaged</label>
+          <label class="block text-gray-700" for="damaged">Kaputt</label>
           <input
             type="checkbox"
             id="damaged"
@@ -251,7 +248,7 @@
         {#if item.Damaged}
           <div class="mb-4">
             <label class="block text-gray-700" for="dd"
-              >Damaged Description</label
+              >Beschreibung des Schadens</label
             >
             <textarea
               id="dd"
@@ -304,7 +301,7 @@
           {:else}
             <div class="mb-4">
               <label class="block text-gray-700" for="brokenObjects"
-                >Broken Objects</label
+                >Kaputte Objekte</label
               >
               <input
                 type="number"
@@ -315,7 +312,7 @@
             </div>
             <div class="mb-4">
               <label class="block text-gray-700" for="lostObjects"
-                >Lost Objects</label
+                >Verlorene Objekte</label
               >
               <input
                 type="number"
@@ -326,7 +323,7 @@
             </div>
             <div class="mb-4">
               <label class="block text-gray-700" for="totalObjects"
-                >Total Objects</label
+                >Totale Objekte</label
               >
               <input
                 type="number"
@@ -337,7 +334,7 @@
             </div>
             <div class="mb-4">
               <label class="block text-gray-700" for="usefulObjects"
-                >Useful Objects</label
+                >Nutzbare Objekte</label
               >
               <input
                 type="number"
@@ -351,7 +348,7 @@
 
         <div class="mb-4">
           <label class="block text-gray-700" for="subjects"
-            >Subjects (hinzugefügt)</label
+            >Fächer (hinzugefügt)</label
           >
           <div class="w-full p-2 border border-gray-300 rounded mt-1">
             {#each item.Subject as subject}
@@ -370,7 +367,7 @@
             {/each}
           </div>
           <label class="block text-gray-700" for="subjects"
-            >Subjects (können hinzugefügt werden)</label
+            >Fächer (können hinzugefügt werden)</label
           >
           <div class="w-full p-2 border border-gray-300 rounded mt-1">
             {#each addableSubjects as subject}
@@ -431,7 +428,7 @@
           </div>
 
           <div class="mb-4">
-            <label class="block text-gray-700">Reservation Details</label>
+            <label class="block text-gray-700">Details zur Reservierung</label>
             <ul class="list-disc ml-6">
               {#if item.Reservations}
                 {#each item.Reservations as reservation}
@@ -441,29 +438,29 @@
                       {reservation.Username}
                     </div>
                     <div>
-                      <strong>Quantity:</strong>
+                      <strong>Anzahl:</strong>
                       {reservation.Quantity}
                     </div>
                     <div>
-                      <strong>Reservation Date:</strong>
+                      <strong>Datum der Reservierung:</strong>
                       {new Date(reservation.ReservationDate).toLocaleString()}
                     </div>
                     <div>
-                      <strong>Time From:</strong>
+                      <strong>Von:</strong>
                       {new Date(reservation.TimeFrom).toLocaleString()}
                     </div>
                     <div>
-                      <strong>Time To:</strong>
+                      <strong>Bis:</strong>
                       {new Date(reservation.TimeTo).toLocaleString()}
                     </div>
                     <div>
-                      <strong>Is Cancelled:</strong>
+                      <strong>Wurde abgesagt:</strong>
                       {reservation.IsCancelled ? "Yes" : "No"}
                     </div>
                   </li>
                 {/each}
               {:else}
-                <li>No reservations</li>
+                <li>Keine Reservierungen</li>
               {/if}
             </ul>
           </div>
@@ -473,8 +470,8 @@
               type="button"
               on:click={() => {
                 Swal.fire({
-                  title: "Are you sure?",
-                  text: "Do you want to cancel editing this item?",
+                  title: "Bitte bestätigen",
+                  text: "Willst du die Änderungen verwerfen?",
                   icon: "warning",
                   showCancelButton: true,
                   confirmButtonText: "Yes",
@@ -491,7 +488,7 @@
             <button
               type="submit"
               class="bg-blue-500 text-white px-4 py-2 rounded shadow-md"
-              >Save</button
+              >Speichern</button
             >
           </div>
         </div>

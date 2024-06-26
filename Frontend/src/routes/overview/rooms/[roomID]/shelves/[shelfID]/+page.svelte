@@ -48,7 +48,9 @@
 
   {#if items}
     {#if items.length === 0}
-      <div class="text-center text-gray-700">No items found</div>
+      <div class="text-center text-gray-700">
+        In diesem Regal gibt es keine Items
+      </div>
     {:else}
       <div
         class="relative overflow-x-auto shadow-lg rounded-lg w-full mt-5 ml-1 bg-white"
@@ -121,7 +123,7 @@
               }}
             >
               <option value="name">Name</option>
-              <option value="quantity">Quantity</option>
+              <option value="quantity">Anzahl</option>
               <option value="status">Status</option>
             </select>
             <button
@@ -164,8 +166,8 @@
           <thead class="text-xs uppercase bg-gray-200 text-gray-700">
             <tr>
               <th scope="col" class="px-6 py-3">Name</th>
-              <th scope="col" class="px-6 py-3">Description</th>
-              <th scope="col" class="px-6 py-3">Quantity</th>
+              <th scope="col" class="px-6 py-3">Beschreibung</th>
+              <th scope="col" class="px-6 py-3">Anzahl</th>
               <th scope="col" class="px-6 py-3">Status</th>
               <th scope="col" class="px-6 py-3">Verfügbar</th>
               <th scope="col" class="px-6 py-3 text-right">Klassen</th>
@@ -206,6 +208,8 @@
       </div>
     {/if}
   {:else}
-    <div class="text-center text-gray-700">No items found</div>
+    <div class="text-center text-gray-700">
+      In diesem Regal gibt es keine Items
+    </div>
   {/if}
 </div>

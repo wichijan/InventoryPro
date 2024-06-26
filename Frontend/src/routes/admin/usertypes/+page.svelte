@@ -34,7 +34,7 @@
 
   {#if usertypes}
     {#if usertypes.length === 0}
-      <div class="text-center text-gray-700">No usertypes found</div>
+      <div class="text-center text-gray-700">Keine Usertypes gefunden</div>
     {:else}
       <div
         class="relative overflow-x-auto shadow-lg rounded-lg w-full max-w-4xl bg-white"
@@ -42,7 +42,7 @@
         <table class="w-full text-sm text-left text-gray-700">
           <thead class="text-xs uppercase bg-gray-200 text-gray-700">
             <tr>
-              <th scope="col" class="px-6 py-3">TypeName</th>
+              <th scope="col" class="px-6 py-3">Typnamen</th>
               <th scope="col" class="px-6 py-3 text-right">Action</th>
             </tr>
           </thead>
@@ -52,7 +52,7 @@
                 class="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-300 transition-colors cursor-pointer"
                 on:click={() => {
                   Swal.fire({
-                    title: "Update typeName",
+                    title: "Update Typnamen",
                     html: `
                         <input
                           id="typeName"
@@ -93,8 +93,8 @@
                   <button
                     on:click|stopPropagation={() => {
                       Swal.fire({
-                        title: "Delete typeName",
-                        text: "Are you sure you want to delete this typeName?",
+                        title: "Löschen eines Typnamens",
+                        text: "Bist du sicher, dass du diesen Typnamen löschen möchtest?",
                         showCancelButton: true,
                         confirmButtonText: `Delete`,
                       }).then((result) => {
@@ -113,7 +113,7 @@
                     }}
                     class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                   >
-                    Delete
+                    Löschen
                   </button>
                 </td>
               </tr>
@@ -126,9 +126,9 @@
       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
       on:click={() => {
         Swal.fire({
-          title: "Create typeName",
+          title: "Create Typnamen",
           html: `
-            <input id="typeName" class="swal2-input" placeholder="typeName" />
+            <input id="typeName" class="swal2-input" placeholder="Typnamen" />
           `,
           showCancelButton: true,
           confirmButtonText: `Create`,
@@ -162,7 +162,7 @@
         });
       }}
     >
-      Create
+      Erstellen
     </button>
   {:else}
     <Spinner />

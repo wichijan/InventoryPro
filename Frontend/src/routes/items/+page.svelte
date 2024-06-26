@@ -120,7 +120,7 @@
               }}
             >
               <option value="name">Name</option>
-              <option value="quantity">Quantity</option>
+              <option value="quantity">Anzahl</option>
               <option value="status">Status</option>
             </select>
             <button
@@ -163,8 +163,8 @@
           <thead class="text-xs uppercase bg-gray-200 text-gray-700">
             <tr>
               <th scope="col" class="px-6 py-3">Name</th>
-              <th scope="col" class="px-6 py-3">Description</th>
-              <th scope="col" class="px-6 py-3">QuantityInShelf</th>
+              <th scope="col" class="px-6 py-3">Beschreibung</th>
+              <th scope="col" class="px-6 py-3">Anzahl im Regal</th>
               <th scope="col" class="px-6 py-3">Status</th>
               <th scope="col" class="px-6 py-3">Verfügbar</th>
               <th scope="col" class="px-6 py-3 text-right">Klassen</th>

@@ -9,7 +9,6 @@
   let room = data.room;
   let warehouseID = data.warehouseID;
   let roomID = data.roomID;
-  console.log(shelves);
 </script>
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6">
@@ -53,8 +52,8 @@
                 <button
                   on:click|stopPropagation={() =>
                     Swal.fire({
-                      title: "Delete room",
-                      text: "Are you sure you want to delete this room?",
+                      title: "Regal löschen",
+                      text: "Möchten Sie dieses Regal wirklich löschen?",
                       showCancelButton: true,
                       confirmButtonText: `Delete`,
                     }).then((result) => {
@@ -68,7 +67,7 @@
                           },
                         }).then(async (response) => {
                           if (response.ok) {
-                            Swal.fire("Shelves deleted!", "", "success");
+                            Swal.fire("Regal gelöscht!", "", "success");
                             shelves = shelves.filter((s) => s.ID !== shelf.ID);
                           } else {
                             Swal.fire("Error deleting shelf", "", "error");
@@ -78,7 +77,7 @@
                     })}
                   class="text-blue-500 hover:text-blue-600 font-semibold transition-colors"
                 >
-                  Delete
+                  Löschen
                 </button>
               </td>
             </tr>
@@ -87,14 +86,14 @@
       </table>
     </div>
   {:else}
-    <div class="text-lg">No shelves</div>
+    <div class="text-lg">Es gibt keine Regale in diesem Raum.</div>
   {/if}
   <!-- Create new shelf-->
   <button
     class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
     on:click={() => {
       Swal.fire({
-        title: "Create Shelf",
+        title: "Erstelle ein Regal",
         html: `
           <input id="name" class="swal2-input" placeholder="Name" />
         `,
@@ -116,7 +115,7 @@
             }),
           }).then(async (response) => {
             if (response.ok) {
-              Swal.fire("Shelf created!", "", "success").then(() => {
+              Swal.fire("Regal created!", "", "success").then(() => {
                 location.reload();
               });
             } else {
@@ -127,6 +126,6 @@
       });
     }}
   >
-    Create Shelf
+    Neues Regal
   </button>
 </div>

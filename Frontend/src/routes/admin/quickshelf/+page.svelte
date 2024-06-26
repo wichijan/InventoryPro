@@ -26,13 +26,13 @@
 
   async function deleteQuickShelf(quickshelfId) {
     Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: "Bist du sicher?",
+      text: "Diese Aktion ist irreversibel!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Ja, lösche es!",
     }).then((result) => {
       if (result.isConfirmed) {
         fetch(`${API_URL}quick-shelves/${quickshelfId}`, {
@@ -45,7 +45,7 @@
           if (response.ok) {
             Swal.fire(
               "Deleted!",
-              "Your quickshelf has been deleted.",
+              "Dein Schnellregal wurde gelöscht.",
               "success"
             );
           } else {
@@ -57,22 +57,18 @@
   }
 
   async function clearQuickShelf(quickshelf) {
-    if (!quickshelf.Items) {
-      Swal.fire("Error", "Quickshelf is already empty", "error");
-      return;
-    }
-    if (quickshelf.Items.length === 0) {
-      Swal.fire("Error", "Quickshelf is already empty", "error");
+    if (!quickshelf.Items || quickshelf.Items.length === 0) {
+      Swal.fire("Error", "Schnellregal ist bereits leer", "error");
       return;
     }
     Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: "Bist du sicher?",
+      text: "Diese Aktion ist irreversibel!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, clear it!",
+      confirmButtonText: "Ja, leere es!",
     }).then((result) => {
       if (result.isConfirmed) {
         fetch(`${API_URL}clear-quick-shelves/${quickshelf.quickshelfId}`, {
@@ -85,7 +81,7 @@
           if (response.ok) {
             Swal.fire(
               "Cleared!",
-              "Your quickshelf has been cleared.",
+              "Dein Schnellregal wurde geleert.",
               "success"
             );
           } else {
@@ -103,8 +99,8 @@
       <div class="w-full p-4">
         <div class="bg-white rounded-lg shadow-lg">
           <div class="p-4">
-            <h3 class="font-semibold text-xl">No Quickshelves</h3>
-            <p>There are no quickshelves available.</p>
+            <h3 class="font-semibold text-xl">Kein Schnellregal</h3>
+            <p>Es gibt keine Schnellregale.</p>
           </div>
         </div>
       </div>
@@ -115,19 +111,20 @@
     <div class="flex flex-row flex-wrap w-full">
       {#each quickshelves as quickshelf}
         <div class="w-full p-4">
-          <button class="bg-white rounded-lg shadow-lg w-full text-left" 
+          <button
+            class="bg-white rounded-lg shadow-lg w-full text-left"
             on:click={() => {
-              goto(`/admin/quickshelf/${quickshelf.quickShelfId}`)
+              goto(`/admin/quickshelf/${quickshelf.quickShelfId}`);
             }}
           >
             <div class="p-4 space-y-2">
               <h3 class="font-semibold text-xl">
                 Warehouse: {getWarehouseAndRoomName(quickshelf)
-                  ?.warehouseName || "Unknown"}
+                  ?.warehouseName || "Unbekannt"}
               </h3>
               <h2 class="font-semibold text-xl">
-                Room: {getWarehouseAndRoomName(quickshelf)?.roomName ||
-                  "Unknown"}
+                Raum: {getWarehouseAndRoomName(quickshelf)?.roomName ||
+                  "Unbekannt"}
               </h2>
               <p>Items: {quickshelf.Items ? quickshelf.Items.length : 0}</p>
             </div>
@@ -138,7 +135,7 @@
                   clearQuickShelf(quickshelf);
                 }}
               >
-                Clear
+                Leeren
               </button>
               <button
                 class="bg-red-500 text-white rounded-lg py-2 px-2 shadow-lg hover:bg-red-400 duration-300"
@@ -146,7 +143,7 @@
                   deleteQuickShelf(quickshelf.quickShelfId);
                 }}
               >
-                Delete
+                Löschen
               </button>
             </div>
           </button>
@@ -165,8 +162,8 @@
         }}
       >
         <div class="p-4">
-          <h3 class="font-semibold text-xl">Create</h3>
-          <p>Create a new quickshelf.</p>
+          <h3 class="font-semibold text-xl">Erstellen</h3>
+          <p>Erstelle ein neues Schnellregal.</p>
         </div>
       </button>
     </div>

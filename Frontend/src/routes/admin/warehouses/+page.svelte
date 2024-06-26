@@ -20,7 +20,7 @@
     <h1 class="text-3xl font-bold text-black">Warehouses</h1>
   </div>
   {#if !warehouse}
-    <div class="text-lg">No warehouses</div>
+    <div class="text-lg">Es sind keine Warehouses vorhanden</div>
   {/if}
   {#if warehouse}
     <div
@@ -45,10 +45,10 @@
         class="max-w-sm rounded overflow-hidden shadow-lg m-3 bg-white hover:bg-green-500 hover:text-white px-5 py-5 hover:shadow-xl duration-300 ease-in-out transform hover:scale-[102%]"
         on:click={() => {
           Swal.fire({
-            title: "Create new warehouse",
+            title: "Erstelle ein neues warehouse",
             html: `
               <input id="name" class="swal2-input" placeholder="Name">
-              <input id="description" class="swal2-input" placeholder="Description">
+              <input id="description" class="swal2-input" placeholder="Beschreibung">
             `,
             showCancelButton: true,
             confirmButtonText: `Create`,
@@ -57,7 +57,7 @@
               const name = document.getElementById("name").value;
               const description = document.getElementById("description").value;
               if (warehouse.some((w) => w.Name === name)) {
-                Swal.fire("Warehouse already exists", "", "error");
+                Swal.fire("Warehouse existiert bereits", "", "error");
                 return;
               }
               fetch(`${API_URL}warehouses`, {
@@ -88,8 +88,10 @@
       >
         <BuildingFill class="mx-auto rounded w-8 h-8 object-cover" />
         <div class="px-6 py-4">
-          <div class="font-bold text-xl mb-2">Create new warehouse</div>
-          <p class="text-gray-700 text-base">Create a new warehouse</p>
+          <div class="font-bold text-xl mb-2">Erstelle ein neues warehouse</div>
+          <p class="text-gray-700 text-base">
+            Hier kannst du ein neues warehouse erstellen
+          </p>
         </div>
       </button>
     </div>

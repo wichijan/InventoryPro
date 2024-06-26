@@ -87,7 +87,7 @@
 
           Swal.fire({
             title: "Success",
-            text: "Item has been created",
+            text: "Item wurde erfolgreich erstellt",
             icon: "success",
           }).then(() => {
             goto(
@@ -140,18 +140,6 @@
     });
     Promise.all([...aKeyWordPromises, ...aSubjectPromises]);
   }
-
-  function handleSubjectChange(event) {
-    newItem.subjects = event.target.value
-      .split(",")
-      .map((subject) => subject.trim());
-  }
-
-  function handleKeywordChange(event) {
-    newItem.keywords = event.target.value
-      .split(",")
-      .map((keyword) => keyword.trim());
-  }
 </script>
 
 <main class="p-6 bg-gray-100 min-h-screen">
@@ -171,7 +159,7 @@
 
         <div class="mb-4">
           <label class="block text-gray-700" for="description"
-            >Description</label
+            >Beschreibung</label
           >
           <textarea
             id="description"
@@ -181,8 +169,7 @@
         </div>
 
         <div class="mb-4">
-          <label class="block text-gray-700" for="quantity">Base Quantity</label
-          >
+          <label class="block text-gray-700" for="quantity">Basis Anzahl</label>
           <input
             id="quantity"
             type="number"
@@ -192,7 +179,7 @@
         </div>
         <div class="flex gap-5">
           <div class="mb-4">
-            <label class="block text-gray-700" for="classOne">Class One</label>
+            <label class="block text-gray-700" for="classOne">Klasse 1</label>
             <input
               type="checkbox"
               id="classOne"
@@ -201,7 +188,7 @@
             />
           </div>
           <div class="mb-4">
-            <label class="block text-gray-700" for="classTwo">Class Two</label>
+            <label class="block text-gray-700" for="classTwo">Klasse 2</label>
             <input
               type="checkbox"
               id="classTwo"
@@ -210,9 +197,7 @@
             />
           </div>
           <div class="mb-4">
-            <label class="block text-gray-700" for="classThree"
-              >Class Three</label
-            >
+            <label class="block text-gray-700" for="classThree">Klasse 3</label>
             <input
               type="checkbox"
               id="classThree"
@@ -221,8 +206,7 @@
             />
           </div>
           <div class="mb-4">
-            <label class="block text-gray-700" for="classFour">Class Four</label
-            >
+            <label class="block text-gray-700" for="classFour">Klasse 4</label>
             <input
               type="checkbox"
               id="classFour"
@@ -233,7 +217,7 @@
         </div>
 
         <div class="mb-4">
-          <label class="block text-gray-700" for="damaged">Damaged</label>
+          <label class="block text-gray-700" for="damaged">Kaputt</label>
           <input
             type="checkbox"
             id="damaged"
@@ -245,7 +229,7 @@
         {#if newItem.Damaged}
           <div class="mb-4">
             <label class="block text-gray-700" for="dd"
-              >Damaged Description</label
+              >Beschreibung des Schadens</label
             >
             <textarea
               id="dd"
@@ -262,7 +246,7 @@
             class="w-full p-2 border border-gray-300 rounded mt-1"
             bind:value={selectedType}
           >
-            <option value="none">Select an item type</option>
+            <option value="none">Auswählen</option>
             {#each types as type}
               <option value={type}>{type}</option>
             {/each}
@@ -271,7 +255,7 @@
 
         <div class="mb-4 w-full ring-2 ring-gray-500 rounded-md py-2 px-2">
           {#if selectedType === "none"}
-            <p class="text-gray-400">Waiting for item type selection...</p>
+            <p class="text-gray-400">Warte auf Auswahl</p>
           {:else if selectedType === "book"}
             <div class="mb-4">
               <label class="block text-gray-700" for="publisher"
@@ -310,7 +294,7 @@
           {:else}
             <div class="mb-4">
               <label class="block text-gray-700" for="brokenObjects"
-                >Broken Objects</label
+                >Kaputte Objekte</label
               >
               <input
                 type="number"
@@ -320,7 +304,7 @@
             </div>
             <div class="mb-4">
               <label class="block text-gray-700" for="lostObjects"
-                >Lost Objects</label
+                >Verlorene Objekte</label
               >
               <input
                 type="number"
@@ -330,7 +314,7 @@
             </div>
             <div class="mb-4">
               <label class="block text-gray-700" for="totalObjects"
-                >Total Objects</label
+                >Totale Objekte</label
               >
               <input
                 type="number"
@@ -340,7 +324,7 @@
             </div>
             <div class="mb-4">
               <label class="block text-gray-700" for="usefulObjects"
-                >Useful Objects</label
+                >Nutzbare Objekte</label
               >
               <input
                 type="number"
@@ -351,7 +335,7 @@
           {/if}
         </div>
         <div class="mb-4">
-          <label class="block text-gray-700" for="subjects">Subjects</label>
+          <label class="block text-gray-700" for="subjects">Fächer</label>
           <select
             id="subjects"
             multiple
@@ -383,7 +367,7 @@
             type="submit"
             class="bg-blue-500 text-white px-4 py-2 rounded shadow-md"
           >
-            Create
+            Erstellen
           </button>
         </div>
       </form>

@@ -63,7 +63,7 @@
         <thead class="text-xs uppercase bg-gray-200 text-gray-700">
           <tr>
             <th scope="col" class="px-6 py-3">Name</th>
-            <th scope="col" class="text-center">Shelves</th>
+            <th scope="col" class="text-center">Regale</th>
             <th scope="col" class="px-6 py-3 text-right">Action</th>
           </tr>
         </thead>
@@ -88,8 +88,8 @@
                 <button
                   on:click|stopPropagation={() =>
                     Swal.fire({
-                      title: "Delete room",
-                      text: "Are you sure you want to delete this room?",
+                      title: "Raum löschen",
+                      text: "Möchten Sie diesen Raum wirklich löschen?",
                       showCancelButton: true,
                       confirmButtonText: `Delete`,
                     }).then((result) => {
@@ -113,7 +113,7 @@
                     })}
                   class="text-blue-500 hover:text-blue-600 font-semibold transition-colors"
                 >
-                  Delete
+                  Löschen
                 </button>
               </td>
             </tr>
@@ -122,13 +122,13 @@
       </table>
     </div>
   {:else}
-    <div class="text-lg mt-10">No rooms</div>
+    <div class="text-lg mt-10">Es gibt noch keine Räume</div>
   {/if}
   <button
     class="mt-5 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
     on:click={() =>
       Swal.fire({
-        title: "Create new room",
+        title: "Erstelle einen neuen Raum",
         html: `
                     <input id="name" class="swal2-input" placeholder="Name">
                 `,
@@ -138,7 +138,7 @@
         if (result.isConfirmed) {
           const name = document.getElementById("name").value;
           if (rooms.some((r) => r.Name === name)) {
-            Swal.fire("Room already exists", "", "error");
+            Swal.fire("Raum existiert bereits", "", "error");
             return;
           }
           fetch(API_URL + "rooms", {
@@ -168,6 +168,6 @@
         }
       })}
   >
-    Create new room
+    Erstelle einen neuen Raum
   </button>
 </div>

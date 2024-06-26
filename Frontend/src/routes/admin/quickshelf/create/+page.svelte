@@ -43,7 +43,7 @@
         if (response.ok) {
           Swal.fire({
             icon: "success",
-            title: "Quickshelf created successfully!",
+            title: "Schnellregal wurde erstellt",
           });
         } else {
           Swal.fire({
@@ -57,18 +57,20 @@
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Please fill in all the fields",
+        text: "Bitte fülle alle Felder aus",
       });
     }
   }
 </script>
 
 <main class="p-6 bg-gray-100 min-h-screen">
-  <h1 class="text-2xl font-bold mb-6 text-center">Create a New Quickshelf</h1>
+  <h1 class="text-2xl font-bold mb-6 text-center">
+    Erstelle ein neues Schnellregal
+  </h1>
 
   <div class="mb-4">
     <label for="warehouse" class="block text-sm font-medium text-gray-700"
-      >Select Warehouse:</label
+      >Warehouse:</label
     >
     <select
       id="warehouse"
@@ -89,7 +91,7 @@
   {#if selectedWarehouse && selectedWarehouse.Rooms}
     <div class="mb-4">
       <label for="room" class="block text-sm font-medium text-gray-700"
-        >Select Room:</label
+        >Räume:</label
       >
       <select
         id="room"
@@ -108,7 +110,8 @@
     <div class="mb-4">
       <label
         for="quickshelfName"
-        class="block text-sm font-medium text-gray-700">Quickshelf Name:</label
+        class="block text-sm font-medium text-gray-700"
+        >Schnellregal Name:</label
       >
       <input
         id="quickshelfName"

@@ -24,7 +24,7 @@
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6 mb-10">
   <div class="flex flex-col mt-10 mb-4 text-center">
-    <div class="text-4xl font-bold text-gray-900">Subjects</div>
+    <div class="text-4xl font-bold text-gray-900">Fächer</div>
   </div>
 
   {#if subjects}
@@ -35,7 +35,7 @@
         <thead class="text-xs uppercase bg-gray-200 text-gray-700">
           <tr>
             <th scope="col" class="px-6 py-3">Name</th>
-            <th scope="col" class="text-center">Description</th>
+            <th scope="col" class="text-center">Beschreibung</th>
             <th scope="col" class="px-6 py-3 text-right">Action</th>
           </tr>
         </thead>
@@ -46,7 +46,7 @@
               on:click={() => {
                 //usign swal to update
                 Swal.fire({
-                  title: "Update subject",
+                  title: "Update Fach",
                   html: `
                     <input
                       id="name"
@@ -104,8 +104,8 @@
                 <button
                   on:click|stopPropagation={() => {
                     Swal.fire({
-                      title: "Delete subject",
-                      text: "Are you sure you want to delete this subject?",
+                      title: "Delete Fach",
+                      text: "Bist du sicher, dass du das Fach löschen möchtest?"
                       showCancelButton: true,
                       confirmButtonText: `Delete`,
                     }).then((result) => {
@@ -124,7 +124,7 @@
                   }}
                   class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                 >
-                  Delete
+                  Löschen
                 </button>
               </td>
             </tr>
@@ -132,15 +132,14 @@
         </tbody>
       </table>
     </div>
-    <!-- create button-->
     <button
       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
       on:click={() => {
         Swal.fire({
-          title: "Create subject",
+          title: "Create Fach",
           html: `
             <input id="name" class="swal2-input" placeholder="Name" />
-            <input id="description" class="swal2-input" placeholder="Description" />
+            <input id="description" class="swal2-input" placeholder="Beschreibung" />
           `,
           showCancelButton: true,
           confirmButtonText: `Create`,
@@ -177,7 +176,7 @@
         });
       }}
     >
-      Create
+      Erstellen
     </button>
   {:else}
     <Spinner />

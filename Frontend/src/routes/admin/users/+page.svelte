@@ -181,17 +181,19 @@
       <div
         class="flex flex-col px-6 py-4 w-full ring-1 rounded-md ring-gray-500 items-start my-auto"
       >
-        <div class="font-bold text-xl mb-2">Add User</div>
-        <p class="text-gray-700 text-base">Add a new user</p>
+        <div class="font-bold text-xl mb-2">User hinzufügen</div>
+        <p class="text-gray-700 text-base">
+          Klicke hier um einen neuen User hinzuzufügen
+        </p>
       </div>
     </button>
   </div>
 
   <div class="mt-10 mb-4">
-    <h1 class="text-3xl font-bold text-black">User Requests</h1>
+    <h1 class="text-3xl font-bold text-black">Useranfragen</h1>
   </div>
   {#if !registrationRequests}
-    <div class="text-lg">No user requests</div>
+    <div class="text-lg">Keine Useranfragen</div>
   {/if}
   {#if registrationRequests}
     <div

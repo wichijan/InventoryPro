@@ -12,7 +12,7 @@
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     passwordError = regex.test(password)
       ? ""
-      : "Invalid password! Password should contain at least one uppercase letter, one lowercase letter, one number, one special character and should be at least 8 characters long.";
+      : "Falsches Passwort! Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl, ein Sonderzeichen enthalten und mindestens 8 Zeichen lang sein.";
   };
 
   function login(e: any) {

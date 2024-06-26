@@ -24,7 +24,7 @@
         <thead class="text-xs uppercase bg-gray-200 text-gray-700">
           <tr>
             <th scope="col" class="px-6 py-3">Name</th>
-            <th scope="col" class="text-center">Quantity</th>
+            <th scope="col" class="text-center">Anzahl</th>
             <th scope="col" class="px-6 py-3 text-right">Action</th>
           </tr>
         </thead>
@@ -48,8 +48,8 @@
                 <button
                   on:click|stopPropagation={() =>
                     Swal.fire({
-                      title: "Delete item",
-                      text: "Are you sure you want to delete this item?",
+                      title: "Item löschen",
+                      text: "Möchten Sie dieses Item wirklich löschen?",
                       showCancelButton: true,
                       confirmButtonText: `Delete`,
                     }).then((result) => {
@@ -68,7 +68,7 @@
                       }
                     })}
                 >
-                  Delete
+                  Löschen
                 </button>
               </td>
             </tr>
@@ -77,7 +77,9 @@
       </table>
     </div>
   {:else}
-    <div class="text-center text-gray-700 mt-4">No items found</div>
+    <div class="text-center text-gray-700 mt-4">
+      Es sind keine Items vorhanden
+    </div>
   {/if}
   <button
     class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -87,6 +89,6 @@
       );
     }}
   >
-    Create Item
+    Item hinzufügen
   </button>
 </div>

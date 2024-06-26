@@ -13,52 +13,52 @@
 
   let dashboardItems = [
     {
-      name: "Users",
+      name: "Benutzer",
       path: "/admin/users",
       icon: PersonCircle,
-      description: "Manage users",
+      description: "Benutzer verwalten",
     },
     {
       name: "Warehouses",
       path: "/admin/warehouses",
       icon: BuildingFill,
-      description: "Manage warehouses",
+      description: "Warehouses verwalten",
     },
     {
       name: "Keywords",
       path: "/admin/keywords",
       icon: ListNested,
-      description: "Manage keywords",
+      description: "Keywords verwalten",
     },
     {
-      name: "Roles",
+      name: "Rollen",
       path: "/admin/roles",
       icon: PeopleFill,
-      description: "Manage roles",
+      description: "Rollen verwalten",
     },
     {
-      name: "Subjects",
+      name: "Fächer",
       path: "/admin/subjects",
       icon: Backpack2Fill,
-      description: "Manage Subjects",
+      description: "Fächer verwalten",
     },
     {
-      name: "Usertypes",
+      name: "Benutzertypen",
       path: "/admin/usertypes",
       icon: ArchiveFill,
-      description: "Manage usertypes",
+      description: "Benutzertypen verwalten",
     },
     {
       name: "Items",
       path: "/admin/items",
       icon: FilesAlt,
-      description: "Manage items",
+      description: "Elemente verwalten",
     },
     {
-      name: "Quickshelf",
+      Name: "Schnellregale",
       path: "/admin/quickshelf",
       icon: Speedometer2,
-      description: "Manage quickshelf",
+      description: "Schnellregale verwalten",
     },
   ];
 </script>
@@ -67,7 +67,8 @@
   <div class="my-3 flex flex-col">
     <h1 class="text-4xl font-bold text-gray-900 mx-auto">Admin Dashboard</h1>
     <p class="text-gray-700 text-base mt-2">
-      Welcome to the admin dashboard. Here you can manage users and warehouses.
+      Willkommen auf dem Admin-Dashboard. Hier können Sie Benutzer und
+      Lagerhäuser verwalten.
     </p>
   </div>
   <div

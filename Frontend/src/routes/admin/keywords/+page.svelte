@@ -51,7 +51,7 @@
                 class="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-300 transition-colors cursor-pointer"
                 on:click={() => {
                   Swal.fire({
-                    title: "Update keyword",
+                    title: "Bearbeiten eines Keyword",
                     html: `
                       <input
                         id="Keyword"
@@ -100,8 +100,8 @@
                   <button
                     on:click|stopPropagation={() => {
                       Swal.fire({
-                        title: "Delete keyword",
-                        text: "Are you sure you want to delete this keyword?",
+                        title: "Keyword löschen",
+                        text: "Bist du sicher, dass du das Keyword löschen möchtest?"
                         showCancelButton: true,
                         confirmButtonText: `Delete`,
                       }).then((result) => {
@@ -133,7 +133,7 @@
       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
       on:click={() => {
         Swal.fire({
-          title: "Create keyword",
+          title: "Erstellen eines keywords",
           html: `
           <input id="Keyword" class="swal2-input" placeholder="Keyword" />
         `,

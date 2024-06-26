@@ -7,16 +7,6 @@
 
   export let data;
 
-  /*
-     "email": "string",
-  "firstname": "string",
-  "jobtitle": "string",
-  "lastname": "string",
-  "password": "string",
-  "phonenumber": "string",
-  "username": "string",
-  "usertypename": "string"
-   */
 
   let email: string = "";
   let password: string = "";
@@ -34,14 +24,14 @@
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     passwordError = regex.test(password)
       ? ""
-      : "Invalid password! Password should contain at least one uppercase letter, one lowercase letter, one number, one special character and should be at least 8 characters long.";
+      : "Falsches Passwort! Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl, ein Sonderzeichen enthalten und mindestens 8 Zeichen lang sein.";
   };
 
   const validatePhonenumber = () => {
     const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
     telephoneError = regex.test(phonenumber)
       ? ""
-      : "Invalid phone number! Phone number should be in the format +1234567890 or 1234567890.";
+      : "False Telefonnummer! Die Telefonnummer muss in dem Format +1234567890 or 1234567890 sein.";
   };
 
   let step = 0;

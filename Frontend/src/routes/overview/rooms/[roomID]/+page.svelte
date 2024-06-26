@@ -51,9 +51,9 @@
         </table>
       </div>
     {:else}
-      <div class="text-lg">No shelves</div>
+      <div class="text-lg">In diesem Raum gibt es keine Regale</div>
     {/if}
   {:else}
-    <div class="text-lg">No shelves</div>
+    <div class="text-lg">In diesem Raum gibt es keine Regale</div>
   {/if}
 </div>
