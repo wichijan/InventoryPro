@@ -90,9 +90,21 @@
             text: "Item wurde erfolgreich erstellt",
             icon: "success",
           }).then(() => {
-            goto(
-              `/admin/warehouses/${data.warehouseID}/rooms/${data.roomID}/shelves/${data.shelfID}`
-            );
+            //ask if user wants to upload a picture, if not redirect to shelf
+            Swal.fire({
+              title: "Möchtest du ein Bild hochladen?",
+              showDenyButton: true,
+              confirmButtonText: `Ja`,
+              denyButtonText: `Nein`,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                uploadPic(data);
+              } else if (result.isDenied) {
+                goto(
+                  `/admin/warehouses/${data.warehouseID}/rooms/${data.roomID}/shelves/${data.shelfID}`
+                );
+              }
+            });
           });
         } else {
           Swal.fire({
@@ -139,6 +151,50 @@
       });
     });
     Promise.all([...aKeyWordPromises, ...aSubjectPromises]);
+  }
+
+  function uploadPic(itemID) {
+    //Using swal, to ask for pic via form
+    Swal.fire({
+      title: "Bild hochladen",
+      html: `
+        <form id="uploadForm" enctype="multipart/form-data">
+          <input type="hidden" id="itemID" name="id" value="${itemID}" />
+          <input type="file" id="file" name="file" accept="image/*" required>
+        </form>
+      `,
+      showCancelButton: true,
+      confirmButtonText: `Hochladen`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append("file", document.getElementById("file").files[0]);
+        formData.append("id", document.getElementById("itemID").value);
+        fetch(`${API_URL}items-picture`, {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        }).then((response) => {
+          if (response.ok) {
+            Swal.fire({
+              title: "Success",
+              text: "Bild wurde erfolgreich hochgeladen",
+              icon: "success",
+            }).then(() => {
+              goto(
+                `/admin/warehouses/${data.warehouseID}/rooms/${data.roomID}/shelves/${data.shelfID}`
+              );
+            });
+          } else {
+            Swal.fire({
+              title: "Error",
+              text: "An error occurred while uploading the picture",
+              icon: "error",
+            });
+          }
+        });
+      }
+    });
   }
 </script>
 

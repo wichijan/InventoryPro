@@ -33,7 +33,9 @@
 
   {#if keywords}
     {#if keywords.length === 0}
-      <div class="text-center text-gray-700">Es wurden keine Keywords gefunden</div>
+      <div class="text-center text-gray-700">
+        Es wurden keine Keywords gefunden
+      </div>
     {:else}
       <div
         class="relative overflow-x-auto shadow-lg rounded-lg w-full max-w-4xl bg-white"
@@ -101,7 +103,7 @@
                     on:click|stopPropagation={() => {
                       Swal.fire({
                         title: "Keyword löschen",
-                        text: "Bist du sicher, dass du das Keyword löschen möchtest?"
+                        text: "Bist du sicher, dass du das Keyword löschen möchtest?",
                         showCancelButton: true,
                         confirmButtonText: `Delete`,
                       }).then((result) => {
@@ -112,7 +114,7 @@
                           }).then(() => {
                             Swal.fire("Deleted!", "", "success");
                             keywords = keywords.filter(
-                              (s) => s.ID !== keyword.ID,
+                              (s) => s.ID !== keyword.ID
                             );
                           });
                         }

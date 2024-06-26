@@ -2,7 +2,7 @@
   import { connect, state } from "$lib/_services/WebSocket";
   import {
     CardList,
-    Gear,
+    Speedometer2,
     GraphUp,
     People,
     GraphUpArrow,
@@ -67,6 +67,14 @@
   async function getLoginDashboardItems() {
     const isLoggedIn = await isUserLoggedIn();
     if (isLoggedIn) {
+      if (!items.some((item) => item.name === "Schnellregal"))
+        items.push({
+          name: "Schnellregal",
+          link: "/quickshelves",
+          icon: Speedometer2,
+          active: active.includes("quickshelves"),
+        });
+
       if (!items.some((item) => item.name === "Notifications"))
         items.push({
           name: "Notifications",

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { API_URL } from "$lib/_services/ShelfService";
   import { SortDown, SortUp, Filter } from "svelte-bootstrap-icons";
 
@@ -6,20 +7,16 @@
 
   let items = data.items;
   const defaultItems = JSON.parse(JSON.stringify(items));
+  const quickshelves = data.quickShelves;
 
   let showItems = items;
   $: showItems = showItems;
 
   let cutOffDescription = 40;
 
-  async function getMoreInformation(item: any) {
-    let url = item.ItemTypes === "book" ? "book" : "set-of-objects";
-    const response = await fetch(`${API_URL}items/${url}/${item.ID}`);
-    const data = await response.json();
-    return data;
-  }
-
   let sort = 0;
+
+  async function redirectToItem(item) {}
 </script>
 
 <div class=" min-h-screen text-gray-900 flex flex-col items-center p-6 mb-10">
@@ -157,9 +154,7 @@
               <tr
                 class="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-300 transition-colors cursor-pointer"
                 on:click={() => {
-                  getMoreInformation(item).then((data) => {
-                    console.log(data);
-                  });
+                  redirectToItem(item);
                 }}
               >
                 <td class="px-6 py-4">{item.Name}</td>
@@ -174,9 +169,10 @@
                 >
                 <td class="px-6 py-4 text-right">
                   <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm"
+                    on:click={() => {}}
                   >
-                    Edit
+                    Schnellregal
                   </button>
                 </td>
               </tr>

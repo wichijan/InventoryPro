@@ -80,6 +80,8 @@
       });
   }
 
+  if (!item.Subject) item.Subject = [];
+  if (!item.Keywords) item.Keywords = [];
   let addableSubjects = [];
   let addableKeywords = [];
 

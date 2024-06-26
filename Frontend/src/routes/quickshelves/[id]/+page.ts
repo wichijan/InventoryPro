@@ -3,8 +3,8 @@ import { API_URL } from '$lib/_services/ShelfService';
 export const load = async ({ fetch, params }) => {
 
 
-    async function getItems(): Promise<any> {
-        const response = await fetch(API_URL + 'items', {
+    async function getQuickShelf(): Promise<any> {
+        const response = await fetch(API_URL + 'quick-shelf/' + params.id, {
             method: 'GET',
             credentials: 'include',
             mode: 'cors',
@@ -15,8 +15,8 @@ export const load = async ({ fetch, params }) => {
         const data = await response.json();
         return data;
     }
-    async function getQuickShelves(): Promise<any> {
-        const response = await fetch(API_URL + 'quick-shelves', {
+    async function getAllWarehousesWithRooms(): Promise<any> {
+        const response = await fetch(API_URL + 'warehouses-with-rooms', {
             method: 'GET',
             credentials: 'include',
             mode: 'cors',
@@ -29,7 +29,7 @@ export const load = async ({ fetch, params }) => {
     }
 
     return {
-        quickShelves: await getQuickShelves(),
-        items: await getItems()
+        quickShelf: await getQuickShelf(),
+        warehouses: await getAllWarehousesWithRooms()
     };
 }

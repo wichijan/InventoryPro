@@ -111,12 +111,7 @@
     <div class="flex flex-row flex-wrap w-full">
       {#each quickshelves as quickshelf}
         <div class="w-full p-4">
-          <button
-            class="bg-white rounded-lg shadow-lg w-full text-left"
-            on:click={() => {
-              goto(`/admin/quickshelf/${quickshelf.quickShelfId}`);
-            }}
-          >
+          <div class="bg-white rounded-lg shadow-lg w-full text-left">
             <div class="p-4 space-y-2">
               <h3 class="font-semibold text-xl">
                 Warehouse: {getWarehouseAndRoomName(quickshelf)
@@ -146,7 +141,7 @@
                 Löschen
               </button>
             </div>
-          </button>
+          </div>
         </div>
       {/each}
     </div>

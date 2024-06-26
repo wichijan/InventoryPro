@@ -232,7 +232,7 @@
       <div class="flex flex-row justify-between mt-3">
         <div class="ml-5 w-1/2" id="imgItem">
           <img
-            src="https://via.placeholder.com/250"
+            src="TODO"
             alt="item"
             class="rounded-md w-fit h-fit mx-auto object-cover"
           />

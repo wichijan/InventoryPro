@@ -55,7 +55,7 @@
       description: "Elemente verwalten",
     },
     {
-      Name: "Schnellregale",
+      name: "Schnellregale",
       path: "/admin/quickshelf",
       icon: Speedometer2,
       description: "Schnellregale verwalten",

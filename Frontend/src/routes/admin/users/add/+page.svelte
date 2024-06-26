@@ -42,7 +42,9 @@
           //returns a code
           Swal.fire({
             icon: "success",
-            title: "User wurde erstellt, der einladungscode lautet:"+ code.RegistrationCode,,
+            title:
+              "User wurde erstellt, der einladungscode lautet:" +
+              code.RegistrationCode,
             footer: "Der Code wurde in die Zwischenablage kopiert",
           });
           //copy it to clipboard
@@ -59,7 +61,7 @@
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Bitte fülle alle Felder aus."
+        text: "Bitte fülle alle Felder aus.",
       });
     }
   }
