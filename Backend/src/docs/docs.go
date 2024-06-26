@@ -1792,6 +1792,33 @@ const docTemplate = `{
             }
         },
         "/quick-shelves/{id}": {
+            "get": {
+                "description": "Get Quick Shelf by Id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Get Quick Shelf by Id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.QuickShelfWithItems"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Delete Quick Shelf",
                 "consumes": [
@@ -3663,6 +3690,9 @@ const docTemplate = `{
         "model.QuickShelves": {
             "type": "object",
             "properties": {
+                "name": {
+                    "type": "string"
+                },
                 "quickShelfID": {
                     "type": "string"
                 },
@@ -4520,6 +4550,9 @@ const docTemplate = `{
         "models.QuickShelfCreate": {
             "type": "object",
             "properties": {
+                "name": {
+                    "type": "string"
+                },
                 "roomId": {
                     "type": "string"
                 }

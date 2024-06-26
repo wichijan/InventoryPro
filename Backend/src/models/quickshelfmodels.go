@@ -28,12 +28,14 @@ type ItemQuickShelfRemoveSingleItem struct {
 }
 
 type QuickShelfCreate struct {
+	Name   string
 	RoomId uuid.UUID
 }
 
 type QuickShelfWithItems struct {
-	QuickShelfID uuid.UUID `alias:"quick_shelves.quick_shelf_id" json:"quickShelfId"`
-	RoomID       uuid.UUID `alias:"quick_shelves.room_id" json:"roomId"`
+	QuickShelfID   uuid.UUID `alias:"quick_shelves.quick_shelf_id" json:"quickShelfId"`
+	QuickShelfName string    `alias:"quick_shelves.name" json:"quickShelfId"`
+	RoomID         uuid.UUID `alias:"quick_shelves.room_id" json:"roomId"`
 
 	Items []struct {
 		model.Items

@@ -10,4 +10,5 @@ package model
 type QuickShelves struct {
 	QuickShelfID string `sql:"primary_key"`
 	RoomID       *string
+	Name         *string
 }

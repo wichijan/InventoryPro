@@ -32,6 +32,32 @@ func GetQuickShelvesHandler(quickShelfCtrl controllers.QuickShelfControllerI) gi
 	}
 }
 
+// @Summary Get Quick Shelf by Id
+// @Description Get Quick Shelf by Id
+// @Tags Quick Shelf
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.QuickShelfWithItems
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /quick-shelves/{id} [get]
+func GetQuickShelfByIdHandler(quickShelfCtrl controllers.QuickShelfControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		quickShelId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid quick shelf id"))
+			return
+		}
+
+		quickShelf, inv_err := quickShelfCtrl.GetQuickShelfById(&quickShelId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, quickShelf)
+	}
+}
+
 // @Summary Create Quick Shelf
 // @Description Create Quick Shelf
 // @Tags Quick Shelf

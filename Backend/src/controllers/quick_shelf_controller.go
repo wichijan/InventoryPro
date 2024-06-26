@@ -10,6 +10,7 @@ import (
 
 type QuickShelfControllerI interface {
 	GetQuickShelves() (*[]models.QuickShelfWithItems, *models.INVError)
+	GetQuickShelfById(quickShelfId *uuid.UUID) (*models.QuickShelfWithItems, *models.INVError)
 	CreateQuickShelf(quickShelf *models.QuickShelfCreate) (*uuid.UUID, *models.INVError)
 	UpdateQuickShelf(quickShelf *model.QuickShelves) *models.INVError
 	DeleteQuickShelf(quickShelfId *uuid.UUID) *models.INVError // Return to regular shelf & clear quick shelf
@@ -22,6 +23,10 @@ type QuickShelfController struct {
 
 func (qsc *QuickShelfController) GetQuickShelves() (*[]models.QuickShelfWithItems, *models.INVError) {
 	return qsc.QuickShelfRepo.GetQuickShelves()
+}
+
+func (qsc *QuickShelfController) GetQuickShelfById(quickShelfId *uuid.UUID) (*models.QuickShelfWithItems, *models.INVError) {
+	return qsc.QuickShelfRepo.GetQuickShelfById(quickShelfId)
 }
 
 func (qsc *QuickShelfController) CreateQuickShelf(quickShelf *models.QuickShelfCreate) (*uuid.UUID, *models.INVError) {

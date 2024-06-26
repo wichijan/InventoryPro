@@ -31,6 +31,8 @@ definitions:
     type: object
   model.QuickShelves:
     properties:
+      name:
+        type: string
       quickShelfID:
         type: string
       roomID:
@@ -595,6 +597,8 @@ definitions:
     type: object
   models.QuickShelfCreate:
     properties:
+      name:
+        type: string
       roomId:
         type: string
     type: object
@@ -2076,6 +2080,24 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Delete Quick Shelf
+      tags:
+      - Quick Shelf
+    get:
+      consumes:
+      - application/json
+      description: Get Quick Shelf by Id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.QuickShelfWithItems'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get Quick Shelf by Id
       tags:
       - Quick Shelf
   /registration-requests:
