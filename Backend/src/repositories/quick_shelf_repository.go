@@ -53,7 +53,9 @@ func (qsr *QuickShelfRepository) GetQuickShelves() (*[]models.QuickShelfWithItem
 func (qsr *QuickShelfRepository) GetQuickShelfById(quickShelfId *uuid.UUID) (*models.QuickShelfWithItems, *models.INVError) {
 	// Create the query
 	stmt := mysql.SELECT(
-		table.QuickShelves.AllColumns,
+		table.QuickShelves.QuickShelfID,
+		table.QuickShelves.Name,
+		table.QuickShelves.RoomID,
 		table.Items.AllColumns,
 	).FROM(
 		table.QuickShelves.
