@@ -91,7 +91,7 @@ func (h *Hub) HandleMessage(message Message) {
 		for client := range h.clients {
 			if client.UserId == message.SentToUserId {
 				select {
-				case client.send <- messageStr:
+				case client.send <- `{"SentToUserId": "`+ message.SentToUserId + `", "Sender": "`+ message.Sender + `", "Message": "` + message.Content + `", "TimeStamp": "` + time.Now().Format(time.RFC3339) + `" }`:
 				default:
 					close(client.send)
 					delete(h.clients, client)
