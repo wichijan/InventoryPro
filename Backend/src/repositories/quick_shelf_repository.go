@@ -15,6 +15,7 @@ import (
 
 type QuickShelfRepositoryI interface {
 	GetQuickShelves() (*[]models.QuickShelfWithItems, *models.INVError)
+	GetQuickShelfById(quickShelfId *uuid.UUID) (*models.QuickShelfWithItems, *models.INVError)
 	CreateQuickShelf(tx *sql.Tx, quickShelf *models.QuickShelfCreate) (*uuid.UUID, *models.INVError)
 	UpdateQuickShelf(tx *sql.Tx, quickShelf *model.QuickShelves) *models.INVError
 	DeleteQuickShelf(tx *sql.Tx, quickShelfId *uuid.UUID) *models.INVError
@@ -49,15 +50,40 @@ func (qsr *QuickShelfRepository) GetQuickShelves() (*[]models.QuickShelfWithItem
 	return &quickShelves, nil
 }
 
+func (qsr *QuickShelfRepository) GetQuickShelfById(quickShelfId *uuid.UUID) (*models.QuickShelfWithItems, *models.INVError) {
+	// Create the query
+	stmt := mysql.SELECT(
+		table.QuickShelves.AllColumns,
+		table.Items.AllColumns,
+	).FROM(
+		table.QuickShelves.
+			LEFT_JOIN(table.ItemQuickShelf, table.ItemQuickShelf.QuickShelfID.EQ(table.QuickShelves.QuickShelfID)).
+			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.ItemQuickShelf.ItemID)),
+	).WHERE(
+		table.QuickShelves.QuickShelfID.EQ(mysql.String(quickShelfId.String())),
+	)
+
+	// Execute the query
+	var quickShelf models.QuickShelfWithItems
+	err := stmt.Query(qsr.GetDatabaseConnection(), &quickShelf)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading quick shelves")
+	}
+
+	return &quickShelf, nil
+}
+
 func (qsr *QuickShelfRepository) CreateQuickShelf(tx *sql.Tx, quickShelf *models.QuickShelfCreate) (*uuid.UUID, *models.INVError) {
 	uuid := uuid.New()
 
 	// Create the query
 	stmt := table.QuickShelves.INSERT(
 		table.QuickShelves.QuickShelfID,
+		table.QuickShelves.Name,
 		table.QuickShelves.RoomID,
 	).VALUES(
 		uuid,
+		quickShelf.Name,
 		quickShelf.RoomId,
 	)
 
@@ -74,8 +100,10 @@ func (qsr *QuickShelfRepository) UpdateQuickShelf(tx *sql.Tx, quickShelf *model.
 	// Create the query
 	stmt := table.QuickShelves.UPDATE(
 		table.QuickShelves.RoomID,
+		table.QuickShelves.Name,
 	).SET(
 		quickShelf.RoomID,
+		quickShelf.Name,
 	).WHERE(
 		table.QuickShelves.QuickShelfID.EQ(mysql.String(quickShelf.QuickShelfID)),
 	)

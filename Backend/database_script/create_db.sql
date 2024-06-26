@@ -158,6 +158,7 @@ create table user_roles(
 CREATE TABLE quick_shelves (
     quick_shelf_id VARCHAR(36) PRIMARY KEY,
     room_id VARCHAR(36),
+    name VARCHAR(100),
     /* So we know where shelf is */
     FOREIGN KEY (room_id) REFERENCES rooms(id)
 );
