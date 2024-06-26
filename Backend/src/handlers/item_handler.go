@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -708,24 +710,55 @@ func UploadImageForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handler
 // @Failure 500 {object} models.INVErrorMessage
 // @Router /items-picture/{id} [get]
 func GetImagePathForItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		// single file
-		id, err := uuid.Parse(c.Param("id"))
+		id, err := uuid.Parse(ctx.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
+			utils.HandleErrorAndAbort(ctx, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid id"))
 			return
 		}
 		log.Print("ID: ", id.String())
 
 		imageId, inv_err := itemCtrl.GetImageIdFromItem(&id)
 		if inv_err != nil {
-			utils.HandleErrorAndAbort(c, inv_err)
+			utils.HandleErrorAndAbort(ctx, inv_err)
 			return
 		}
 		imageName := "./../uploads/" + imageId.String() + ".jpeg"
 		log.Print("Reading image: ", imageName)
 
-		c.JSON(http.StatusOK, models.PicturePath{Path: imageName})
+		// New ---------------------------------------------------------------
+
+		// Open the file
+		fileData, err := os.Open(imageName)
+		if err != nil {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "Image not found"})
+			return
+		}
+		defer fileData.Close()
+
+		// Read the first 512 bytes of the file to determine its content type
+		fileHeader := make([]byte, 512)
+		_, err = fileData.Read(fileHeader)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read image"})
+			return
+		}
+		fileContentType := http.DetectContentType(fileHeader)
+
+		// Get the file info
+		fileInfo, err := fileData.Stat()
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get image info"})
+			return
+		}
+
+		ctx.Header("Content-Description", "File Transfer")
+		ctx.Header("Content-Transfer-Encoding", "binary")
+		ctx.Header("Content-Disposition", fmt.Sprintf("inline; filename=%s", imageId.String()))
+		ctx.Header("Content-Type", fileContentType)
+		ctx.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
+		ctx.File(imageName)
 	}
 }
 
