@@ -3,12 +3,13 @@
   import {
     PersonCircle,
     ListNested,
-    BuildingFill,
-    PeopleFill,
-    ArchiveFill,
-    Backpack2Fill,
+    Building,
+    People,
+    Archive,
+    Backpack2,
     FilesAlt,
     Speedometer2,
+    SendCheck,
   } from "svelte-bootstrap-icons";
 
   let dashboardItems = [
@@ -21,7 +22,7 @@
     {
       name: "Warehouses",
       path: "/admin/warehouses",
-      icon: BuildingFill,
+      icon: Building,
       description: "Warehouses verwalten",
     },
     {
@@ -33,19 +34,19 @@
     {
       name: "Rollen",
       path: "/admin/roles",
-      icon: PeopleFill,
+      icon: People,
       description: "Rollen verwalten",
     },
     {
       name: "Fächer",
       path: "/admin/subjects",
-      icon: Backpack2Fill,
+      icon: Backpack2,
       description: "Fächer verwalten",
     },
     {
       name: "Benutzertypen",
       path: "/admin/usertypes",
-      icon: ArchiveFill,
+      icon: Archive,
       description: "Benutzertypen verwalten",
     },
     {
@@ -59,6 +60,12 @@
       path: "/admin/quickshelf",
       icon: Speedometer2,
       description: "Schnellregale verwalten",
+    },
+    {
+      name: "Itemtransfer",
+      path: "/requests",
+      icon: SendCheck,
+      description: "Anfragen verwalten",
     },
   ];
 </script>

@@ -6,9 +6,9 @@ export const load = async ({ fetch, params }) => {
         Description: string;
         Id: string;
         Name: string;
-      };
+    };
 
-    async  function getAllWarehouses(): Promise<Warehouse[]> {
+    async function getAllWarehouses(): Promise<Warehouse[]> {
         return new Promise((resolve, reject) => {
             fetch(API_URL + 'warehouses', {
                 method: 'GET',
@@ -18,30 +18,33 @@ export const load = async ({ fetch, params }) => {
                     'Content-Type': 'application/json'
                 }
             })
-            .then(async (response) => {
-                if (response.ok) {
-                    let aPromise = [];
-                    await response.json().then((data) => {
-                        aPromise = data.map(async (warehouse) => {
-                            let warehouseData = await fetch(API_URL + 'warehouses/' + warehouse.ID, {
-                                method: 'GET',
-                                credentials: 'include',
-                                mode: 'cors',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                }
+                .then(async (response) => {
+                    if (response.ok) {
+                        let aPromise = [];
+                        await response.json().then((data) => {
+                            if (!data || data.length === 0) {
+                                resolve([]);
+                            }
+                            aPromise = data.map(async (warehouse) => {
+                                let warehouseData = await fetch(API_URL + 'warehouses/' + warehouse.ID, {
+                                    method: 'GET',
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                return warehouseData.json();
                             });
-                            return warehouseData.json();
+                            Promise.all(aPromise).then((data) => {
+                                resolve(data);
+                                (data);
+                            });
                         });
-                        Promise.all(aPromise).then((data) => {
-                            resolve(data);
-                            (data);
-                        });
-                    });
-                } else {
-                    reject(response.statusText);
-                }
-            });
+                    } else {
+                        reject(response.statusText);
+                    }
+                });
         });
     }
 
@@ -67,5 +70,5 @@ export const load = async ({ fetch, params }) => {
     }
 
 
-    return {warehouses: await getAllWarehouses(), rooms: await getRooms()};
+    return { warehouses: await getAllWarehouses(), rooms: await getRooms() };
 }

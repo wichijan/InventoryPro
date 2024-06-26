@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { isUserAdmin } from "$lib/_services/UserService.js";
   import { state } from "$lib/_services/WebSocket";
   import { onMount } from "svelte";
 
@@ -16,6 +17,22 @@
     state.subscribe((value) => {
       notifications = value.requests;
       notificationCount = value.requests.length;
+    });
+
+    isUserAdmin().then((isAdmin) => {
+      if (!isAdmin) {
+        //remove all notifications where is not item move request
+        if (notifications) {
+          notifications.forEach((notification) => {
+            const object = buildObject(notification);
+            if (object.title !== "Item move request created") {
+              notifications = notifications.filter(
+                (n) => n.Message !== "Item move request created"
+              );
+            }
+          });
+        }
+      }
     });
   });
 
