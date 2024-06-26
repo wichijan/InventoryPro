@@ -17,11 +17,14 @@
   onMount(async () => {
     await getUser().then((res) => {
       user = res;
-      userHasBorrowedItem = item.UsersBorrowed.some(
-        (user) => user.BorrowedByUserID === res.ID
-      );
+      if (item.UsersBorrowed) {
+        userHasBorrowedItem = item.UsersBorrowed.some(
+          (user) => user.BorrowedByUserID === res.ID
+        );
+      } else {
+        userHasBorrowedItem = false;
+      }
       userHasBorrowedItem = userHasBorrowedItem;
-      console.log(userHasBorrowedItem);
     });
 
     const mI = await getMoreInformation();
