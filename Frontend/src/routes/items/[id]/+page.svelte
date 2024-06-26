@@ -17,12 +17,11 @@
   onMount(async () => {
     await getUser().then((res) => {
       user = res;
-      userHasBorrowedItem = item.UsersBorrowed
-        ? item.UsersBorrowed.find(
-            (user_) => user_.BorrowedByUserID === user.ID
-          ) !== null
-        : false;
+      userHasBorrowedItem = item.UsersBorrowed.some(
+        (user) => user.BorrowedByUserID === res.ID
+      );
       userHasBorrowedItem = userHasBorrowedItem;
+      console.log(userHasBorrowedItem);
     });
 
     const mI = await getMoreInformation();
@@ -330,7 +329,7 @@
           <div class="text-gray-700 text-lg mb-4">
             Anzahl: {item.QuantityInShelf}
           </div>
-          {#if userHasBorrowedItem}
+          {#if item.UsersBorrowed && item.UsersBorrowed.length > 0}
             <div class="text-gray-700 text-lg mb-4">
               Ausgeliehen von: {#each item.UsersBorrowed as user}
                 {user.BorrowedByUserName},
@@ -413,24 +412,18 @@
         <h3 class="text-2xl font-semibold text-gray-800 mb-4">Kaputt</h3>
         <div class="text-gray-700 text-lg">{item.Damaged ? "Ja" : "Nein"}</div>
         {#if item.Damaged}
-          <div class="text-gray-700 text-lg mt-2">{item.DamagedDesc}</div>
+          <div class="text-gray-700 text-lg mt-2">
+            {item.DamagedDescription}
+          </div>
         {/if}
       </div>
       <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-1/2 ml-5">
         <h3 class="text-2xl font-semibold text-gray-800 mb-4">Klassen</h3>
-        <div class="text-gray-700 text-lg">
-          {#if item.ClassOne}
-            Klasse 1
-          {/if}
-          {#if item.ClassTwo}
-            Klasse 2
-          {/if}
-          {#if item.ClassThree}
-            Klasse 3
-          {/if}
-          {#if item.ClassFour}
-            Klasse 4
-          {/if}
+        <div class="flex flex-col text-gray-700 text-lg">
+          <div>{item.ClassOne ? "Klasse 1" : ""}</div>
+          <div>{item.ClassTwo ? "Klasse 2" : ""}</div>
+          <div>{item.ClassThree ? "Klasse 3" : ""}</div>
+          <div>{item.ClassFour ? "Klasse 4" : ""}</div>
         </div>
       </div>
     </div>
@@ -472,6 +465,44 @@
                 {new Date(reservation.TimeFrom).toLocaleDateString()},
                 <strong>Bis:</strong>
                 {new Date(reservation.TimeTo).toLocaleDateString()}
+                {#if user && reservation.UserID === user.ID}
+                  <button
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition ml-4"
+                    on:click={() => {
+                      fetch(
+                        `${API_URL}items/reserve-cancel/${reservation.ReservationID}`,
+                        {
+                          method: "DELETE",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          credentials: "include",
+                        }
+                      ).then((res) => {
+                        if (res.ok) {
+                          Swal.fire({
+                            title: "Reservierung gelöscht",
+                            text: "Die Reservierung wurde erfolgreich gelöscht",
+                            icon: "success",
+                            confirmButtonText: "Ok",
+                          });
+                          setTimeout(() => {
+                            browser ? window.location.reload() : null;
+                          }, 2000);
+                        } else {
+                          Swal.fire({
+                            title: "Fehler",
+                            text: "Die Reservierung konnte nicht gelöscht werden",
+                            icon: "error",
+                            confirmButtonText: "Ok",
+                          });
+                        }
+                      });
+                    }}
+                  >
+                    Löschen
+                  </button>
+                {/if}
               </li>
             {/each}
           </ul>
