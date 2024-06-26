@@ -160,7 +160,7 @@
       html: `
         <form id="uploadForm" enctype="multipart/form-data">
           <input type="hidden" id="itemID" name="id" value="${itemID}" />
-          <input type="file" id="file" name="file" accept="image/*" required>
+          <input type="file" id="file" name="file" accept="image/jpeg" required>
         </form>
       `,
       showCancelButton: true,

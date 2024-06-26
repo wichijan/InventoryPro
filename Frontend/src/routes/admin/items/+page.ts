@@ -27,9 +27,22 @@ export const load = async ({ fetch, params }) => {
         const data = await response.json();
         return data;
     }
+    async function getAllWarehousesWithRooms(): Promise<any> {
+        const response = await fetch(API_URL + 'warehouses-with-rooms', {
+            method: 'GET',
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        return data;
+    }
 
     return {
         quickShelves: await getQuickShelves(),
-        items: await getItems()
+        items: await getItems(),
+        warehouses: await getAllWarehousesWithRooms()
     };
 }

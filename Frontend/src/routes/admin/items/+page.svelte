@@ -2,15 +2,33 @@
   import { goto } from "$app/navigation";
   import { API_URL } from "$lib/_services/ShelfService";
   import { SortDown, SortUp, Filter } from "svelte-bootstrap-icons";
+  import Swal from "sweetalert2";
 
   export let data;
 
   let items = data.items;
   const defaultItems = JSON.parse(JSON.stringify(items));
   const quickshelves = data.quickShelves;
+  const warehouses = data.warehouses;
 
   let showItems = items;
   $: showItems = showItems;
+
+  function getWarehouseAndRoomName(quickshelf) {
+    for (let warehouse of warehouses) {
+      if (warehouse.Rooms) {
+        for (let room of warehouse.Rooms) {
+          if (room.ID === quickshelf.roomId) {
+            return {
+              warehouseName: warehouse.Name,
+              roomName: room.Name,
+            };
+          }
+        }
+      }
+    }
+    return null;
+  }
 
   let cutOffDescription = 40;
 
@@ -170,7 +188,75 @@
                 <td class="px-6 py-4 text-right">
                   <button
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm"
-                    on:click={() => {}}
+                    on:click={() => {
+                      Swal.fire({
+                        title: "Schnellregal",
+                        html: `
+                          <select id="quickshelf" class="swal2-input w-full">
+                            ${quickshelves
+                              .map(
+                                (quickshelf) =>
+                                  `<option value="${quickshelf.quickShelfId}">${getWarehouseAndRoomName(quickshelf).warehouseName} - ${getWarehouseAndRoomName(quickshelf).roomName}</option>`
+                              )
+                              .join("")}
+                          </select>
+                          <input
+                            id="quantity"
+                            class="swal2-input"
+                            placeholder="Menge"
+                          />
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: `Update`,
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          const quickshelf =
+                            document.getElementById("quickshelf").value;
+                          const quantity =
+                            document.getElementById("quantity").value;
+                          if (quantity < 1) {
+                            Swal.fire(
+                              "Die Menge muss größer als 0 sein",
+                              "",
+                              "error"
+                            );
+                            return;
+                          }
+                          if (quantity > item.QuantityInShelf) {
+                            Swal.fire(
+                              "Die Menge ist größer als die Anzahl im Regal",
+                              "",
+                              "error"
+                            );
+                            return;
+                          }
+
+                          fetch(API_URL + "add-items-to-quick-shelf", {
+                            method: "POST",
+                            credentials: "include",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                              quickShelfId: quickshelf,
+                              ItemID: item.ID,
+                              Quantity: Number(quantity),
+                            }),
+                          }).then((response) => {
+                            if (response.ok) {
+                              Swal.fire(
+                                "Das Item wurde erfolgreich dem Schnellregal hinzugefügt",
+                                "",
+                                "success"
+                              );
+                              location.reload();
+                            } else {
+                              Swal.fire("Error!", "", "error");
+                            }
+                          });
+                        }
+                      });
+                    }}
                   >
                     Schnellregal
                   </button>

@@ -232,7 +232,7 @@
       <div class="flex flex-row justify-between mt-3">
         <div class="ml-5 w-1/2" id="imgItem">
           <img
-            src="TODO"
+            src="{API_URL}items-picture/{item.ID}"
             alt="item"
             class="rounded-md w-fit h-fit mx-auto object-cover"
           />
