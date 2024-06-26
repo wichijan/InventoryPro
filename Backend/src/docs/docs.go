@@ -4608,10 +4608,13 @@ const docTemplate = `{
                         }
                     }
                 },
-                "quickShelfId": {
+                "quickShelfID": {
                     "type": "string"
                 },
-                "roomId": {
+                "quickShelfName": {
+                    "type": "string"
+                },
+                "roomID": {
                     "type": "string"
                 }
             }

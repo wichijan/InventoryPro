@@ -635,9 +635,11 @@ definitions:
               type: string
           type: object
         type: array
-      quickShelfId:
+      quickShelfID:
         type: string
-      roomId:
+      quickShelfName:
+        type: string
+      roomID:
         type: string
     type: object
   models.RegistrationCode:
