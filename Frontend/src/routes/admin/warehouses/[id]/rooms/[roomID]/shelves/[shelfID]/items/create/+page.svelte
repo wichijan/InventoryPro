@@ -8,7 +8,9 @@
   export let data;
 
   let keywords = data.keywords;
+  if (!keywords) keywords = [];
   let subjects = data.subjects;
+  if (!subjects) subjects = [];
 
   let selectedType = "none";
 
