@@ -5,7 +5,7 @@ export DB_HOST=$DB_HOST
 export DB_USER=$DB_USER
 export DB_PASSWORD=$DB_PASSWORD
 
-# rm ../uploads/*
+rm ../uploads/*
 # find ../uploads -type f ! -name 'Hallo.png' ! -name 'Bye.png' -exec rm {} +
 
 
