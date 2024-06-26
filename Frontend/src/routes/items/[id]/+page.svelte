@@ -5,6 +5,7 @@
   import Swal from "sweetalert2";
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
+  import { jsPDF } from "jspdf";
 
   export let data;
 
@@ -305,6 +306,28 @@
       }
     });
   }
+  async function toPdf() {
+    const doc = new jsPDF();
+    doc.text("Item Information", 10, 10);
+    doc.text("Name: " + item.Name, 10, 20);
+    doc.text("Description: " + item.Description, 10, 30);
+    doc.text("Quantity: " + item.QuantityInShelf, 10, 40);
+    doc.text("HintText: " + item.HintText, 10, 50);
+    doc.text("Damaged: " + item.Damaged, 10, 60);
+    doc.text("ClassOne: " + item.ClassOne, 10, 70);
+    doc.text("ClassTwo: " + item.ClassTwo, 10, 80);
+    doc.text("ClassThree: " + item.ClassThree, 10, 90);
+    doc.text("ClassFour: " + item.ClassFour, 10, 100);
+    doc.text("DamagedDesc: " + item.DamagedDescription, 10, 110);
+    doc.text("Keywords: " + item.Keywords, 10, 130);
+    doc.text("Subject: " + item.Subject, 10, 140);
+    doc.text("Reservations: " + item.Reservations, 10, 150);
+
+    //open the pdf in a new tab and download it
+    browser
+      ? (window.location = doc.output("datauristring"))
+      : doc.save("item.pdf");
+  }
 </script>
 
 {#if item}
@@ -369,7 +392,115 @@
               >
                 Zurückgeben
               </button>
+              <!-- An anderen user schicken -->
+              <button
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition"
+                on:click={() => {
+                  let allUsers = data.users;
+                  if (!allUsers) {
+                    Swal.fire({
+                      title: "Fehler",
+                      text: "Es gibt keine User",
+                      icon: "error",
+                      confirmButtonText: "Ok",
+                    });
+                    return;
+                  }
+                  let usersToSend = allUsers.filter((u) => u.ID !== user.ID);
+                  if (usersToSend.length === 0) {
+                    Swal.fire({
+                      title: "Fehler",
+                      text: "Es gibt keine anderen User",
+                      icon: "error",
+                      confirmButtonText: "Ok",
+                    });
+                    return;
+                  }
+                  Swal.fire({
+                    title: "An anderen User senden",
+                    html: `
+                      <!-- Select user which isnt him-->
+                      <select id="username" class="swal2-select w-1/2">
+                        ${allUsers
+                          .filter((u) => u.ID !== user.ID)
+                          .map(
+                            (u) =>
+                              `<option value="${u.ID}">${u.Username}</option>`
+                          )}
+                      </select>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: "Senden",
+                    cancelButtonText: "Abbrechen",
+                    preConfirm: () => {
+                      const userID = document.getElementById("username").value;
+
+                      if (!userID) {
+                        Swal.showValidationMessage(
+                          "Alle Felder müssen ausgefüllt werden"
+                        );
+                        return false;
+                      }
+
+                      return { userID };
+                    },
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      const { userID } = result.value;
+                      fetch(`${API_URL}items/transfer-request`, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        credentials: "include",
+                        body: JSON.stringify({
+                          ItemID: item.ID,
+                          NewUserID: userID,
+                        }),
+                      })
+                        .then((res) => {
+                          if (res.ok) {
+                            Swal.fire({
+                              title: "Gesendet",
+                              text: "Das Item wurde erfolgreich gesendet",
+                              icon: "success",
+                              confirmButtonText: "Ok",
+                            });
+                            setTimeout(() => {
+                              browser ? window.location.reload() : null;
+                            }, 2000);
+                          } else {
+                            Swal.fire({
+                              title: "Fehler",
+                              text: "Das Item konnte nicht gesendet werden",
+                              icon: "error",
+                              confirmButtonText: "Ok",
+                            });
+                          }
+                        })
+                        .catch((error) => {
+                          Swal.fire({
+                            title: "Fehler",
+                            text: "Ein Fehler ist aufgetreten",
+                            icon: "error",
+                            confirmButtonText: "Ok",
+                          });
+                        });
+                    }
+                  });
+                }}
+              >
+                Senden an User
+              </button>
             {/if}
+            <button
+              class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition"
+              on:click={() => {
+                toPdf();
+              }}
+            >
+              Export zu PDF
+            </button>
           </div>
         </div>
       </div>

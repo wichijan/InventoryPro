@@ -1,8 +1,11 @@
-<!-- Notifications.svelte -->
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { state } from "$lib/_services/WebSocket";
   import { onMount } from "svelte";
+
+  export let data;
+
+  let user = data.users;
 
   let notificationCount = 0;
   let notifications = [];
@@ -16,17 +19,30 @@
     });
   });
 
-  function getObject(notificationType) {
-    if (notificationType === "Registration Request for Admins!") {
-      return {
-        title: "Registrierungsanfrage!",
-        message:
-          "Ein neuer Benutzer hat sich registriert und wartet auf die Freischaltung.",
-        timestamp: "2 hours ago",
-        iconUrl: "https://cdn-icons-png.flaticon.com/512/1828/1828665.png",
-        url: "/admin/users",
-      };
-    }
+  function buildObject(notificationType) {
+    const notification = JSON.parse(notificationType);
+    return {
+      title: notification.Message,
+      message:
+        notification.Message === "Item move request created"
+          ? "Der Benutzer " +
+            getUserFromId(notification.Sender).Username +
+            " hat dir eine Anfrage geschickt"
+          : "Ein neuer Benutzer wurde erstellt",
+      timestamp: getDate(notification.TimeStamp),
+      url:
+        notification.Message === "Item move request created"
+          ? "/requests"
+          : "/admin/users",
+    };
+  }
+  function getDate(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+  }
+
+  function getUserFromId(userId) {
+    return user.find((u) => u.ID === userId);
   }
 </script>
 
@@ -36,12 +52,12 @@
   <!-- Notification count badge -->
   <div class="mt-6">
     <p class="text-sm font-medium text-gray-900">
-      You have {notificationCount} notifications
+      Du hast {notificationCount} neue Benachrichtigungen
     </p>
   </div>
   <!-- Notification list -->
   {#if notifications.length === 0}
-    <p class="text-gray-500">No notifications</p>
+    <p class="text-gray-500">Keine Benachrichtigungen</p>
   {:else}
     <ul class="divide-y divide-gray-200">
       {#each notifications as notification}
@@ -49,19 +65,19 @@
           <button
             class="flex space-x-3 text-left py-3 px-4 w-full bg-gray-200 rounded-md hover:scale-[102%] transition-transform duration-300 ease-in-out"
             on:click={() => {
-              goto(getObject(notification)?.url);
+              goto(buildObject(notification)?.url);
             }}
           >
             <!-- Notification content -->
             <div class="flex-1 space-y-1">
               <p class="text-sm font-medium text-gray-900">
-                {getObject(notification).title}
+                {buildObject(notification).title}
               </p>
               <p class="text-sm text-gray-500">
-                {getObject(notification).message}
+                {buildObject(notification).message}
               </p>
               <p class="text-xs text-gray-400">
-                {getObject(notification).timestamp}
+                {buildObject(notification).timestamp}
               </p>
             </div>
           </button>

@@ -30,6 +30,7 @@
 	"type": "module",
 	"dependencies": {
 		"bootstrap-icons": "^1.11.3",
+		"jspdf": "^2.5.1",
 		"sweetalert2": "^11.11.0"
 	}
 }

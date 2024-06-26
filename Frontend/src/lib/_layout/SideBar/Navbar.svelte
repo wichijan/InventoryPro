@@ -27,6 +27,7 @@
   $: notificationCount = notificationCount;
 
   state.subscribe((value) => {
+    console.log(value);
     notificationCount = value.requests.length;
     items = items.map((item) => {
       if (item.name === "Notifications") {
