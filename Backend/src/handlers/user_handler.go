@@ -194,6 +194,31 @@ func GetUsersHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get User By Id
+// @Description Get User By Id
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Users
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /users/{id} [GET]
+func GetUserByIdHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid user ID"))
+			return
+		}
+
+		user, inv_err := userCtrl.GetUserById(&userId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, user)
+	}
+}
+
 // @Summary Accept User Registration Request
 // @Description Accept User Registration Request
 // @Tags Users
