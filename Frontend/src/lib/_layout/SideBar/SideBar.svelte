@@ -13,6 +13,7 @@
       text={item.name}
       href={item.link}
       active={item.active}
+      nCount={item.nCount}
     />
   {/each}
 </div>

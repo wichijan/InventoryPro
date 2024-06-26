@@ -29,12 +29,13 @@
 
   {#if items}
     {#if items.length === 0}
-      <div class="text-center text-gray-700">No items found</div>
+      <div class="text-center text-gray-700">
+        Es wurden keine Items gefunden
+      </div>
     {:else}
       <div
         class="relative overflow-x-auto shadow-lg rounded-lg w-full max-w-4xl bg-white"
       >
-        <!-- filter icon and sort icon should be here-->
         <div class="flex justify-between items-center p-4">
           <div class="flex items-center">
             <input
@@ -70,9 +71,6 @@
                 }
               }}
             />
-            <!-- <button class="ml-2">
-              <Filter class="h-6 w-6 text-gray-500" />
-            </button> -->
           </div>
           <div class="flex items-center">
             <select
@@ -104,7 +102,7 @@
               }}
             >
               <option value="name">Name</option>
-              <option value="quantity">Quantity</option>
+              <option value="quantity">Anzahl</option>
               <option value="status">Status</option>
             </select>
             <button
@@ -148,8 +146,8 @@
           <thead class="text-xs uppercase bg-gray-200 text-gray-700">
             <tr>
               <th scope="col" class="px-6 py-3">Name</th>
-              <th scope="col" class="px-6 py-3">Description</th>
-              <th scope="col" class="px-6 py-3">QuantityInShelf</th>
+              <th scope="col" class="px-6 py-3">Beschreibung</th>
+              <th scope="col" class="px-6 py-3">Anzahl im Regal</th>
               <th scope="col" class="px-6 py-3">Status</th>
               <th scope="col" class="px-6 py-3 text-right">Action</th>
             </tr>

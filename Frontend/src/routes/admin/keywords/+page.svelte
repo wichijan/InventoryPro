@@ -33,7 +33,7 @@
 
   {#if keywords}
     {#if keywords.length === 0}
-      <div class="text-center text-gray-700">No keywords found</div>
+      <div class="text-center text-gray-700">Es wurden keine Keywords gefunden</div>
     {:else}
       <div
         class="relative overflow-x-auto shadow-lg rounded-lg w-full max-w-4xl bg-white"
@@ -120,7 +120,7 @@
                     }}
                     class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                   >
-                    Delete
+                    Löschen
                   </button>
                 </td>
               </tr>

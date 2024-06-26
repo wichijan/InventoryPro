@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { connect, state } from "$lib/_services/WebSocket";
   import {
     CardList,
     Gear,
@@ -7,6 +8,7 @@
     GraphUpArrow,
     ListCheck,
     DoorOpen,
+    Bell,
   } from "svelte-bootstrap-icons";
 
   import Sidebar from "./Sidebar.svelte";
@@ -21,9 +23,23 @@
 
   let items: any[] = [];
 
+  let notificationCount = 0;
+  $: notificationCount = notificationCount;
+
+  state.subscribe((value) => {
+    notificationCount = value.requests.length;
+    items = items.map((item) => {
+      if (item.name === "Notifications") {
+        item.nCount = notificationCount;
+      }
+      return item;
+    });
+  });
+
   $: items = items;
   onMount(() => {
     syncItems();
+    connect();
   });
 
   function syncItems() {
@@ -51,6 +67,15 @@
   async function getLoginDashboardItems() {
     const isLoggedIn = await isUserLoggedIn();
     if (isLoggedIn) {
+      if (!items.some((item) => item.name === "Notifications"))
+        items.push({
+          name: "Notifications",
+          link: "/notifications",
+          icon: Bell,
+          active: active.includes("notifications"),
+          nCount: notificationCount,
+        });
+
       const isAdmin = await isUserAdmin();
       if (isAdmin) {
         if (!items.some((item) => item.name === "Admin"))
