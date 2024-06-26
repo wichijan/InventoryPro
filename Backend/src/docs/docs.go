@@ -15,43 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/add-item-to-quick-shelf": {
-            "post": {
-                "description": "Add item from user to Quick Shelf",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Quick Shelf"
-                ],
-                "summary": "Add item to Quick Shelf",
-                "parameters": [
-                    {
-                        "description": "ItemQuickShelfInsertODT model",
-                        "name": "ItemQuickShelfInsertODT",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ItemQuickShelfInsertODT"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
         "/auth/accept-registration/:userId": {
             "post": {
                 "description": "Accept User Registration Request",
@@ -418,41 +381,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/clear-quick-shelf/{id}": {
-            "delete": {
-                "description": "Remove all items from quick shelf",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Quick Shelf"
-                ],
-                "summary": "Clear all times from Quick shelf",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "quick shelf id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
         "/items": {
             "get": {
                 "description": "Get items",
@@ -593,6 +521,43 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/add-item-to-quick-shelf": {
+            "post": {
+                "description": "Add item from user to Quick Shelf",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Add item to Quick Shelf",
+                "parameters": [
+                    {
+                        "description": "ItemQuickShelfInsertODT model",
+                        "name": "ItemQuickShelfInsertODT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemQuickShelfInsertODT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.INVErrorMessage"
                         }
@@ -832,6 +797,119 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.ItemReserveODT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/clear-quick-shelf/{id}": {
+            "delete": {
+                "description": "Remove all items from quick shelf",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Clear all times from Quick shelf",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "quick shelf id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/quick-shelf/{id}": {
+            "get": {
+                "description": "Get all items in quick shelf",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Get Items in Quick shelf",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "quick shelf id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.GetQuickShelf"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/items/remove-item-to-quick-shelf": {
+            "delete": {
+                "description": "You can only take all quantity of item from quick shelf to return it to regular shelf",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quick Shelf"
+                ],
+                "summary": "Bring item from Quick shelf to regular shelf",
+                "parameters": [
+                    {
+                        "description": "ItemQuickShelfRemoveSingleItem model",
+                        "name": "ItemQuickShelfRemoveSingleItem",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemQuickShelfRemoveSingleItem"
                         }
                     }
                 ],
@@ -1645,47 +1723,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/quick-shelf/{id}": {
-            "get": {
-                "description": "Get all items in quick shelf",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Quick Shelf"
-                ],
-                "summary": "Get Items in Quick shelf",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "quick shelf id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.GetQuickShelf"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
         "/quick-shelves": {
             "get": {
                 "description": "Get all Quick Shelves",
@@ -1875,43 +1912,6 @@ const docTemplate = `{
                                 "$ref": "#/definitions/model.RegistrationRequests"
                             }
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.INVErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/remove-item-to-quick-shelf": {
-            "delete": {
-                "description": "You can only take all quantity of item from quick shelf to return it to regular shelf",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Quick Shelf"
-                ],
-                "summary": "Bring item from Quick shelf to regular shelf",
-                "parameters": [
-                    {
-                        "description": "ItemQuickShelfRemoveSingleItem model",
-                        "name": "ItemQuickShelfRemoveSingleItem",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ItemQuickShelfRemoveSingleItem"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",

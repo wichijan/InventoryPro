@@ -19,7 +19,7 @@ import (
 // @Param ItemQuickShelfInsertODT body models.ItemQuickShelfInsertODT true "ItemQuickShelfInsertODT model"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /add-item-to-quick-shelf [post]
+// @Router /items/add-item-to-quick-shelf [post]
 func AddToQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -60,7 +60,7 @@ func AddToQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControl
 // @Param ItemQuickShelfRemoveSingleItem body models.ItemQuickShelfRemoveSingleItem true "ItemQuickShelfRemoveSingleItem model"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /remove-item-to-quick-shelf [delete]
+// @Router /items/remove-item-to-quick-shelf [delete]
 func RemoveItemFromQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var itemQuick models.ItemQuickShelfRemoveSingleItem
@@ -88,7 +88,7 @@ func RemoveItemFromQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShe
 // @Param id path string true "quick shelf id"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /clear-quick-shelf/{id} [delete]
+// @Router /items/clear-quick-shelf/{id} [delete]
 func ClearQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		quickShelfId, err := uuid.Parse(c.Param("id"))
@@ -115,7 +115,7 @@ func ClearQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControl
 // @Param id path string true "quick shelf id"
 // @Success 200 {array} models.GetQuickShelf
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /quick-shelf/{id} [get]
+// @Router /items/quick-shelf/{id} [get]
 func GetItemsInQuickShelfHandler(itemQuickShelfCtrl controllers.ItemQuickShelfControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		quickShelfId, err := uuid.Parse(c.Param("id"))

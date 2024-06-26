@@ -897,30 +897,6 @@ definitions:
 info:
   contact: {}
 paths:
-  /add-item-to-quick-shelf:
-    post:
-      consumes:
-      - application/json
-      description: Add item from user to Quick Shelf
-      parameters:
-      - description: ItemQuickShelfInsertODT model
-        in: body
-        name: ItemQuickShelfInsertODT
-        required: true
-        schema:
-          $ref: '#/definitions/models.ItemQuickShelfInsertODT'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Add item to Quick Shelf
-      tags:
-      - Quick Shelf
   /auth/accept-registration/:userId:
     post:
       consumes:
@@ -1159,29 +1135,6 @@ paths:
             $ref: '#/definitions/models.INVErrorMessage'
       tags:
       - Users
-  /clear-quick-shelf/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Remove all items from quick shelf
-      parameters:
-      - description: quick shelf id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Clear all times from Quick shelf
-      tags:
-      - Quick Shelf
   /items:
     get:
       consumes:
@@ -1331,6 +1284,30 @@ paths:
       summary: Get item by id
       tags:
       - Items
+  /items/add-item-to-quick-shelf:
+    post:
+      consumes:
+      - application/json
+      description: Add item from user to Quick Shelf
+      parameters:
+      - description: ItemQuickShelfInsertODT model
+        in: body
+        name: ItemQuickShelfInsertODT
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemQuickShelfInsertODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Add item to Quick Shelf
+      tags:
+      - Quick Shelf
   /items/add-keyword:
     post:
       consumes:
@@ -1493,6 +1470,81 @@ paths:
       summary: Borrow Item
       tags:
       - Items
+  /items/clear-quick-shelf/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove all items from quick shelf
+      parameters:
+      - description: quick shelf id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Clear all times from Quick shelf
+      tags:
+      - Quick Shelf
+  /items/quick-shelf/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all items in quick shelf
+      parameters:
+      - description: quick shelf id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GetQuickShelf'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get Items in Quick shelf
+      tags:
+      - Quick Shelf
+  /items/remove-item-to-quick-shelf:
+    delete:
+      consumes:
+      - application/json
+      description: You can only take all quantity of item from quick shelf to return
+        it to regular shelf
+      parameters:
+      - description: ItemQuickShelfRemoveSingleItem model
+        in: body
+        name: ItemQuickShelfRemoveSingleItem
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemQuickShelfRemoveSingleItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Bring item from Quick shelf to regular shelf
+      tags:
+      - Quick Shelf
   /items/remove-keyword:
     delete:
       consumes:
@@ -1965,33 +2017,6 @@ paths:
       summary: Delete Keyword
       tags:
       - Keywords
-  /quick-shelf/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all items in quick shelf
-      parameters:
-      - description: quick shelf id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.GetQuickShelf'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Get Items in Quick shelf
-      tags:
-      - Quick Shelf
   /quick-shelves:
     get:
       consumes:
@@ -2123,31 +2148,6 @@ paths:
       summary: Get Registration Requests
       tags:
       - Users
-  /remove-item-to-quick-shelf:
-    delete:
-      consumes:
-      - application/json
-      description: You can only take all quantity of item from quick shelf to return
-        it to regular shelf
-      parameters:
-      - description: ItemQuickShelfRemoveSingleItem model
-        in: body
-        name: ItemQuickShelfRemoveSingleItem
-        required: true
-        schema:
-          $ref: '#/definitions/models.ItemQuickShelfRemoveSingleItem'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.INVErrorMessage'
-      summary: Bring item from Quick shelf to regular shelf
-      tags:
-      - Quick Shelf
   /reset-password:
     post:
       consumes:
