@@ -218,384 +218,265 @@
     let data = await response.json();
     return data;
   }
+  async function makeReservation() {
+    if (!user) {
+      Swal.fire({
+        title: "Du musst eingeloggt sein, um eine Reservierung vorzunehmen",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "Für welches Datum möchtest du das Item reservieren?",
+      html:
+        '<input id="quantity" class="swal2-input" placeholder="Menge" type="number" min="1">' +
+        '<input id="fromDate" class="swal2-input" placeholder="Start Datum" type="date">' +
+        '<input id="toDate" class="swal2-input" placeholder="End Datum" type="date">',
+      showCancelButton: true,
+      confirmButtonText: "Reservieren",
+      cancelButtonText: "Abbrechen",
+      preConfirm: () => {
+        const quantity = (
+          document.getElementById("quantity") as HTMLInputElement
+        ).value;
+        const fromDate = (
+          document.getElementById("fromDate") as HTMLInputElement
+        ).value;
+        const toDate = (document.getElementById("toDate") as HTMLInputElement)
+          .value;
+
+        if (!quantity || !fromDate || !toDate) {
+          Swal.showValidationMessage("Alle Felder müssen ausgefüllt werden");
+          return false;
+        }
+
+        if (parseInt(quantity) < 1) {
+          Swal.showValidationMessage("Die Menge muss größer als 0 sein");
+          return false;
+        }
+
+        return { quantity, fromDate, toDate };
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const { quantity, fromDate, toDate } = result.value;
+        fetch(`${API_URL}items/reserve`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            itemID: item.ID,
+            quantity: parseInt(quantity),
+            timeFrom: fromDate,
+            timeTo: toDate,
+          }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              Swal.fire({
+                title: "Reserviert",
+                text: "Das Item wurde erfolgreich reserviert",
+                icon: "success",
+                confirmButtonText: "Ok",
+              });
+              setTimeout(() => {
+                browser ? window.location.reload() : null;
+              }, 2000);
+            } else {
+              Swal.fire({
+                title: "Fehler",
+                text: "Das Item konnte nicht reserviert werden",
+                icon: "error",
+                confirmButtonText: "Ok",
+              });
+            }
+          })
+          .catch((error) => {
+            Swal.fire({
+              title: "Fehler",
+              text: "Ein Fehler ist aufgetreten",
+              icon: "error",
+              confirmButtonText: "Ok",
+            });
+          });
+      }
+    });
+  }
 </script>
 
 {#if item}
-  <div class="my-5 flex flex-col w-full">
-    <div
-      class="flex flex-col bg-tertiary px-5 py-5 mt-5 ml-10 mr-5 rounded-md"
-      id="generalInformation"
-    >
-      <div class="mx-auto font-semibold text-2xl" id="header">
-        General information
-      </div>
-      <div class="flex flex-row justify-between mt-3">
-        <div class="ml-5 w-1/2" id="imgItem">
+  <div class="flex flex-col items-center w-full my-10">
+    <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-full max-w-4xl">
+      <h2 class="text-3xl font-semibold text-gray-800 mb-4">
+        Generelle Information
+      </h2>
+      <div class="flex flex-row justify-between">
+        <div class="flex-shrink-0 w-1/3">
           <img
             src="{API_URL}items-picture/{item.ID}"
             alt="item"
-            class="rounded-md w-fit h-fit mx-auto object-cover"
+            class="rounded-lg shadow-md w-full object-cover"
           />
         </div>
-        <div class="flex flex-col text-[#344e41] ml-12 font-semibold">
-          <div class="">Name: {item.Name}</div>
-          <div class="">Beschreibung: {item.Description}</div>
-          <div class="">Menge: {item.QuantityInShelf}</div>
+        <div class="flex-grow ml-10">
+          <div class="text-gray-700 text-lg mb-4">Name: {item.Name}</div>
+          <div class="text-gray-700 text-lg mb-4">
+            Beschreibung: {item.Description}
+          </div>
+          <div class="text-gray-700 text-lg mb-4">
+            Anzahl: {item.QuantityInShelf}
+          </div>
           {#if userHasBorrowedItem}
-            <div class="">
+            <div class="text-gray-700 text-lg mb-4">
               Ausgeliehen von: {#each item.UsersBorrowed as user}
                 {user.BorrowedByUserName},
               {/each}
             </div>
           {/if}
           {#if item.Subject}
-            <div class="flex flex-col mt-2">Fächer</div>
-            {#each item.Subject as subject}
-              <div class="text-[#344e41]">- {subject.Name}</div>
-            {/each}
-          {/if}
-          {#if item.Keywords}
-            <div class="flex flex-col mt-2">Schlüsselwörter</div>
-            {#each item.Keywords as keyword}
-              <div class="text-[#344e41] capitalize">- {keyword.Keyword}</div>
-            {/each}
-          {/if}
-
-          <hr class="my-5" />
-          <div class="flex justify-between w-full space-x-5">
-            <button
-              class="bg-[#d5bdaf] hover:bg-green-500 hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 w-full"
-              on:click={() => {
-                borrow();
-              }}
-            >
-              Ausleihen
-            </button>
-            {#if user}
-              {#if userHasBorrowedItem}
-                <button
-                  class="bg-[#d5bdaf] hover:bg-red-500 hover:text-black hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 w-full"
-                  on:click={() => {
-                    returnItem();
-                  }}
-                >
-                  Zurückgeben
-                </button>
-              {/if}
-            {/if}
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="flex justify-between">
-      <div
-        class="flex flex-col bg-tertiary px-5 py-5 mt-5 ml-10 mr-5 w-full rounded-md"
-        id="damaged"
-      >
-        <div class="mx-auto font-semibold text-xl" id="header">Beschädigt</div>
-        <div class="w-full">
-          <div class="flex space-x-3">
-            {#if item.Damaged}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6 rounded-md bg-red-400 text-white"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18 18 6M6 6l12 12"
-                />
-              </svg>
-              <div class="text-red-600">Beschädigt</div>
-            {:else}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6 rounded-md bg-green-400 text-white"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-              <div class="text-green-600">In Ordnung</div>
-            {/if}
-          </div>
-          {#if item.DamagedDescription}
-            <br />
-            <hr />
-            <div class="mt-5">
-              Beschreibung: <br />
-              {item.DamagedDescription}
-            </div>
-          {/if}
-        </div>
-      </div>
-      <div
-        class="flex flex-col bg-tertiary px-5 py-5 mt-5 ml-10 mr-5 w-full rounded-md"
-        id="classes"
-      >
-        <div class="mx-auto font-semibold text-xl" id="header">Klassen</div>
-        <div class="w-full">
-          <div class="flex-row">
-            <div class={item.ClassOne ? "text-green-500" : "text-red-500"}>
-              Klasse 1
-            </div>
-            <div class={item.ClassTwo ? "text-green-500" : "text-red-500"}>
-              Klasse 2
-            </div>
-            <div class={item.ClassThree ? "text-green-500" : "text-red-500"}>
-              Klasse 3
-            </div>
-            <div class={item.ClassFour ? "text-green-500" : "text-red-500"}>
-              Klasse 4
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="flex flex-col bg-tertiary px-5 py-5 mt-5 ml-10 mr-5 rounded-md"
-      id="specificInformation"
-    >
-      <div class="mx-auto font-semibold text-xl" id="header">
-        Spezifische Informationen für {item.ItemTypes === "book"
-          ? "Buch"
-          : "Normal"}
-      </div>
-      <div class="w-full">
-        <div class="flex flex-col">
-          {#if item.ItemTypes === "book"}
-            <div class="flex flex-col">
-              <div class="text-[#344e41]">Autor: {item.Author}</div>
-              <div class="text-[#344e41]">Edition: {item.Edition}</div>
-              <div class="text-[#344e41]">ISBN: {item.Isbn}</div>
-              <div class="text-[#344e41]">Verlag: {item.Publisher}</div>
-            </div>
-          {:else}
-            <div class="flex flex-col">
-              <div class="text-[#344e41]">
-                Anzahl Objekte: {item.TotalObjects}
-              </div>
-              <div class="text-[#344e41]">
-                Anzahl defekte Objekte: {item.BrokenObjects}
-              </div>
-              <div class="text-[#344e41]">
-                Anzahl verlorene Objekte: {item.LostObjects}
-              </div>
-              <div class="text-[#344e41]">
-                Anzahl der nutzbaren Objekte: {item.UsefulObjects}
-              </div>
-            </div>
-          {/if}
-          {#if item.HintText}
-            <div class="flex flex-col mt-5">Hinweis</div>
-            <div class="text-[#344e41]">{item.HintText}</div>
-          {/if}
-        </div>
-      </div>
-    </div>
-    <div
-      class="flex flex-col bg-tertiary px-5 py-5 mt-5 ml-10 mr-5 rounded-md"
-      id="reservations"
-    >
-      <div class="mx-auto font-semibold text-xl" id="header">
-        Reservierungen
-      </div>
-      <div class="w-full">
-        <div class="flex flex-col">
-          {#key errorText}
-            <div
-              class="flex space-x-1 w-1/2 mx-auto mb-5"
-              class:hidden={errorText === ""}
-              transition:fade={{ delay: 0, duration: 300 }}
-            >
-              <button
-                id="errorText"
-                class="w-max text-red-500 hover:bg-white duration-300 flex space-x-2 px-2 py-2 rounded-md bg-red-100"
-                on:click={() => {
-                  errorText = "";
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6 my-auto text-red-500"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-                  />
-                </svg>{errorText}</button
-              >
-            </div>
-          {/key}
-          {#if !item.Reservations}
-            <div class="text-[#344e41]">Keine Reservierungen</div>
-          {:else}
-            <div class="grid grid-cols-2 w-full gap-5">
-              {#each item.Reservations as reservation}
-                <div
-                  class="flex flex-col bg-white py-3 px-3 rounded-md w-max mx-auto space-y-2"
-                >
-                  <div class="text-[#344e41] mx-5">
-                    Reserviert von: {reservation.UserID}
-                  </div>
-                  <div class="text-[#344e41] mx-5">
-                    Anzahl: {reservation.Quantity}
-                  </div>
-                  <div class="text-[#344e41] mx-5">
-                    Von: {new Date(reservation.TimeFrom).toLocaleDateString()} Bis:
-                    {new Date(reservation.TimeTo).toLocaleDateString()}
-                  </div>
-
-                  {#if user}
-                    {#if user.ID === reservation.UserID}
-                      <button
-                        class="bg-[#d5bdaf] hover:bg-red-500 hover:text-black hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 w-full"
-                        on:click={() => {
-                          Swal.fire({
-                            title:
-                              "Möchtest du die Reservierung wirklich stornieren?",
-                            showCancelButton: true,
-                            confirmButtonText: "Ja",
-                            cancelButtonText: "Nein",
-                            showLoaderOnConfirm: true,
-                            preConfirm: () => {
-                              return fetch(
-                                `${API_URL}items/reserve-cancel/${reservation.ReservationID}`,
-                                {
-                                  method: "DELETE",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                  },
-                                  credentials: "include",
-                                }
-                              ).then((res) => {
-                                if (res.ok) {
-                                  Swal.fire({
-                                    title: "Storniert",
-                                    text: "Die Reservierung wurde erfolgreich storniert",
-                                    icon: "success",
-                                    confirmButtonText: "Ok",
-                                  });
-                                  setTimeout(() => {
-                                    browser ? window.location.reload() : null;
-                                  }, 2000);
-                                } else {
-                                  Swal.fire({
-                                    title: "Fehler",
-                                    text: "Die Reservierung konnte nicht storniert werden",
-                                    icon: "error",
-                                    confirmButtonText: "Ok",
-                                  });
-                                }
-                              });
-                            },
-                          });
-                        }}
-                      >
-                        Stornieren
-                      </button>
-                    {/if}
-                  {/if}
-                </div>
-                <hr class="mt-5" />
+            <div class="text-gray-700 text-lg mb-4">
+              Fächer: {#each item.Subject as subject}
+                {subject.Name}
               {/each}
             </div>
           {/if}
-          <form
-            class="flex flex-col mt-5"
-            on:submit|preventDefault={(event) => {
-              fetch(`${API_URL}items/reserve`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                  ItemID: item.ID,
-                  TimeFrom: event.target.timeFrom.value,
-                  TimeTo: event.target.timeTo.value,
-                  Quantity: Number(event.target.quantity.value),
-                }),
-              }).then((res) => {
-                if (res.ok) {
-                  Swal.fire({
-                    title: "Reserviert",
-                    text: "Das Item wurde erfolgreich reserviert",
-                    icon: "success",
-                    confirmButtonText: "Ok",
-                  });
-                  setTimeout(() => {
-                    browser ? window.location.reload() : null;
-                  }, 2000);
-                } else {
-                  Swal.fire({
-                    title: "Fehler",
-                    text: "Das Item konnte nicht reserviert werden",
-                    icon: "error",
-                    confirmButtonText: "Ok",
-                  });
-                }
-              });
-            }}
-          >
-            <div class="flex flex-col">
-              <label for="quantity">Anzahl</label>
-              <input
-                type="number"
-                id="quantity"
-                class="rounded-md border-2 border-gray-300 focus:border-green-500"
-                name="quantity"
-                min="1"
-                max={item.QuantityInShelf}
-                required
-              />
+          {#if item.Keywords}
+            <div class="text-gray-700 text-lg mb-4">
+              Keywords: {#each item.Keywords as keyword}
+                {keyword.Keyword}
+              {/each}
             </div>
-            <div class="flex flex-col">
-              <label for="timeFrom">Von</label>
-              <input
-                type="date"
-                class="rounded-md border-2 border-gray-300 focus:border-green-500"
-                id="timeFrom"
-                name="timeFrom"
-                required
-              />
+          {/if}
+          {#if item.HintText}
+            <div class="text-gray-700 text-lg mb-4">
+              Hinweis: {item.HintText}
             </div>
-            <div class="flex flex-col">
-              <label for="timeTo">Bis</label>
-              <input
-                type="date"
-                id="timeTo"
-                name="timeTo"
-                required
-                class="rounded-md border-2 border-gray-300 focus:border-green-500"
-              />
-            </div>
+          {/if}
+          <div class="flex space-x-4 mt-6">
             <button
-              class="bg-[#d5bdaf] hover:bg-green-500 hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 w-full mt-5"
-              type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition"
+              on:click={borrow}
             >
-              Reservieren
+              Ausleihen
             </button>
-          </form>
+            {#if user && userHasBorrowedItem}
+              <button
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition"
+                on:click={returnItem}
+              >
+                Zurückgeben
+              </button>
+            {/if}
+          </div>
         </div>
       </div>
     </div>
+    {#if item.ItemTypes === "book"}
+      <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-full max-w-4xl mt-10">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">
+          Buch Information
+        </h3>
+        <div class="text-gray-700 text-lg mb-4">
+          Herausgeber: {item.Publisher}
+        </div>
+        <div class="text-gray-700 text-lg mb-4">Autor: {item.Author}</div>
+        <div class="text-gray-700 text-lg mb-4">ISBN: {item.Isbn}</div>
+        <div class="text-gray-700 text-lg mb-4">Ausgabe: {item.Edition}</div>
+      </div>
+    {/if}
+    {#if item.ItemTypes === "set_of_objects"}
+      <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-full max-w-4xl mt-10">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">
+          Normale Information
+        </h3>
+        <div class="text-gray-700 text-lg mb-4">
+          Totale Objecte: {item.TotalObjects}
+        </div>
+        <div class="text-gray-700 text-lg mb-4">
+          Nutzbare Objecte: {item.UsefulObjects}
+        </div>
+        <div class="text-gray-700 text-lg mb-4">
+          Kaputte Objecte: {item.BrokenObjects}
+        </div>
+        <div class="text-gray-700 text-lg mb-4">
+          Verlorene Objecte: {item.LostObjects}
+        </div>
+      </div>
+    {/if}
+
+    <div class="flex justify-between w-full max-w-4xl mt-10">
+      <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-1/2 mr-5">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Kaputt</h3>
+        <div class="text-gray-700 text-lg">{item.Damaged ? "Ja" : "Nein"}</div>
+        {#if item.Damaged}
+          <div class="text-gray-700 text-lg mt-2">{item.DamagedDesc}</div>
+        {/if}
+      </div>
+      <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-1/2 ml-5">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Klassen</h3>
+        <div class="text-gray-700 text-lg">
+          {#if item.ClassOne}
+            Klasse 1
+          {/if}
+          {#if item.ClassTwo}
+            Klasse 2
+          {/if}
+          {#if item.ClassThree}
+            Klasse 3
+          {/if}
+          {#if item.ClassFour}
+            Klasse 4
+          {/if}
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col w-full max-w-4xl mt-10" id="reservations">
+      <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-full mb-10">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">
+          Reservierungen
+        </h3>
+        <p class="text-gray-700 text-lg mb-4">
+          Wenn der Artikel nicht verfügbar ist, können Sie eine Reservierung
+          vornehmen.
+        </p>
+        <div class="flex space-x-4">
+          <button
+            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition"
+            on:click={makeReservation}
+          >
+            Item reservieren
+          </button>
+        </div>
+        {#if errorText}
+          <div class="text-red-500 text-lg mt-4">{errorText}</div>
+        {/if}
+      </div>
+
+      {#if item.Reservations && item.Reservations.length > 0}
+        <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-full">
+          <h3 class="text-2xl font-semibold text-gray-800 mb-4">
+            Bestehende Reservierungen
+          </h3>
+          <ul class="list-disc list-inside">
+            {#each item.Reservations as reservation}
+              <li class="text-gray-700 text-lg mb-2">
+                <strong>Username:</strong>
+                {reservation.Username},
+                <strong>Anzahl:</strong>
+                {reservation.Quantity},
+                <strong>Von:</strong>
+                {new Date(reservation.TimeFrom).toLocaleDateString()},
+                <strong>Bis:</strong>
+                {new Date(reservation.TimeTo).toLocaleDateString()}
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+    </div>
   </div>
-{:else}
-  <Spinner />
 {/if}
