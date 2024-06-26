@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -547,7 +549,36 @@ func GetImagePathForUserHandler(userCtrl controllers.UserControllerI) gin.Handle
 		imageName := "./../uploads/" + imageId.String() + ".jpeg"
 		log.Print("Reading image: ", imageName)
 
-		c.JSON(http.StatusOK, models.PicturePath{Path: imageName})
+		// Open the file
+		fileData, err := os.Open(imageName)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Image not found"})
+			return
+		}
+		defer fileData.Close()
+
+		// Read the first 512 bytes of the file to determine its content type
+		fileHeader := make([]byte, 512)
+		_, err = fileData.Read(fileHeader)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read image"})
+			return
+		}
+		fileContentType := http.DetectContentType(fileHeader)
+
+		// Get the file info
+		fileInfo, err := fileData.Stat()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get image info"})
+			return
+		}
+
+		c.Header("Content-Description", "File Transfer")
+		c.Header("Content-Transfer-Encoding", "binary")
+		c.Header("Content-Disposition", fmt.Sprintf("inline; filename=%s", imageId.String()))
+		c.Header("Content-Type", fileContentType)
+		c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
+		c.File(imageName)
 	}
 }
 

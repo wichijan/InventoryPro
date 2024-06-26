@@ -727,7 +727,6 @@ func GetImagePathForItemHandler(itemCtrl controllers.ItemControllerI) gin.Handle
 		imageName := "./../uploads/" + imageId.String() + ".jpeg"
 		log.Print("Reading image: ", imageName)
 
-		// New ---------------------------------------------------------------
 
 		// Open the file
 		fileData, err := os.Open(imageName)
