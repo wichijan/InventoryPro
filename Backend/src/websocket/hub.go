@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"log"
+	"time"
 
 	"github.com/wichijan/InventoryPro/src/utils"
 )
@@ -77,6 +78,9 @@ func (h *Hub) RemoveClient(client *Client) {
 
 // Function to handle message based on type of message
 func (h *Hub) HandleMessage(message Message) {
+	messageStr := `{ "Message": "` + message.Content + `", "TimeStamp": "` + time.Now().Format(time.RFC3339) + `" }`
+	log.Print("Message: ", messageStr)
+
 	if len(h.clients) == 0 {
 		log.Print("No clients to send message to")
 		return
@@ -87,7 +91,7 @@ func (h *Hub) HandleMessage(message Message) {
 		for client := range h.clients {
 			if client.UserId == message.SentToUserId {
 				select {
-				case client.send <- message.Content:
+				case client.send <- messageStr:
 				default:
 					close(client.send)
 					delete(h.clients, client)
@@ -103,7 +107,7 @@ func (h *Hub) HandleMessage(message Message) {
 			log.Print("Client ID: ", client.ID)
 			if client.IsAdmin {
 				select {
-				case client.send <- message.Content:
+				case client.send <- messageStr:
 				default:
 					close(client.send)
 					delete(h.clients, client)
@@ -116,7 +120,7 @@ func (h *Hub) HandleMessage(message Message) {
 		log.Print("Send to everyone")
 		for client := range h.clients {
 			select {
-			case client.send <- message.Content:
+			case client.send <- messageStr:
 			default:
 				close(client.send)
 				delete(h.clients, client)

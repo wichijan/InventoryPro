@@ -47,13 +47,11 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 
 		// inform admin
 		hub.HandleMessage(websocket.Message{
-			Type:     utils.MESSAGE_TYPE_TO_ADMINS,
+			Type:         utils.MESSAGE_TYPE_TO_ADMINS,
 			SentToUserId: "",
-			Sender:   "server",
-			Content:  "Registration Request for Admins!",
+			Sender:       "server",
+			Content:      "Registration Request for Admins!",
 		})
-
-
 
 		c.JSON(http.StatusCreated, nil)
 	}
@@ -222,7 +220,6 @@ func AcceptUserRegistrationRequestHandler(userCtrl controllers.UserControllerI) 
 	}
 }
 
-
 // @Summary Decline User Registration Request
 // @Description Decline User Registration Request
 // @Tags Users
@@ -248,7 +245,6 @@ func DeclineUserRegistrationRequestHandler(userCtrl controllers.UserControllerI)
 		c.JSON(http.StatusOK, nil)
 	}
 }
-
 
 func LogoutUserHandler(c *gin.Context) {
 	utils.SetJWTCookies(c, "", "", true)
