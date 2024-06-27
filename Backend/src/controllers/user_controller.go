@@ -386,6 +386,11 @@ func (uc *UserController) RegisterUserAndCode(registrationData models.Registrati
 		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
+	inv_err = uc.MailMgr.SendRegistrationCodeMail(registrationData.Email, code)
+	if inv_err != nil {
+		return nil, inv_err
+	}
+
 	return &models.RegistrationCodeResponse{
 		RegistrationCode: code,
 	}, nil

@@ -3,7 +3,6 @@ package utils
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/mailgun/mailgun-go/v4"
 	"github.com/matcornic/hermes/v2"
@@ -27,7 +26,8 @@ var h = hermes.Hermes{
 func PrepareWelcomeMailBody(username string) (string, error) {
 	hermesMail := hermes.Email{
 		Body: hermes.Body{
-			Name: username,
+			Name:      username,
+			Signature: "Mit freundlichen Grüßen",
 			Intros: []string{
 				fmt.Sprintf("Willkommen bei InventoryPro, %v! Wir freuen uns dich an Board zu haben .", username),
 			},
@@ -46,84 +46,10 @@ func PrepareWelcomeMailBody(username string) (string, error) {
 	return body, nil
 }
 
-func prettierTime(time time.Time) string {
-	return time.Format("2006-01-02 15:04:05")
-}
-
-func prettyPrice(price int32) string {
-	x := float64(price)
-	x = x / 100
-	return fmt.Sprintf("€%.2f", x)
-}
-
-/*
-func generateDataFromOrder(order models.GetOrderDTO) [][]hermes.Entry {
-	var data [][]hermes.Entry
-	for _, ticket := range order.Tickets {
-		data = append(data, []hermes.Entry{
-			{Key: "Price Category", Value: ticket.PriceCategory.CategoryName},
-			{Key: "Seat Category", Value: ticket.SeatCategory.CategoryName},
-			{Key: "Row", Value: fmt.Sprint(ticket.Seat.RowNr)},
-			{Key: "Column", Value: fmt.Sprint(ticket.Seat.ColumnNr)},
-		})
-	}
-	return data
-}
-*/
-/*
-func PrepareOrderConfirmationBody(order models.GetOrderDTO) (string, error) {
-
-	hermesMail := hermes.Email{
-		Body: hermes.Body{
-			Intros: []string{
-				"Your order has been processed successfully.",
-			},
-			Dictionary: []hermes.Entry{
-				{Key: "Event Title", Value: order.Event.Title},
-				{Key: "Cinema Hall", Value: order.CinemaHall.Name},
-				{Key: "Date and Time", Value: prettierTime(order.Event.Start)},
-				{Key: "Total Price", Value: prettyPrice(order.Order.Totalprice)},
-				{Key: "Theatre Name", Value: order.Theatre.Name},
-			},
-			Table: hermes.Table{
-
-				Data: generateDataFromOrder(order),
-
-				Columns: hermes.Columns{
-					CustomWidth: map[string]string{
-						"Price Category": "35%",
-						"Seat Category":  "35%",
-						"Row":            "15%",
-						"Column":         "15%",
-					},
-				},
-			},
-			Actions: []hermes.Action{
-				{
-					Instructions: "You can check your order and more in your overview:",
-					Button: hermes.Button{
-						Text:  "Go to Overview",
-						Link:  "http://" + URL + "/overview",
-						Color: "#334155",
-					},
-				},
-			},
-		},
-	}
-
-	body, err := h.GenerateHTML(hermesMail)
-
-	if err != nil {
-		return "", err
-	}
-
-	return body, nil
-}
-*/
-
 func PrepareResetPasswordBody(userId *string) (string, error) {
 	hermesMail := hermes.Email{
 		Body: hermes.Body{
+			Signature: "Mit freundlichen Grüßen",
 			Intros: []string{
 				"Du hast eine Anfrage zur Passwortänderung gestellt.",
 			},
@@ -155,6 +81,7 @@ func PrepareResetPasswordBody(userId *string) (string, error) {
 func PrepareInformAdminsRegistBody(username string) (string, error) {
 	hermesMail := hermes.Email{
 		Body: hermes.Body{
+			Signature: "Mit freundlichen Grüßen",
 			Intros: []string{
 				"Benutzer " + username + " hat sich registriert.",
 			},
@@ -180,11 +107,10 @@ func PrepareInformAdminsRegistBody(username string) (string, error) {
 	return body, nil
 }
 
-
-
 func PrepareInformUserItemAcceptBody() (string, error) {
 	hermesMail := hermes.Email{
 		Body: hermes.Body{
+			Signature: "Mit freundlichen Grüßen",
 			Intros: []string{
 				"Item-Transfer wurde angenommen",
 			},
@@ -210,10 +136,10 @@ func PrepareInformUserItemAcceptBody() (string, error) {
 	return body, nil
 }
 
-
 func PrepareInformUserItemRequestBody() (string, error) {
 	hermesMail := hermes.Email{
 		Body: hermes.Body{
+			Signature: "Mit freundlichen Grüßen",
 			Intros: []string{
 				"Anfrage auf Item-Transfer.",
 			},
@@ -225,6 +151,31 @@ func PrepareInformUserItemRequestBody() (string, error) {
 						Link:  "http://" + URL + "/dashboard",
 						Color: "#334155",
 					},
+				},
+			},
+		},
+	}
+
+	body, err := h.GenerateHTML(hermesMail)
+
+	if err != nil {
+		return "", err
+	}
+
+	return body, nil
+}
+
+func PrepareRegistrationCodeBody(code string) (string, error) {
+	hermesMail := hermes.Email{
+		Body: hermes.Body{
+			Signature: "Mit freundlichen Grüßen",
+			Intros: []string{
+				"Anmeldung-Abschließen.",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "Um die Registrierung abzuschließen, nutze diesen Einmal-Code um ein neues Password festzulegen:",
+					InviteCode:   code,
 				},
 			},
 		},
