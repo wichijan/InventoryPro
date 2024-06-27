@@ -23,6 +23,8 @@ type UserControllerI interface {
 	GetUsers() (*[]models.Users, *models.INVError)
 	IsAdmin(userId *uuid.UUID) (bool, *models.INVError)
 
+	UpdateUser(user models.UserWithoutRoles) *models.INVError
+
 	AcceptUserRegistrationRequest(userId *string) *models.INVError
 	DeclineUserRegistrationRequest(userId *string) *models.INVError
 	GetRegistrationRequests() (*[]model.RegistrationRequests, *models.INVError)
@@ -177,6 +179,42 @@ func (uc *UserController) CheckUsername(username string) *models.INVError {
 
 func (uc *UserController) GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError) {
 	return uc.UserRepo.GetUserById(userId)
+}
+
+func (uc *UserController) UpdateUser(user models.UserWithoutRoles) *models.INVError {
+	tx, err := uc.UserRepo.NewTransaction()
+	if err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
+	}
+	defer tx.Rollback()
+
+	userTypeId, inv_err := uc.UserTypeRepo.GetUserTypeByName(user.UserTypeName)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	userPure, inv_err := uc.UserRepo.GetUserPureById(user.ID)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	userPure.Email = &user.Email
+	userPure.FirstName = &user.FirstName
+	userPure.LastName = &user.LastName
+	userPure.JobTitle = &user.JobTitle
+	userPure.PhoneNumber = &user.PhoneNumber
+	userPure.UserTypeID = userTypeId
+
+	inv_error := uc.UserRepo.UpdateUser(tx, userPure)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	if err = tx.Commit(); err != nil {
+		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
+	}
+
+	return nil
 }
 
 func (uc *UserController) AcceptUserRegistrationRequest(userIdString *string) *models.INVError {

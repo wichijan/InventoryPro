@@ -53,6 +53,25 @@ type Users struct {
 	}
 }
 
+type UserWithoutRoles struct {
+	ID           *uuid.UUID `alias:"users.id" sql:"primary_key"`
+	Email        string     `alias:"users.email"`
+	FirstName    string     `alias:"users.first_name"`
+	LastName     string     `alias:"users.last_name"`
+	JobTitle     string     `alias:"users.job_title"`
+	PhoneNumber  string     `alias:"users.phone_number"`
+	UserTypeName *string    `alias:"user_types.type_name"`
+}
+
+type UserWithoutRolesODT struct {
+	Email        string  `alias:"users.email"`
+	FirstName    string  `alias:"users.first_name"`
+	LastName     string  `alias:"users.last_name"`
+	JobTitle     string  `alias:"users.job_title"`
+	PhoneNumber  string  `alias:"users.phone_number"`
+	UserTypeName *string `alias:"user_types.type_name"`
+}
+
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
