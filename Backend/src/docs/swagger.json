@@ -150,6 +150,7 @@
         },
         "/auth/generate-code": {
             "post": {
+                "description": "Generate User Registration Code - User gets email with code and link to website",
                 "consumes": [
                     "application/json"
                 ],
@@ -159,6 +160,7 @@
                 "tags": [
                     "Users"
                 ],
+                "summary": "Generate User Registration Code",
                 "parameters": [
                     {
                         "type": "string",
@@ -327,6 +329,7 @@
         },
         "/auth/register/:code": {
             "post": {
+                "description": "Register user with code",
                 "consumes": [
                     "application/json"
                 ],
@@ -336,6 +339,7 @@
                 "tags": [
                     "Users"
                 ],
+                "summary": "Register user with code",
                 "parameters": [
                     {
                         "type": "string",

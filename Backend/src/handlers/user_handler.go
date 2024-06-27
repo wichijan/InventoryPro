@@ -67,8 +67,8 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 	}
 }
 
-// @Summary
-// @Description
+// @Summary Register user with code
+// @Description Register user with code
 // @Tags Users
 // @Accept  json
 // @Produce  json
@@ -118,8 +118,8 @@ func RegisterUserWithCodeHandler(userCtrl controllers.UserControllerI) gin.Handl
 	}
 }
 
-// @Summary
-// @Description
+// @Summary Generate User Registration Code
+// @Description Generate User Registration Code - User gets email with code and link to website
 // @Tags Users
 // @Accept  json
 // @Produce  json
