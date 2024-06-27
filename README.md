@@ -39,7 +39,7 @@ Dieses Projekt ist eine vollst√§ndige Webanwendung zur Verwaltung von Lagerbest√
 2. **pnpm Installation**:
    - Installieren Sie pnpm global auf Ihrem System.
    ```sh
-   npm i pnpm -g
+   npm install -g pnpm
    ```
 
 3. **Frontend einrichten und starten**:
