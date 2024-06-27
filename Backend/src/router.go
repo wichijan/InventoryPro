@@ -184,6 +184,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 			RegistrationCodeRepo:    registrationCodeRepo,
 			RoleRepo:                roleRepo,
 			MailMgr:                 mailMgr,
+			UserItemRepo:            userItemRepo,
 		},
 		UserRoleController: &controllers.UserRoleController{
 			UserRoleRepo: userRoleRepo,
@@ -233,7 +234,6 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 	adminRoutes.Handle(http.MethodDelete, "/auth/decline-registration/:userId", handlers.DeclineUserRegistrationRequestHandler(controller.UserController))
 	adminRoutes.Handle(http.MethodPost, "/auth/generate-code", handlers.GenerateUserRegistrationCodeHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/register/:code", handlers.RegisterUserWithCodeHandler(controller.UserController))
-	
 
 	securedRoutes.Handle(http.MethodPost, "/auth/reset-password", handlers.ResetPasswordHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodPost, "/request-forgot-password", handlers.RequestForgetPasswordHandler(controller.UserController))
@@ -254,6 +254,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 	securedRoutes.Handle(http.MethodPut, "/users", handlers.UpdateUserHandler(controller.UserController))
 	adminRoutes.Handle(http.MethodPut, "/users/admin", handlers.UpdateUserAsAdminHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodGet, "/users/:id", handlers.GetUserByIdHandler(controller.UserController))
+	securedRoutes.Handle(http.MethodGet, "/users/items", handlers.GetUserItemsHandler(controller.UserController))
 	// Picture for Users
 	securedRoutes.Handle(http.MethodPost, "/users-picture", handlers.UploadImageForUserHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodGet, "/users-picture", handlers.GetImagePathForUserHandler(controller.UserController))

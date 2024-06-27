@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
 )
@@ -115,4 +117,20 @@ type RegistrationCode struct {
 
 type UserPicture struct {
 	PictureId string `alias:"users.profile_picture"`
+}
+
+type UserItems struct {
+	Reservations []struct {
+		Reservation struct {
+			model.Reservations
+		}
+		Item struct {
+			model.Items
+		}
+	}
+
+	BorrowedItems []struct {
+		BorrowedAt time.Time `alias:"user_items.transaction_date"`
+		model.Items
+	}
 }

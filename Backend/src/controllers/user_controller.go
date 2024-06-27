@@ -22,6 +22,7 @@ type UserControllerI interface {
 	GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError)
 	GetUsers() (*[]models.Users, *models.INVError)
 	IsAdmin(userId *uuid.UUID) (bool, *models.INVError)
+	GetUserItems(userId *uuid.UUID) (*[]models.UserItems, *models.INVError)
 
 	UpdateUser(user models.UserWithoutRoles) *models.INVError
 
@@ -46,6 +47,7 @@ type UserControllerI interface {
 
 type UserController struct {
 	UserRepo                repositories.UserRepositoryI
+	UserItemRepo            repositories.UserItemRepositoryI
 	UserTypeRepo            repositories.UserTypeRepositoryI
 	RegistrationRequestRepo repositories.RegistrationRequestRepositoryI
 	RegistrationCodeRepo    repositories.RegistrationCodeRepositoryI
@@ -180,6 +182,9 @@ func (uc *UserController) CheckUsername(username string) *models.INVError {
 
 func (uc *UserController) GetUserById(userId *uuid.UUID) (*models.UserWithTypeName, *models.INVError) {
 	return uc.UserRepo.GetUserById(userId)
+}
+func (uc *UserController) GetUserItems(userId *uuid.UUID) (*[]models.UserItems, *models.INVError) {
+	return uc.UserItemRepo.GetUserItems(userId)
 }
 
 func (uc *UserController) UpdateUser(user models.UserWithoutRoles) *models.INVError {
