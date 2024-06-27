@@ -251,29 +251,27 @@ func (ur *UserRepository) CreateUser(tx *sql.Tx, user model.Users) *models.INVEr
 
 func (ur *UserRepository) UpdateUser(tx *sql.Tx, user *model.Users) *models.INVError {
 	stmt := table.Users.UPDATE(
-		table.Users.ID,
-		table.Users.FirstName,
-		table.Users.LastName,
 		table.Users.Username,
 		table.Users.Email,
-		table.Users.Password,
+		table.Users.FirstName,
+		table.Users.LastName,
 		table.Users.JobTitle,
 		table.Users.PhoneNumber,
 		table.Users.UserTypeID,
+		table.Users.Password,
 		table.Users.ProfilePicture,
 		table.Users.RegistrationTime,
 		table.Users.RegistrationAccepted,
 		table.Users.IsActive,
 	).SET(
-		user.ID,
-		user.FirstName,
-		user.LastName,
 		user.Username,
 		user.Email,
-		user.Password,
+		user.FirstName,
+		user.LastName,
 		user.JobTitle,
 		user.PhoneNumber,
 		user.UserTypeID,
+		user.Password,
 		user.ProfilePicture,
 		user.RegistrationTime,
 		user.RegistrationAccepted,
@@ -289,6 +287,7 @@ func (ur *UserRepository) UpdateUser(tx *sql.Tx, user *model.Users) *models.INVE
 
 	return nil
 }
+
 
 func (ur *UserRepository) DeleteUser(tx *sql.Tx, userId *uuid.UUID) *models.INVError {
 	stmt := table.Users.DELETE().WHERE(

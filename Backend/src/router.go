@@ -249,6 +249,8 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 
 	securedRoutes.Handle(http.MethodGet, "/users/get-me", handlers.GetUserHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodGet, "/users", handlers.GetUsersHandler(controller.UserController))
+	securedRoutes.Handle(http.MethodPut, "/users", handlers.UpdateUserHandler(controller.UserController))
+	adminRoutes.Handle(http.MethodPut, "/users/admin", handlers.UpdateUserAsAdminHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodGet, "/users/:id", handlers.GetUserByIdHandler(controller.UserController))
 	// Picture for Users
 	securedRoutes.Handle(http.MethodPost, "/users-picture", handlers.UploadImageForUserHandler(controller.UserController))

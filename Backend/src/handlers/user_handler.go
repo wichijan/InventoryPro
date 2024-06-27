@@ -229,6 +229,76 @@ func GetUserByIdHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Update User
+// @Description Update User
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body models.UserWithoutRolesODT true "User data"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /users [PUT]
+func UpdateUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		var newUser models.UserWithoutRolesODT
+		err_convert := c.ShouldBind(&newUser)
+		if err_convert != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+
+		updateUser := models.UserWithoutRoles{
+			ID:           userId,
+			Email:        newUser.Email,
+			FirstName:    newUser.FirstName,
+			LastName:     newUser.LastName,
+			JobTitle:     newUser.JobTitle,
+			PhoneNumber:  newUser.PhoneNumber,
+			UserTypeName: newUser.UserTypeName,
+		}
+
+		inv_err := userCtrl.UpdateUser(updateUser)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Update User as Admin
+// @Description Update User as Admin
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body models.UserWithoutRoles true "User data"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /users/admin [PUT]
+func UpdateUserAsAdminHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var newUser models.UserWithoutRoles
+		err_convert := c.ShouldBind(&newUser)
+		if err_convert != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+
+		inv_err := userCtrl.UpdateUser(newUser)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
 // @Summary Accept User Registration Request
 // @Description Accept User Registration Request
 // @Tags Users
