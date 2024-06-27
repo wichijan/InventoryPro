@@ -55,7 +55,6 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 			Sender:       "server",
 			Content:      "New user registration request: " + registrationData.Username,
 		})
-		log.Print("Amount of users received: ", amountOfUsersReceived)
 		if amountOfUsersReceived == nil || *amountOfUsersReceived == 0 {
 			// send emails to admins
 			inv_err = userCtrl.SendEmailToAdmins(registrationData.Username, mailMgr)

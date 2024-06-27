@@ -34,7 +34,7 @@ values
         'Admin',
         'Admin',
         'Admin',
-        'admin@admin.com',
+        'sebastian.kiebert.dhbw@gmail.com',
         "+0161838382920",
         "7209efef-5a3f-4fab-8a47-7a157c2df829",
         0,

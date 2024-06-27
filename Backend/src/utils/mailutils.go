@@ -103,7 +103,7 @@ func PrepareOrderConfirmationBody(order models.GetOrderDTO) (string, error) {
 					Instructions: "You can check your order and more in your overview:",
 					Button: hermes.Button{
 						Text:  "Go to Overview",
-						Link:  "https://" + URL + "/overview",
+						Link:  "http://" + URL + "/overview",
 						Color: "#334155",
 					},
 				},
@@ -132,7 +132,7 @@ func PrepareResetPasswordBody(userId *string) (string, error) {
 					Instructions: "Klick den Button, um dein Passwort zu ändern:",
 					Button: hermes.Button{
 						Text:  "Änder dein Passwort",
-						Link:  "https://" + URL + "/reset-password?userId=" + *userId,
+						Link:  "http://" + URL + "/reset-password?userId=" + *userId,
 						Color: "#334155",
 					},
 				},
@@ -163,7 +163,7 @@ func PrepareInformAdminsRegistBody(username string) (string, error) {
 					Instructions: "Klick den Button, um den Benutzer anzunehmen oder abzulehnen:",
 					Button: hermes.Button{
 						Text:  "anzunehmen oder abzulehnen",
-						Link:  "https://" + URL + "/", // TODO Link anpassen
+						Link:  "http://" + URL + "/admin/users",
 						Color: "#334155",
 					},
 				},
