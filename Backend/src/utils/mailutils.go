@@ -176,6 +176,11 @@ func PrepareRegistrationCodeBody(code string) (string, error) {
 				{
 					Instructions: "Um die Registrierung abzuschließen, nutze diesen Einmal-Code um ein neues Password festzulegen:",
 					InviteCode:   code,
+					Button: hermes.Button{
+						Text:  "Code verwenden",
+						Link:  "http://" + URL + "/auth/code/code?=" + code,
+						Color: "#334155",
+					},
 				},
 			},
 		},
