@@ -654,6 +654,28 @@ definitions:
     required:
     - password
     type: object
+  models.RegistrationCodes:
+    properties:
+      registrationCode:
+        type: string
+      user:
+        properties:
+          email:
+            type: string
+          firstName:
+            type: string
+          id:
+            type: string
+          jobTitle:
+            type: string
+          lastName:
+            type: string
+          phoneNumber:
+            type: string
+          userTypeName:
+            type: string
+        type: object
+    type: object
   models.RegistrationRequest:
     properties:
       email:
@@ -801,6 +823,97 @@ definitions:
         type: string
       userID:
         type: string
+    type: object
+  models.UserItems:
+    properties:
+      borrowedItems:
+        items:
+          properties:
+            borrowedAt:
+              type: string
+            classFour:
+              type: boolean
+            classOne:
+              type: boolean
+            classThree:
+              type: boolean
+            classTwo:
+              type: boolean
+            damaged:
+              type: boolean
+            damagedDescription:
+              type: string
+            description:
+              type: string
+            hintText:
+              type: string
+            id:
+              type: string
+            itemTypes:
+              $ref: '#/definitions/model.ItemsItemTypes'
+            name:
+              type: string
+            picture:
+              type: string
+            regularShelfID:
+              type: string
+          type: object
+        type: array
+      reservations:
+        items:
+          properties:
+            item:
+              properties:
+                classFour:
+                  type: boolean
+                classOne:
+                  type: boolean
+                classThree:
+                  type: boolean
+                classTwo:
+                  type: boolean
+                damaged:
+                  type: boolean
+                damagedDescription:
+                  type: string
+                description:
+                  type: string
+                hintText:
+                  type: string
+                id:
+                  type: string
+                itemTypes:
+                  $ref: '#/definitions/model.ItemsItemTypes'
+                name:
+                  type: string
+                picture:
+                  type: string
+                regularShelfID:
+                  type: string
+              type: object
+            reservation:
+              properties:
+                isCancelled:
+                  type: boolean
+                itemID:
+                  type: string
+                quantity:
+                  type: integer
+                reservationDate:
+                  type: string
+                reservationID:
+                  type: string
+                timeFrom:
+                  type: string
+                timeTo:
+                  type: string
+                userID:
+                  type: string
+                username:
+                  type: string
+              type: object
+          type: object
+        type: array
     type: object
   models.UserWithTypeName:
     properties:
@@ -2223,6 +2336,27 @@ paths:
       summary: Get Quick Shelf by Id
       tags:
       - Quick Shelf
+  /registers:
+    get:
+      consumes:
+      - application/json
+      description: Get Registration Codes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RegistrationCodes'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get Registration Codes
+      tags:
+      - Users
   /registration-requests:
     get:
       consumes:
@@ -3211,6 +3345,27 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get User Data
+      tags:
+      - Users
+  /users/items:
+    get:
+      consumes:
+      - application/json
+      description: Get User Items (Borrowed items) and Reservations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UserItems'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Get User Items and Reservations
       tags:
       - Users
   /warehouses:
