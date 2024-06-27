@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mailgun/mailgun-go/v4"
 	"github.com/wichijan/InventoryPro/src/controllers"
 	"github.com/wichijan/InventoryPro/src/docs"
 	"github.com/wichijan/InventoryPro/src/handlers"
@@ -33,7 +34,12 @@ type Controllers struct {
 	QuickShelfController      controllers.QuickShelfControllerI
 }
 
-func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
+func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.MailgunImpl) *gin.Engine {
+
+	mailMgr := &managers.MailManager{
+		MailgunInstance: mgInstance,
+	}
+
 	// Create managers and repositories
 	databaseManager := &managers.DatabaseManager{
 		Connection: dbConnection,
@@ -174,6 +180,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub) *gin.Engine {
 			RegistrationRequestRepo: registrationRequestRepo,
 			RegistrationCodeRepo:    registrationCodeRepo,
 			RoleRepo:                roleRepo,
+			MailMgr:                 mailMgr,
 		},
 		UserRoleController: &controllers.UserRoleController{
 			UserRoleRepo: userRoleRepo,

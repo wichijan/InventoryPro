@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
+	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/repositories"
 	"github.com/wichijan/InventoryPro/src/utils"
@@ -41,6 +42,7 @@ type UserController struct {
 	RegistrationRequestRepo repositories.RegistrationRequestRepositoryI
 	RegistrationCodeRepo    repositories.RegistrationCodeRepositoryI
 	RoleRepo                repositories.RoleRepositoryI
+	MailMgr                 managers.MailMgr
 }
 
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) *models.INVError {
@@ -184,8 +186,13 @@ func (uc *UserController) AcceptUserRegistrationRequest(userIdString *string) *m
 		return inv_errors.INV_BAD_REQUEST.WithDetails("Invalid user ID")
 	}
 
+	user, inv_err := uc.UserRepo.GetUserPureById(&userId)
+	if inv_err != nil {
+		return inv_err
+	}
+
 	// Check if user registration request exists
-	_, inv_err := uc.RegistrationRequestRepo.GetRequestByUserId(&userId)
+	_, inv_err = uc.RegistrationRequestRepo.GetRequestByUserId(&userId)
 	if inv_err != nil {
 		return inv_err
 	}
@@ -205,6 +212,8 @@ func (uc *UserController) AcceptUserRegistrationRequest(userIdString *string) *m
 	if err = tx.Commit(); err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
+
+	uc.MailMgr.SendWelcomeMail(*user.Email, *user.Username)
 
 	return nil
 }
