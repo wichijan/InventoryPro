@@ -32,6 +32,7 @@ type UserControllerI interface {
 	ValidateRegistrationCode(code *string) (*uuid.UUID, *models.INVError)
 	RegisterUserAndCode(registrationData models.RegistrationRequest) (*models.RegistrationCodeResponse, *models.INVError)
 	DeleteRegistrationCode(code *string) *models.INVError
+	GetRegistrationCodes() (*[]models.RegistrationCodes, *models.INVError)
 
 	UpdateUserPassword(userId *uuid.UUID, password string) *models.INVError
 	ForgotPassword(username string) *models.INVError
@@ -300,6 +301,9 @@ func (uc *UserController) DeclineUserRegistrationRequest(userIdString *string) *
 
 func (uc *UserController) GetRegistrationRequests() (*[]model.RegistrationRequests, *models.INVError) {
 	return uc.RegistrationRequestRepo.GetRegistrationRequests()
+}
+func (uc *UserController) GetRegistrationCodes() (*[]models.RegistrationCodes, *models.INVError) {
+	return uc.RegistrationCodeRepo.GetRegistrationCodes()
 }
 
 func (uc *UserController) ValidateRegistrationCode(code *string) (*uuid.UUID, *models.INVError) {

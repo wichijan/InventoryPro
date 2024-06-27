@@ -118,6 +118,27 @@ func RegisterUserWithCodeHandler(userCtrl controllers.UserControllerI) gin.Handl
 	}
 }
 
+// @Summary Get Registration Codes
+// @Description Get Registration Codes
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.RegistrationCodes
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /registers [get]
+func GetRegistrationCodesHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Delete code
+		registrationCodes, inv_err := userCtrl.GetRegistrationCodes()
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, registrationCodes)
+	}
+}
+
 // @Summary Generate User Registration Code
 // @Description Generate User Registration Code - User gets email with code and link to website
 // @Tags Users

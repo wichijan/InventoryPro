@@ -233,6 +233,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 	adminRoutes.Handle(http.MethodDelete, "/auth/decline-registration/:userId", handlers.DeclineUserRegistrationRequestHandler(controller.UserController))
 	adminRoutes.Handle(http.MethodPost, "/auth/generate-code", handlers.GenerateUserRegistrationCodeHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/register/:code", handlers.RegisterUserWithCodeHandler(controller.UserController))
+	
 
 	securedRoutes.Handle(http.MethodPost, "/auth/reset-password", handlers.ResetPasswordHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodPost, "/request-forgot-password", handlers.RequestForgetPasswordHandler(controller.UserController))
@@ -246,6 +247,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 	securedRoutes.Handle(http.MethodGet, "/auth/is-Admin", handlers.IsAdmin(controller.UserController))
 
 	adminRoutes.Handle(http.MethodGet, "/registration-requests", handlers.GetRegistrationRequestsHandler(controller.UserController))
+	adminRoutes.Handle(http.MethodGet, "/registers", handlers.GetRegistrationCodesHandler(controller.UserController))
 
 	securedRoutes.Handle(http.MethodGet, "/users/get-me", handlers.GetUserHandler(controller.UserController))
 	securedRoutes.Handle(http.MethodGet, "/users", handlers.GetUsersHandler(controller.UserController))
