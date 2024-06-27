@@ -16,10 +16,10 @@ type MailgunInterface interface {
 
 var h = hermes.Hermes{
 	Product: hermes.Product{
-		Name:        "Cinemika",
+		Name:        "InventoryPro",
 		Link:        URL,
 		TroubleText: "If the {ACTION}-button is not working for you, just copy and paste the URL below into your web browser.",
-		Copyright:   "Copyright © 2024 Cinemika-WWI22SEB",
+		Copyright:   "Copyright © 2024 InventoryPro-WWI22SEB",
 	},
 	Theme: new(hermes.Default),
 }
@@ -29,7 +29,7 @@ func PrepareWelcomeMailBody(username string) (string, error) {
 		Body: hermes.Body{
 			Name: username,
 			Intros: []string{
-				fmt.Sprintf("Welcome to Cinemika, %v! We're very excited to have you on board.", username),
+				fmt.Sprintf("Welcome to InventoryPro, %v! We're very excited to have you on board.", username),
 			},
 			Outros: []string{
 				"Need help, or have questions? Just reply to this email, we'd love to help.",
@@ -100,10 +100,10 @@ func PrepareOrderConfirmationBody(order models.GetOrderDTO) (string, error) {
 			},
 			Actions: []hermes.Action{
 				{
-					Instructions: "You can check your order and more in your dashboard:",
+					Instructions: "You can check your order and more in your overview:",
 					Button: hermes.Button{
-						Text:  "Go to Dashboard",
-						Link:  "https://" + URL + "/dashboard",
+						Text:  "Go to Overview",
+						Link:  "https://" + URL + "/overview",
 						Color: "#334155",
 					},
 				},
