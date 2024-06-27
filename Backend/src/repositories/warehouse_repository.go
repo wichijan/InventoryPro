@@ -80,12 +80,11 @@ func (wr *WarehouseRepository) CreateWarehouse(tx *sql.Tx, warehouse *models.War
 		table.Warehouses.ID,
 		table.Warehouses.Name,
 		table.Warehouses.Description,
-	).
-		VALUES(
-			uuid.String(),
-			warehouse.Name,
-			warehouse.Description,
-		)
+	).VALUES(
+		uuid.String(),
+		warehouse.Name,
+		warehouse.Description,
+	)
 
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
