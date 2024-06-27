@@ -829,12 +829,20 @@ func MoveItemRequestHandler(itemCtrl controllers.ItemControllerI, hub *websocket
 		}
 
 		// Inform user that item move request created
-		hub.HandleMessage(websocket.Message{
+		amountOfUsersReceived := hub.HandleMessage(websocket.Message{
 			Type:         utils.MESSAGE_TYPE_TO_USER,
 			SentToUserId: item.NewUserID.String(),
 			Sender:       userId.String(),
 			Content:      "Item move request created",
 		})
+		if amountOfUsersReceived == nil || *amountOfUsersReceived == 0 {
+			// send emails to user
+			inv_err = itemCtrl.SendItemRequestToUser(&item.NewUserID)
+			if inv_err != nil {
+				utils.HandleErrorAndAbort(c, inv_err)
+				return
+			}
+		}
 
 		c.JSON(http.StatusOK, models.TransferRequestResponse{
 			TransferRequestID: transferRequestId.String(),
@@ -878,12 +886,20 @@ func MoveItemAcceptedHandler(itemCtrl controllers.ItemControllerI, hub *websocke
 		}
 
 		// Inform user that item has been moved
-		hub.HandleMessage(websocket.Message{
+		amountOfUsersReceived := hub.HandleMessage(websocket.Message{
 			Type:         utils.MESSAGE_TYPE_TO_USER,
 			SentToUserId: transferRequest.UserID.String(),
 			Sender:       userId.String(),
 			Content:      "Item move request accepted",
 		})
+		if amountOfUsersReceived == nil || *amountOfUsersReceived == 0 {
+			// send emails to user
+			inv_err = itemCtrl.SendItemAcceptToUser(transferRequest.UserID)
+			if inv_err != nil {
+				utils.HandleErrorAndAbort(c, inv_err)
+				return
+			}
+		}
 
 		c.JSON(http.StatusOK, nil)
 	}

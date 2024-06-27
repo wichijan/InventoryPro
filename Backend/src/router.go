@@ -173,6 +173,9 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 			SetOfObjectsRepo:    setOfObjectsRepo,
 			ReservationRepo:     reservationRepo,
 			ItemsQuickShelfRepo: itemQuickShelfRepo,
+
+			MailMgr:  mailMgr,
+			UserRepo: userRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:                userRepo,
@@ -225,7 +228,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 	adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware(controller.UserController))
 
 	// user routes
-	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController, hub, mailMgr))
+	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController, hub))
 	adminRoutes.Handle(http.MethodPost, "/auth/accept-registration/:userId", handlers.AcceptUserRegistrationRequestHandler(controller.UserController))
 	adminRoutes.Handle(http.MethodDelete, "/auth/decline-registration/:userId", handlers.DeclineUserRegistrationRequestHandler(controller.UserController))
 	adminRoutes.Handle(http.MethodPost, "/auth/generate-code", handlers.GenerateUserRegistrationCodeHandler(controller.UserController))

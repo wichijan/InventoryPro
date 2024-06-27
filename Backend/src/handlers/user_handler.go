@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/wichijan/InventoryPro/src/controllers"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
-	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/utils"
 	"github.com/wichijan/InventoryPro/src/websocket"
@@ -25,7 +24,7 @@ import (
 // @Success 201
 // @Failure 400 {object} models.INVErrorMessage
 // @Router /auth/register [post]
-func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hub, mailMgr *managers.MailManager) gin.HandlerFunc {
+func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hub) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var registrationData models.RegistrationRequest
 		err := c.ShouldBind(&registrationData)
@@ -57,7 +56,7 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 		})
 		if amountOfUsersReceived == nil || *amountOfUsersReceived == 0 {
 			// send emails to admins
-			inv_err = userCtrl.SendEmailToAdmins(registrationData.Username, mailMgr)
+			inv_err = userCtrl.SendEmailToAdmins(registrationData.Username)
 			if inv_err != nil {
 				utils.HandleErrorAndAbort(c, inv_err)
 				return

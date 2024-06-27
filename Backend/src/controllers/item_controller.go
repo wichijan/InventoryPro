@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	inv_errors "github.com/wichijan/InventoryPro/src/errors"
 	"github.com/wichijan/InventoryPro/src/gen/InventoryProDB/model"
+	"github.com/wichijan/InventoryPro/src/managers"
 	"github.com/wichijan/InventoryPro/src/models"
 	"github.com/wichijan/InventoryPro/src/repositories"
 	"github.com/wichijan/InventoryPro/src/utils"
@@ -41,6 +42,8 @@ type ItemControllerI interface {
 	MoveItemRequest(itemMove models.ItemMove) (*uuid.UUID, *models.INVError)
 	MoveItemAccepted(transferAccept models.TransferAccept) (*models.TransferRequestSelect, *models.INVError)
 	GetTransferRequestByUserId(userId uuid.UUID) (*[]models.TransferRequestSelect, *models.INVError)
+	SendItemAcceptToUser(userId *uuid.UUID) *models.INVError
+	SendItemRequestToUser(userId *uuid.UUID) *models.INVError
 
 	UploadItemImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetImageIdFromItem(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
@@ -59,12 +62,12 @@ type ItemController struct {
 	TransactionRepo     repositories.TransactionRepositoryI
 	TransferRequestRepo repositories.TransferRequestRepositoryI
 	ShelveRepo          repositories.ShelveRepositoryI
-
 	ItemsQuickShelfRepo repositories.ItemQuickShelfRepositoryI
-
-	BookRepo         repositories.BookRepositoryI
-	SingleObjectRepo repositories.SingleObjectRepositoryI
-	SetOfObjectsRepo repositories.SetsOfObjectsRepositoryI
+	BookRepo            repositories.BookRepositoryI
+	SingleObjectRepo    repositories.SingleObjectRepositoryI
+	SetOfObjectsRepo    repositories.SetsOfObjectsRepositoryI
+	MailMgr             managers.MailMgr
+	UserRepo            repositories.UserRepositoryI
 }
 
 func (ic *ItemController) GetItems() (*[]models.ItemWithEverything, *models.INVError) {
@@ -982,3 +985,39 @@ func (ic *ItemController) MoveItemAccepted(transferAccept models.TransferAccept)
 func (ic *ItemController) GetTransferRequestByUserId(userId uuid.UUID) (*[]models.TransferRequestSelect, *models.INVError) {
 	return ic.TransferRequestRepo.GetTransferRequestByUserId(userId)
 }
+
+func (ic *ItemController) SendItemAcceptToUser(userId *uuid.UUID) *models.INVError {
+	// Send email to user
+	// Get user email
+	user, inv_error := ic.UserRepo.GetUserPureById(userId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Send email
+	inv_error = ic.MailMgr.SendMailItemAcceptToUser(*user.Email)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+
+
+func (ic *ItemController) SendItemRequestToUser(userId *uuid.UUID) *models.INVError {
+	// Send email to user
+	// Get user email
+	user, inv_error := ic.UserRepo.GetUserPureById(userId)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	// Send email
+	inv_error = ic.MailMgr.SendMailItemRequestToUser(*user.Email)
+	if inv_error != nil {
+		return inv_error
+	}
+
+	return nil
+}
+

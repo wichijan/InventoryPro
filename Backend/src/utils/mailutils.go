@@ -179,3 +179,62 @@ func PrepareInformAdminsRegistBody(username string) (string, error) {
 
 	return body, nil
 }
+
+
+
+func PrepareInformUserItemAcceptBody() (string, error) {
+	hermesMail := hermes.Email{
+		Body: hermes.Body{
+			Intros: []string{
+				"Item-Transfer wurde angenommen",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "Kontrolliere den Transfer in deinem Dashboard:",
+					Button: hermes.Button{
+						Text:  "Check Transfer",
+						Link:  "http://" + URL + "/dashboard",
+						Color: "#334155",
+					},
+				},
+			},
+		},
+	}
+
+	body, err := h.GenerateHTML(hermesMail)
+
+	if err != nil {
+		return "", err
+	}
+
+	return body, nil
+}
+
+
+func PrepareInformUserItemRequestBody() (string, error) {
+	hermesMail := hermes.Email{
+		Body: hermes.Body{
+			Intros: []string{
+				"Anfrage auf Item-Transfer.",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "Jemand möchte dir sein Item transferieren:",
+					Button: hermes.Button{
+						Text:  "Anzunehmen oder abzulehnen",
+						Link:  "http://" + URL + "/dashboard",
+						Color: "#334155",
+					},
+				},
+			},
+		},
+	}
+
+	body, err := h.GenerateHTML(hermesMail)
+
+	if err != nil {
+		return "", err
+	}
+
+	return body, nil
+}
