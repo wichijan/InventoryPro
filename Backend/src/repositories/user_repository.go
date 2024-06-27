@@ -23,7 +23,9 @@ type UserRepositoryI interface {
 	DeleteUser(tx *sql.Tx, userId *uuid.UUID) *models.INVError
 	CheckIfUsernameExists(username string) *models.INVError
 	CheckIfEmailExists(email string) *models.INVError
+
 	GetUsers() (*[]models.Users, *models.INVError)
+	GetAdmins() (*[]model.Users, *models.INVError)
 
 	StoreUserPicture(tx *sql.Tx, userId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetPictureIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError)
@@ -107,6 +109,27 @@ func (ur *UserRepository) GetUsers() (*[]models.Users, *models.INVError) {
 			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)).
 			LEFT_JOIN(table.UserRoles, table.UserRoles.UserID.EQ(table.Users.ID)).
 			LEFT_JOIN(table.Roles, table.Roles.ID.EQ(table.UserRoles.RoleID)),
+	)
+
+	err := stmt.Query(ur.GetDatabaseConnection(), &users)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading users")
+	}
+
+	return &users, nil
+}
+
+func (ur *UserRepository) GetAdmins() (*[]model.Users, *models.INVError) {
+	var users []model.Users
+	stmt := mysql.SELECT(
+		table.Users.AllColumns,
+	).FROM(
+		table.Users.
+			LEFT_JOIN(table.UserTypes, table.UserTypes.ID.EQ(table.Users.UserTypeID)).
+			LEFT_JOIN(table.UserRoles, table.UserRoles.UserID.EQ(table.Users.ID)).
+			LEFT_JOIN(table.Roles, table.Roles.ID.EQ(table.UserRoles.RoleID)),
+	).WHERE(
+		table.Roles.RoleName.EQ(mysql.String("Admin")),
 	)
 
 	err := stmt.Query(ur.GetDatabaseConnection(), &users)

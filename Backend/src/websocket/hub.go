@@ -77,13 +77,15 @@ func (h *Hub) RemoveClient(client *Client) {
 }
 
 // Function to handle message based on type of message
-func (h *Hub) HandleMessage(message Message) {
+func (h *Hub) HandleMessage(message Message) *int {
 	messageStr := `{ "Message": "` + message.Content + `", "TimeStamp": "` + time.Now().Format(time.RFC3339) + `" }`
 	log.Print("Message: ", messageStr)
 
+	count := 0
+
 	if len(h.clients) == 0 {
 		log.Print("No clients to send message to")
-		return
+		return nil
 	}
 
 	if message.Type == utils.MESSAGE_TYPE_TO_USER {
@@ -91,11 +93,12 @@ func (h *Hub) HandleMessage(message Message) {
 		for client := range h.clients {
 			if client.UserId == message.SentToUserId {
 				select {
-				case client.send <- `{"SentToUserId": "`+ message.SentToUserId + `", "Sender": "`+ message.Sender + `", "Message": "` + message.Content + `", "TimeStamp": "` + time.Now().Format(time.RFC3339) + `" }`:
+				case client.send <- `{"SentToUserId": "` + message.SentToUserId + `", "Sender": "` + message.Sender + `", "Message": "` + message.Content + `", "TimeStamp": "` + time.Now().Format(time.RFC3339) + `" }`:
 				default:
 					close(client.send)
 					delete(h.clients, client)
 				}
+				count++
 			}
 		}
 
@@ -112,6 +115,7 @@ func (h *Hub) HandleMessage(message Message) {
 					close(client.send)
 					delete(h.clients, client)
 				}
+				count++
 			}
 		}
 	}
@@ -125,7 +129,10 @@ func (h *Hub) HandleMessage(message Message) {
 				close(client.send)
 				delete(h.clients, client)
 			}
+			count++
 		}
 	}
+
+	return &count
 
 }

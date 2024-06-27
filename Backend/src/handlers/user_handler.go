@@ -48,12 +48,20 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI, hub *websocket.Hu
 		}
 
 		// inform admin
-		hub.HandleMessage(websocket.Message{
+		amountOfUsersReceived := hub.HandleMessage(websocket.Message{
 			Type:         utils.MESSAGE_TYPE_TO_ADMINS,
 			SentToUserId: "",
 			Sender:       "server",
-			Content:      "Registration Request for Admins!",
+			Content:      "New user registration request: " + registrationData.Username,
 		})
+		if amountOfUsersReceived == nil || *amountOfUsersReceived == 0 {
+			// send emails to admins
+			inv_err = userCtrl.SendEmailToAdmins(registrationData.Username)
+			if inv_err != nil {
+				utils.HandleErrorAndAbort(c, inv_err)
+				return
+			}
+		}
 
 		c.JSON(http.StatusCreated, nil)
 	}

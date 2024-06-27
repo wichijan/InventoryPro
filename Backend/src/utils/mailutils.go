@@ -103,7 +103,7 @@ func PrepareOrderConfirmationBody(order models.GetOrderDTO) (string, error) {
 					Instructions: "You can check your order and more in your overview:",
 					Button: hermes.Button{
 						Text:  "Go to Overview",
-						Link:  "https://" + URL + "/overview",
+						Link:  "http://" + URL + "/overview",
 						Color: "#334155",
 					},
 				},
@@ -132,13 +132,100 @@ func PrepareResetPasswordBody(userId *string) (string, error) {
 					Instructions: "Klick den Button, um dein Passwort zu ändern:",
 					Button: hermes.Button{
 						Text:  "Änder dein Passwort",
-						Link:  "https://" + URL + "/reset-password?userId=" + *userId,
+						Link:  "http://" + URL + "/reset-password?userId=" + *userId,
 						Color: "#334155",
 					},
 				},
 			},
 			Outros: []string{
 				"Wenn du keine Passwortänderung angefordert haben, ignoriere diese E-Mail bitte.",
+			},
+		},
+	}
+
+	body, err := h.GenerateHTML(hermesMail)
+
+	if err != nil {
+		return "", err
+	}
+
+	return body, nil
+}
+
+func PrepareInformAdminsRegistBody(username string) (string, error) {
+	hermesMail := hermes.Email{
+		Body: hermes.Body{
+			Intros: []string{
+				"Benutzer " + username + " hat sich registriert.",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "Klick den Button, um den Benutzer anzunehmen oder abzulehnen:",
+					Button: hermes.Button{
+						Text:  "anzunehmen oder abzulehnen",
+						Link:  "http://" + URL + "/admin/users",
+						Color: "#334155",
+					},
+				},
+			},
+		},
+	}
+
+	body, err := h.GenerateHTML(hermesMail)
+
+	if err != nil {
+		return "", err
+	}
+
+	return body, nil
+}
+
+
+
+func PrepareInformUserItemAcceptBody() (string, error) {
+	hermesMail := hermes.Email{
+		Body: hermes.Body{
+			Intros: []string{
+				"Item-Transfer wurde angenommen",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "Kontrolliere den Transfer in deinem Dashboard:",
+					Button: hermes.Button{
+						Text:  "Check Transfer",
+						Link:  "http://" + URL + "/dashboard",
+						Color: "#334155",
+					},
+				},
+			},
+		},
+	}
+
+	body, err := h.GenerateHTML(hermesMail)
+
+	if err != nil {
+		return "", err
+	}
+
+	return body, nil
+}
+
+
+func PrepareInformUserItemRequestBody() (string, error) {
+	hermesMail := hermes.Email{
+		Body: hermes.Body{
+			Intros: []string{
+				"Anfrage auf Item-Transfer.",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "Jemand möchte dir sein Item transferieren:",
+					Button: hermes.Button{
+						Text:  "Anzunehmen oder abzulehnen",
+						Link:  "http://" + URL + "/dashboard",
+						Color: "#334155",
+					},
+				},
 			},
 		},
 	}

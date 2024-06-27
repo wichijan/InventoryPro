@@ -15,6 +15,9 @@ import (
 type MailMgr interface {
 	SendWelcomeMail(to string, username string) *models.INVError
 	SendLinkForNewPasswordMail(to string, userId *string) *models.INVError
+	SendEmailToAdmin(to string, username string) *models.INVError
+	SendMailItemAcceptToUser(to string) *models.INVError
+	SendMailItemRequestToUser(to string) *models.INVError
 }
 
 type MailManager struct {
@@ -68,6 +71,40 @@ func (mm *MailManager) SendLinkForNewPasswordMail(to string, userId *string) *mo
 	subject := "Änder dein Passwort"
 
 	body, err := utils.PrepareResetPasswordBody(userId)
+	if err != nil {
+		return inv_errors.INV_UPSTREAM_ERROR
+	}
+
+	return mm.sendMail(to, emailSender, subject, body)
+}
+
+
+func (mm *MailManager) SendEmailToAdmin(to string, username string) *models.INVError {
+	subject := "Benutzer Registrierung"
+
+	body, err := utils.PrepareInformAdminsRegistBody(username)
+	if err != nil {
+		return inv_errors.INV_UPSTREAM_ERROR
+	}
+
+	return mm.sendMail(to, emailSender, subject, body)
+}
+
+func (mm *MailManager) SendMailItemAcceptToUser(to string) *models.INVError {
+	subject := "Dein Artikel wurde akzeptiert"
+
+	body, err := utils.PrepareInformUserItemAcceptBody()
+	if err != nil {
+		return inv_errors.INV_UPSTREAM_ERROR
+	}
+
+	return mm.sendMail(to, emailSender, subject, body)
+}
+
+func (mm *MailManager) SendMailItemRequestToUser(to string) *models.INVError {
+	subject := "Dein Artikel wurde akzeptiert"
+
+	body, err := utils.PrepareInformUserItemRequestBody()
 	if err != nil {
 		return inv_errors.INV_UPSTREAM_ERROR
 	}

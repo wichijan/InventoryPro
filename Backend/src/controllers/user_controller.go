@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"os"
 	"time"
 
@@ -32,6 +33,8 @@ type UserControllerI interface {
 
 	UpdateUserPassword(userId *uuid.UUID, password string) *models.INVError
 	ForgotPassword(username string) *models.INVError
+
+	SendEmailToAdmins(message string) *models.INVError
 
 	UploadUserImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetImageIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError)
@@ -489,6 +492,23 @@ func (uc *UserController) ForgotPassword(username string) *models.INVError {
 	inv_err = uc.MailMgr.SendLinkForNewPasswordMail(*user.Email, &user.ID)
 	if inv_err != nil {
 		return inv_err
+	}
+
+	return nil
+}
+
+func (uc *UserController) SendEmailToAdmins(userRegistUsername string) *models.INVError {
+	admins, inv_err := uc.UserRepo.GetAdmins()
+	if inv_err != nil {
+		return inv_err
+	}
+	log.Print("Admins: ", admins)
+
+	for _, admin := range *admins {
+		inv_err = uc.MailMgr.SendEmailToAdmin(*admin.Email, userRegistUsername)
+		if inv_err != nil {
+			return inv_err
+		}
 	}
 
 	return nil

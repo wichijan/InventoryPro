@@ -173,6 +173,9 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 			SetOfObjectsRepo:    setOfObjectsRepo,
 			ReservationRepo:     reservationRepo,
 			ItemsQuickShelfRepo: itemQuickShelfRepo,
+
+			MailMgr:  mailMgr,
+			UserRepo: userRepo,
 		},
 		UserController: &controllers.UserController{
 			UserRepo:                userRepo,
