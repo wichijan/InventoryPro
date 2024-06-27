@@ -840,6 +840,38 @@ definitions:
       username:
         type: string
     type: object
+  models.UserWithoutRoles:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: string
+      jobTitle:
+        type: string
+      lastName:
+        type: string
+      phoneNumber:
+        type: string
+      userTypeName:
+        type: string
+    type: object
+  models.UserWithoutRolesODT:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      jobTitle:
+        type: string
+      lastName:
+        type: string
+      phoneNumber:
+        type: string
+      userTypeName:
+        type: string
+    type: object
   models.Username:
     properties:
       username:
@@ -3015,6 +3047,29 @@ paths:
       summary: Get Users
       tags:
       - Users
+    put:
+      consumes:
+      - application/json
+      description: Update User
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserWithoutRolesODT'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update User
+      tags:
+      - Users
   /users-picture:
     delete:
       consumes:
@@ -3108,6 +3163,30 @@ paths:
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
       summary: Get User By Id
+      tags:
+      - Users
+  /users/admin:
+    put:
+      consumes:
+      - application/json
+      description: Update User as Admin
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserWithoutRoles'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Update User as Admin
       tags:
       - Users
   /users/get-me:
