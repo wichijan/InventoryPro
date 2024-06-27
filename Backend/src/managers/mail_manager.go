@@ -18,6 +18,7 @@ type MailMgr interface {
 	SendEmailToAdmin(to string, username string) *models.INVError
 	SendMailItemAcceptToUser(to string) *models.INVError
 	SendMailItemRequestToUser(to string) *models.INVError
+	SendRegistrationCodeMail(to string, code string) *models.INVError
 }
 
 type MailManager struct {
@@ -78,7 +79,6 @@ func (mm *MailManager) SendLinkForNewPasswordMail(to string, userId *string) *mo
 	return mm.sendMail(to, emailSender, subject, body)
 }
 
-
 func (mm *MailManager) SendEmailToAdmin(to string, username string) *models.INVError {
 	subject := "Benutzer Registrierung"
 
@@ -105,6 +105,17 @@ func (mm *MailManager) SendMailItemRequestToUser(to string) *models.INVError {
 	subject := "Dein Artikel wurde akzeptiert"
 
 	body, err := utils.PrepareInformUserItemRequestBody()
+	if err != nil {
+		return inv_errors.INV_UPSTREAM_ERROR
+	}
+
+	return mm.sendMail(to, emailSender, subject, body)
+}
+
+func (mm *MailManager) SendRegistrationCodeMail(to string, code string) *models.INVError {
+	subject := "Dein Registrierungscode"
+
+	body, err := utils.PrepareRegistrationCodeBody(code)
 	if err != nil {
 		return inv_errors.INV_UPSTREAM_ERROR
 	}

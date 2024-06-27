@@ -161,6 +161,7 @@ const docTemplate = `{
         },
         "/auth/generate-code": {
             "post": {
+                "description": "Generate User Registration Code - User gets email with code and link to website",
                 "consumes": [
                     "application/json"
                 ],
@@ -170,6 +171,7 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
+                "summary": "Generate User Registration Code",
                 "parameters": [
                     {
                         "type": "string",
@@ -338,6 +340,7 @@ const docTemplate = `{
         },
         "/auth/register/:code": {
             "post": {
+                "description": "Register user with code",
                 "consumes": [
                     "application/json"
                 ],
@@ -347,6 +350,7 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
+                "summary": "Register user with code",
                 "parameters": [
                     {
                         "type": "string",

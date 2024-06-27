@@ -1037,6 +1037,8 @@ paths:
     post:
       consumes:
       - application/json
+      description: Generate User Registration Code - User gets email with code and
+        link to website
       parameters:
       - description: Registration Code
         in: path
@@ -1060,6 +1062,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
+      summary: Generate User Registration Code
       tags:
       - Users
   /auth/is-admin:
@@ -1152,6 +1155,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Register user with code
       parameters:
       - description: Registration Code
         in: path
@@ -1175,6 +1179,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
+      summary: Register user with code
       tags:
       - Users
   /auth/reset-password:
