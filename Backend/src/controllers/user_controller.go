@@ -26,10 +26,12 @@ type UserControllerI interface {
 	DeclineUserRegistrationRequest(userId *string) *models.INVError
 	GetRegistrationRequests() (*[]model.RegistrationRequests, *models.INVError)
 
-	ValidateRegistrationCode(code *string) (*string, *models.INVError)
+	ValidateRegistrationCode(code *string) (*uuid.UUID, *models.INVError)
 	RegisterUserAndCode(registrationData models.RegistrationRequest) (*models.RegistrationCodeResponse, *models.INVError)
-	UpdateUserPassword(userIdStr *string, password string) *models.INVError
 	DeleteRegistrationCode(code *string) *models.INVError
+
+	UpdateUserPassword(userId *uuid.UUID, password string) *models.INVError
+	ForgotPassword(username string) *models.INVError
 
 	UploadUserImage(itemId *uuid.UUID) (*uuid.UUID, *models.INVError)
 	GetImageIdFromUser(userId *uuid.UUID) (*uuid.UUID, *models.INVError)
@@ -259,7 +261,7 @@ func (uc *UserController) GetRegistrationRequests() (*[]model.RegistrationReques
 	return uc.RegistrationRequestRepo.GetRegistrationRequests()
 }
 
-func (uc *UserController) ValidateRegistrationCode(code *string) (*string, *models.INVError) {
+func (uc *UserController) ValidateRegistrationCode(code *string) (*uuid.UUID, *models.INVError) {
 	ok, inv_err := uc.RegistrationCodeRepo.CheckIfUserWithCodeExists(code)
 	if inv_err != nil {
 		return nil, inv_err
@@ -269,12 +271,17 @@ func (uc *UserController) ValidateRegistrationCode(code *string) (*string, *mode
 		return nil, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid registration code")
 	}
 
-	userId, inv_err := uc.RegistrationCodeRepo.GetUserIdByCode(code)
+	user, inv_err := uc.RegistrationCodeRepo.GetUserIdByCode(code)
 	if inv_err != nil {
 		return nil, inv_err
 	}
 
-	return &userId.UserID, nil
+	userId, err := uuid.Parse(user.UserID)
+	if err != nil {
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error parsing user ID")
+	}
+
+	return &userId, nil
 }
 
 func (uc *UserController) RegisterUserAndCode(registrationData models.RegistrationRequest) (*models.RegistrationCodeResponse, *models.INVError) {
@@ -343,7 +350,7 @@ func (uc *UserController) RegisterUserAndCode(registrationData models.Registrati
 	}, nil
 }
 
-func (uc *UserController) UpdateUserPassword(userIdStr *string, password string) *models.INVError {
+func (uc *UserController) UpdateUserPassword(userId *uuid.UUID, password string) *models.INVError {
 	tx, err := uc.UserRepo.NewTransaction()
 	if err != nil {
 		return inv_errors.INV_INTERNAL_ERROR.WithDetails("Error creating transaction")
@@ -355,12 +362,7 @@ func (uc *UserController) UpdateUserPassword(userIdStr *string, password string)
 		return inv_errors.INV_UPSTREAM_ERROR.WithDetails("Invalid password")
 	}
 
-	userId, inv_uuid_err := uuid.Parse(*userIdStr)
-	if inv_uuid_err != nil {
-		return inv_errors.INV_INTERNAL_ERROR.WithDetails("String UUID can not be parsed to UUID")
-	}
-
-	user, inv_err := uc.UserRepo.GetUserPureById(&userId)
+	user, inv_err := uc.UserRepo.GetUserPureById(userId)
 	if inv_err != nil {
 		return inv_err
 	}
@@ -471,4 +473,23 @@ func (uc *UserController) IsAdmin(userId *uuid.UUID) (bool, *models.INVError) {
 	}
 
 	return false, nil
+}
+
+func (uc *UserController) ForgotPassword(username string) *models.INVError {
+	user, inv_err := uc.UserRepo.GetUserByUsername(username)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	if !*user.IsActive {
+		return inv_errors.INV_CREDENTIALS_INVALID.WithDetails("User not active")
+	}
+
+	// send new password via email
+	inv_err = uc.MailMgr.SendLinkForNewPasswordMail(*user.Email, &user.ID)
+	if inv_err != nil {
+		return inv_err
+	}
+
+	return nil
 }
