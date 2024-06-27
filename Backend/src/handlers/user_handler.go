@@ -499,8 +499,8 @@ func ResetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 // @Param user body models.Username true "Username"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /forgot-password [POST]
-func ForgetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+// @Router /email-forget-password [POST]
+func EmailForgetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Register user
 		var username models.Username
@@ -527,7 +527,7 @@ func ForgetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc
 }
 
 // @Summary Request Password Reset
-// @Description Request Password Reset | send email to user with link for reset password. UserId should be in URL of Frontend
+// @Description Request Password Reset in Database. UserId should be in URL of Frontend
 // @Tags Users
 // @Accept  json
 // @Produce  json

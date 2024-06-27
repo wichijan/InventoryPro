@@ -20,7 +20,6 @@ var h = hermes.Hermes{
 		Link:        URL,
 		TroubleText: "Wenn der {ACTION}-Button nicht funktioniert, kopieren Sie einfach die URL unten und fügen Sie sie in Ihren Webbrowser ein.",
 		Copyright:   "Copyright © 2024 InventoryPro-WWI22SEB",
-		Logo:        "http://www.w3.org/2000/svg",
 	},
 	Theme: new(hermes.Default),
 }
