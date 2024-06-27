@@ -151,3 +151,31 @@ func PrepareResetPasswordBody(userId *string) (string, error) {
 
 	return body, nil
 }
+
+func PrepareInformAdminsRegistBody(username string) (string, error) {
+	hermesMail := hermes.Email{
+		Body: hermes.Body{
+			Intros: []string{
+				"Benutzer " + username + " hat sich registriert.",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "Klick den Button, um den Benutzer anzunehmen oder abzulehnen:",
+					Button: hermes.Button{
+						Text:  "anzunehmen oder abzulehnen",
+						Link:  "https://" + URL + "/", // TODO Link anpassen
+						Color: "#334155",
+					},
+				},
+			},
+		},
+	}
+
+	body, err := h.GenerateHTML(hermesMail)
+
+	if err != nil {
+		return "", err
+	}
+
+	return body, nil
+}

@@ -74,3 +74,15 @@ func (mm *MailManager) SendLinkForNewPasswordMail(to string, userId *string) *mo
 
 	return mm.sendMail(to, emailSender, subject, body)
 }
+
+
+func (mm *MailManager) SendEmailToAdmin(to string, username string) *models.INVError {
+	subject := "Benutzer Registrierung"
+
+	body, err := utils.PrepareInformAdminsRegistBody(username)
+	if err != nil {
+		return inv_errors.INV_UPSTREAM_ERROR
+	}
+
+	return mm.sendMail(to, emailSender, subject, body)
+}
