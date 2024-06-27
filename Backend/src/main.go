@@ -24,7 +24,12 @@ func main() {
 	hub := websocket.NewHub()
 	go hub.Run()
 
-	router := createRouter(dbConnection, hub)
+	mgInstance := managers.InitializeMailgunClient()
+	if mgInstance == nil {
+		panic("Could not initialize Mailgun instance")
+	}
+
+	router := createRouter(dbConnection, hub, mgInstance)
 
 	const port = "8080"
 
