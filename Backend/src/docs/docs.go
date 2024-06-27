@@ -418,7 +418,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/forgot-password": {
+        "/email-forget-password": {
             "post": {
                 "description": "Forget Password =\u003e Reset | send email to user with link for reset password",
                 "consumes": [
@@ -1998,7 +1998,7 @@ const docTemplate = `{
         },
         "/request-forgot-password": {
             "post": {
-                "description": "Request Password Reset | send email to user with link for reset password. UserId should be in URL of Frontend",
+                "description": "Request Password Reset in Database. UserId should be in URL of Frontend",
                 "consumes": [
                     "application/json"
                 ],

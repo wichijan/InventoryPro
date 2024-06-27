@@ -1169,7 +1169,7 @@ paths:
       summary: Reset Password
       tags:
       - Users
-  /forgot-password:
+  /email-forget-password:
     post:
       consumes:
       - application/json
@@ -2211,8 +2211,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Request Password Reset | send email to user with link for reset
-        password. UserId should be in URL of Frontend
+      description: Request Password Reset in Database. UserId should be in URL of
+        Frontend
       parameters:
       - description: User data
         in: body
