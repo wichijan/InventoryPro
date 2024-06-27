@@ -1957,6 +1957,38 @@
                 }
             }
         },
+        "/registers": {
+            "get": {
+                "description": "Get Registration Codes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get Registration Codes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.RegistrationCodes"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/registration-requests": {
             "get": {
                 "description": "Get Registration Requests",
@@ -3428,6 +3460,38 @@
                 }
             }
         },
+        "/users/items": {
+            "get": {
+                "description": "Get User Items (Borrowed items) and Reservations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get User Items and Reservations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UserItems"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{id}": {
             "get": {
                 "description": "Get User By Id",
@@ -4777,6 +4841,40 @@
                 }
             }
         },
+        "models.RegistrationCodes": {
+            "type": "object",
+            "properties": {
+                "registrationCode": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string"
+                        },
+                        "firstName": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "jobTitle": {
+                            "type": "string"
+                        },
+                        "lastName": {
+                            "type": "string"
+                        },
+                        "phoneNumber": {
+                            "type": "string"
+                        },
+                        "userTypeName": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "models.RegistrationRequest": {
             "type": "object",
             "properties": {
@@ -5000,6 +5098,145 @@
                 },
                 "userID": {
                     "type": "string"
+                }
+            }
+        },
+        "models.UserItems": {
+            "type": "object",
+            "properties": {
+                "borrowedItems": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "borrowedAt": {
+                                "type": "string"
+                            },
+                            "classFour": {
+                                "type": "boolean"
+                            },
+                            "classOne": {
+                                "type": "boolean"
+                            },
+                            "classThree": {
+                                "type": "boolean"
+                            },
+                            "classTwo": {
+                                "type": "boolean"
+                            },
+                            "damaged": {
+                                "type": "boolean"
+                            },
+                            "damagedDescription": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "hintText": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "itemTypes": {
+                                "$ref": "#/definitions/model.ItemsItemTypes"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "picture": {
+                                "type": "string"
+                            },
+                            "regularShelfID": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "reservations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "item": {
+                                "type": "object",
+                                "properties": {
+                                    "classFour": {
+                                        "type": "boolean"
+                                    },
+                                    "classOne": {
+                                        "type": "boolean"
+                                    },
+                                    "classThree": {
+                                        "type": "boolean"
+                                    },
+                                    "classTwo": {
+                                        "type": "boolean"
+                                    },
+                                    "damaged": {
+                                        "type": "boolean"
+                                    },
+                                    "damagedDescription": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "hintText": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "itemTypes": {
+                                        "$ref": "#/definitions/model.ItemsItemTypes"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "picture": {
+                                        "type": "string"
+                                    },
+                                    "regularShelfID": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "reservation": {
+                                "type": "object",
+                                "properties": {
+                                    "isCancelled": {
+                                        "type": "boolean"
+                                    },
+                                    "itemID": {
+                                        "type": "string"
+                                    },
+                                    "quantity": {
+                                        "type": "integer"
+                                    },
+                                    "reservationDate": {
+                                        "type": "string"
+                                    },
+                                    "reservationID": {
+                                        "type": "string"
+                                    },
+                                    "timeFrom": {
+                                        "type": "string"
+                                    },
+                                    "timeTo": {
+                                        "type": "string"
+                                    },
+                                    "userID": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },

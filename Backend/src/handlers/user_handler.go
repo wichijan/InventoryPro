@@ -250,6 +250,31 @@ func GetUserByIdHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get User Items and Reservations
+// @Description  Get User Items (Borrowed items) and Reservations
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.UserItems
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /users/items [GET]
+func GetUserItemsHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
+		user, inv_err := userCtrl.GetUserItems(userId)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+		c.JSON(http.StatusOK, user)
+	}
+}
+
 // @Summary Update User
 // @Description Update User
 // @Tags Users

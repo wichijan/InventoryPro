@@ -16,6 +16,7 @@ import (
 
 type UserItemRepositoryI interface {
 	GetUserItemByUserIdAndItemId(userId *uuid.UUID, itemId *uuid.UUID) (*model.UserItems, *models.INVError)
+	GetUserItems(userId *uuid.UUID) (*[]models.UserItems, *models.INVError)
 	MoveItemToNewUser(tx *sql.Tx, userId *uuid.UUID, itemId *uuid.UUID, newUserId *uuid.UUID) *models.INVError
 
 	InsertUserItem(tx *sql.Tx, itemBorrow *models.ItemBorrow) *models.INVError
@@ -57,6 +58,34 @@ func (uir *UserItemRepository) GetUserItemByUserIdAndItemId(userId *uuid.UUID, i
 	}
 
 	return &userItem, nil
+}
+
+func (uir *UserItemRepository) GetUserItems(userId *uuid.UUID) (*[]models.UserItems, *models.INVError) {
+	var userItems []models.UserItems
+
+	// Create the query
+	stmt := mysql.SELECT(
+		table.Items.AllColumns,
+		table.Reservations.AllColumns,
+		table.UserItems.AllColumns,
+	).FROM(
+		table.UserItems.
+			LEFT_JOIN(table.Items, table.Items.ID.EQ(table.UserItems.ItemID)).
+			LEFT_JOIN(table.Reservations, table.Reservations.ItemID.EQ(table.UserItems.ItemID)),
+	).WHERE(
+		table.UserItems.UserID.EQ(mysql.String(userId.String())),
+	)
+
+	// Execute the query
+	err := stmt.Query(uir.GetDatabaseConnection(), &userItems)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, inv_errors.INV_NOT_FOUND.WithDetails("User item not found")
+		}
+		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error reading user item")
+	}
+
+	return &userItems, nil
 }
 
 func (uir *UserItemRepository) GetQuantityFromUserItem(itemId *uuid.UUID, userId *uuid.UUID) (*int32, *models.INVError) {
