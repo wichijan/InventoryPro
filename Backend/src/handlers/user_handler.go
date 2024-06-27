@@ -78,7 +78,7 @@ func RegisterUserWithCodeHandler(userCtrl controllers.UserControllerI) gin.Handl
 		}
 
 		// Validate code
-		userIdStr, inv_err := userCtrl.ValidateRegistrationCode(&code)
+		userId, inv_err := userCtrl.ValidateRegistrationCode(&code)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -93,7 +93,7 @@ func RegisterUserWithCodeHandler(userCtrl controllers.UserControllerI) gin.Handl
 		}
 
 		// user is logged in after registration
-		inv_err = userCtrl.UpdateUserPassword(userIdStr, newPassword.Password)
+		inv_err = userCtrl.UpdateUserPassword(userId, newPassword.Password)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return
@@ -457,9 +457,15 @@ func GetRegistrationRequestsHandler(userCtrl controllers.UserControllerI) gin.Ha
 // @Param user body models.PasswordReset true "User data"
 // @Success 200
 // @Failure 400 {object} models.INVErrorMessage
-// @Router /reset-password [POST]
+// @Router /auth/reset-password [POST]
 func ResetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_UNAUTHORIZED)
+			return
+		}
+
 		// Register user
 		var newPassword models.PasswordReset
 		err := c.ShouldBind(&newPassword)
@@ -468,14 +474,85 @@ func ResetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 			return
 		}
 		if utils.ContainsEmptyString(
-			newPassword.Password, *newPassword.Username,
+			newPassword.Password,
 		) {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
 			return
 		}
 
 		// user is logged in after registration
-		inv_err := userCtrl.UpdateUserPassword(newPassword.Username, newPassword.Password)
+		inv_err := userCtrl.UpdateUserPassword(userId, newPassword.Password)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Forget Password
+// @Description Forget Password => Reset | send email to user with link for reset password
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body models.Username true "Username"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /email-forget-password [POST]
+func EmailForgetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Register user
+		var username models.Username
+		err := c.ShouldBind(&username)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(
+			username.Username,
+		) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
+			return
+		}
+
+		inv_err := userCtrl.ForgotPassword(username.Username)
+		if inv_err != nil {
+			utils.HandleErrorAndAbort(c, inv_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// @Summary Request Password Reset
+// @Description Request Password Reset in Database. UserId should be in URL of Frontend
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body models.PasswordResetEmail true "User data"
+// @Success 200
+// @Failure 400 {object} models.INVErrorMessage
+// @Router /request-forgot-password [POST]
+func RequestForgetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Register user
+		var newPassword models.PasswordResetEmail
+		err := c.ShouldBind(&newPassword)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
+			return
+		}
+		if utils.ContainsEmptyString(
+			newPassword.Password,
+		) {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
+			return
+		}
+
+		// user is logged in after registration
+		inv_err := userCtrl.UpdateUserPassword(newPassword.UserId, newPassword.Password)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

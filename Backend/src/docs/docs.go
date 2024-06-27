@@ -381,6 +381,80 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/reset-password": {
+            "post": {
+                "description": "Reset Password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Reset Password",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PasswordReset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/email-forget-password": {
+            "post": {
+                "description": "Forget Password =\u003e Reset | send email to user with link for reset password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Forget Password",
+                "parameters": [
+                    {
+                        "description": "Username",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Username"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.INVErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/items": {
             "get": {
                 "description": "Get items",
@@ -1922,9 +1996,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/reset-password": {
+        "/request-forgot-password": {
             "post": {
-                "description": "Reset Password",
+                "description": "Request Password Reset in Database. UserId should be in URL of Frontend",
                 "consumes": [
                     "application/json"
                 ],
@@ -1934,7 +2008,7 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
-                "summary": "Reset Password",
+                "summary": "Request Password Reset",
                 "parameters": [
                     {
                         "description": "User data",
@@ -1942,7 +2016,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.PasswordReset"
+                            "$ref": "#/definitions/models.PasswordResetEmail"
                         }
                     }
                 ],
@@ -4533,8 +4607,16 @@ const docTemplate = `{
             "properties": {
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "models.PasswordResetEmail": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
                 },
-                "username": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -4909,6 +4991,14 @@ const docTemplate = `{
                 "userTypeName": {
                     "type": "string"
                 },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Username": {
+            "type": "object",
+            "properties": {
                 "username": {
                     "type": "string"
                 }

@@ -78,8 +78,16 @@ type LoggedInResponse struct {
 }
 
 type PasswordReset struct {
-	Username *string `json:"username"`
-	Password string  `json:"password"`
+	Password string
+}
+
+type Username struct {
+	Username string
+}
+
+type PasswordResetEmail struct {
+	UserId   *uuid.UUID
+	Password string
 }
 
 type RegistrationCode struct {

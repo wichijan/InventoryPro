@@ -18,7 +18,7 @@ var h = hermes.Hermes{
 	Product: hermes.Product{
 		Name:        "InventoryPro",
 		Link:        URL,
-		TroubleText: "If the {ACTION}-button is not working for you, just copy and paste the URL below into your web browser.",
+		TroubleText: "Wenn der {ACTION}-Button nicht funktioniert, kopieren Sie einfach die URL unten und fügen Sie sie in Ihren Webbrowser ein.",
 		Copyright:   "Copyright © 2024 InventoryPro-WWI22SEB",
 	},
 	Theme: new(hermes.Default),
@@ -29,10 +29,10 @@ func PrepareWelcomeMailBody(username string) (string, error) {
 		Body: hermes.Body{
 			Name: username,
 			Intros: []string{
-				fmt.Sprintf("Welcome to InventoryPro, %v! We're very excited to have you on board.", username),
+				fmt.Sprintf("Willkommen bei InventoryPro, %v! Wir freuen uns dich an Board zu haben .", username),
 			},
 			Outros: []string{
-				"Need help, or have questions? Just reply to this email, we'd love to help.",
+				"Wenn du Hilfe brauchst, oder Fragen hast, antworte einfach auf diese E-Mail, wir helfen dir gerne weiter.",
 			},
 		},
 	}
@@ -120,3 +120,34 @@ func PrepareOrderConfirmationBody(order models.GetOrderDTO) (string, error) {
 	return body, nil
 }
 */
+
+func PrepareResetPasswordBody(userId *string) (string, error) {
+	hermesMail := hermes.Email{
+		Body: hermes.Body{
+			Intros: []string{
+				"Du hast eine Anfrage zur Passwortänderung gestellt.",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "Klick den Button, um dein Passwort zu ändern:",
+					Button: hermes.Button{
+						Text:  "Änder dein Passwort",
+						Link:  "https://" + URL + "/reset-password?userId=" + *userId,
+						Color: "#334155",
+					},
+				},
+			},
+			Outros: []string{
+				"Wenn du keine Passwortänderung angefordert haben, ignoriere diese E-Mail bitte.",
+			},
+		},
+	}
+
+	body, err := h.GenerateHTML(hermesMail)
+
+	if err != nil {
+		return "", err
+	}
+
+	return body, nil
+}

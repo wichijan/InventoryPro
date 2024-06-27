@@ -587,7 +587,12 @@ definitions:
     properties:
       password:
         type: string
-      username:
+    type: object
+  models.PasswordResetEmail:
+    properties:
+      password:
+        type: string
+      userId:
         type: string
     type: object
   models.PicturePath:
@@ -832,6 +837,11 @@ definitions:
         type: array
       userTypeName:
         type: string
+      username:
+        type: string
+    type: object
+  models.Username:
+    properties:
       username:
         type: string
     type: object
@@ -1133,6 +1143,55 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
+      tags:
+      - Users
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset Password
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.PasswordReset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Reset Password
+      tags:
+      - Users
+  /email-forget-password:
+    post:
+      consumes:
+      - application/json
+      description: Forget Password => Reset | send email to user with link for reset
+        password
+      parameters:
+      - description: Username
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.Username'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.INVErrorMessage'
+      summary: Forget Password
       tags:
       - Users
   /items:
@@ -2148,18 +2207,19 @@ paths:
       summary: Get Registration Requests
       tags:
       - Users
-  /reset-password:
+  /request-forgot-password:
     post:
       consumes:
       - application/json
-      description: Reset Password
+      description: Request Password Reset in Database. UserId should be in URL of
+        Frontend
       parameters:
       - description: User data
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.PasswordReset'
+          $ref: '#/definitions/models.PasswordResetEmail'
       produces:
       - application/json
       responses:
@@ -2169,7 +2229,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.INVErrorMessage'
-      summary: Reset Password
+      summary: Request Password Reset
       tags:
       - Users
   /roles:
