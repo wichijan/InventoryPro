@@ -395,10 +395,7 @@ func (uc *UserController) RegisterUserAndCode(registrationData models.Registrati
 		return nil, inv_errors.INV_INTERNAL_ERROR.WithDetails("Error committing transaction")
 	}
 
-	inv_err = uc.MailMgr.SendRegistrationCodeMail(registrationData.Email, code)
-	if inv_err != nil {
-		return nil, inv_err
-	}
+	uc.MailMgr.SendRegistrationCodeMail(registrationData.Email, code)
 
 	return &models.RegistrationCodeResponse{
 		RegistrationCode: code,
@@ -541,10 +538,7 @@ func (uc *UserController) ForgotPassword(username string) *models.INVError {
 	}
 
 	// send new password via email
-	inv_err = uc.MailMgr.SendLinkForNewPasswordMail(*user.Email, &user.ID)
-	if inv_err != nil {
-		return inv_err
-	}
+	uc.MailMgr.SendLinkForNewPasswordMail(*user.Email, &user.ID)
 
 	return nil
 }
@@ -557,10 +551,7 @@ func (uc *UserController) SendEmailToAdmins(userRegistUsername string) *models.I
 	log.Print("Admins: ", admins)
 
 	for _, admin := range *admins {
-		inv_err = uc.MailMgr.SendEmailToAdmin(*admin.Email, userRegistUsername)
-		if inv_err != nil {
-			return inv_err
-		}
+		uc.MailMgr.SendEmailToAdmin(*admin.Email, userRegistUsername)
 	}
 
 	return nil

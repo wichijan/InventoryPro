@@ -995,14 +995,10 @@ func (ic *ItemController) SendItemAcceptToUser(userId *uuid.UUID) *models.INVErr
 	}
 
 	// Send email
-	inv_error = ic.MailMgr.SendMailItemAcceptToUser(*user.Email)
-	if inv_error != nil {
-		return inv_error
-	}
+	ic.MailMgr.SendMailItemAcceptToUser(*user.Email)
 
 	return nil
 }
-
 
 func (ic *ItemController) SendItemRequestToUser(userId *uuid.UUID) *models.INVError {
 	// Send email to user
@@ -1013,11 +1009,7 @@ func (ic *ItemController) SendItemRequestToUser(userId *uuid.UUID) *models.INVEr
 	}
 
 	// Send email
-	inv_error = ic.MailMgr.SendMailItemRequestToUser(*user.Email)
-	if inv_error != nil {
-		return inv_error
-	}
+	ic.MailMgr.SendMailItemRequestToUser(*user.Email)
 
 	return nil
 }
-
