@@ -41,7 +41,8 @@
       !logIn &&
       url !== "/auth/login" &&
       url !== "/auth/register" &&
-      url !== "/auth/code"
+      url !== "/auth/code" &&
+      url.includes("/auth/forgot-password") === false
     ) {
       goto("/auth/login");
     }

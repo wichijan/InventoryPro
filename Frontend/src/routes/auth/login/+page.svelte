@@ -1,12 +1,13 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { API_URL } from "$lib/_services/ShelfService";
+  import { Eye, EyeSlash } from "svelte-bootstrap-icons";
   import Swal from "sweetalert2";
 
   let username: string = "";
   let password: string = "";
   let passwordError: string = "";
-
+  let passwordVisible = false;
   const validatePassword = () => {
     const regex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -15,6 +16,20 @@
       : "Falsches Passwort! Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl, ein Sonderzeichen enthalten und mindestens 8 Zeichen lang sein.";
   };
 
+  function typeCheck(node) {
+    node.type = passwordVisible ? "text" : "password";
+  }
+
+  function togglePasswordVisibility() {
+    let pElement = document.getElementById("password");
+
+    passwordVisible = pElement.type === "password";
+    if (pElement.type === "password") {
+      pElement.type = "text";
+    } else {
+      pElement.type = "password";
+    }
+  }
   function login(e: any) {
     e.preventDefault();
 
@@ -75,21 +90,36 @@
           />
         </div>
       </div>
+
       <div>
         <label for="password" class="text-white text-lg font-bold">
           Password
         </label>
-        <div class="mt-1 rounded-md shadow-sm">
-          <input
-            bind:value={password}
-            on:input={validatePassword}
-            type="password"
-            class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
-            placeholder="Password"
-            required
-          />
-          <p class="text-red-500 text-sm mt-2">{passwordError}</p>
+        <div class="mt-1 rounded-md shadow-sm relative">
+          {#key passwordVisible}
+            <input
+              bind:value={password}
+              on:input={validatePassword}
+              id="password"
+              use:typeCheck
+              class="block w-full p-3 border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:border-blue-500"
+              placeholder="Password"
+              required
+            />
+          {/key}
+          <button
+            type="button"
+            on:click={togglePasswordVisibility}
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-transparent border-none text-gray-500 focus:outline-none"
+          >
+            {#if passwordVisible}
+              <EyeSlash class="h-6 w-6" />
+            {:else}
+              <Eye class="h-6 w-6" />
+            {/if}
+          </button>
         </div>
+        <p class="text-red-500 text-sm mt-2">{passwordError}</p>
       </div>
       <div class="flex justify-between">
         <div class="flex flex-row w-max gap-1">
@@ -98,6 +128,12 @@
             >Angemeldet bleiben?</label
           >
         </div>
+        <a
+          href="/auth/forgot-password"
+          class="text-white text-sm font-bold hover:text-blue-400 duration-300"
+          >Passwort vergessen?</a
+        >
+
         <a
           href="/auth/register"
           class="text-white text-sm font-bold hover:text-blue-400 duration-300"
