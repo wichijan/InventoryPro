@@ -34,7 +34,7 @@
 <div class="container mx-auto p-6">
   <h1 class="text-3xl font-bold mb-8 text-center">Forgot Password</h1>
 
-  <div class="bg-gray-100 shadow-lg rounded-lg p-6 max-w-md mx-auto">
+  <div class="bg-tertiary shadow-lg rounded-lg p-6 max-w-md mx-auto">
     <p class="mb-4 text-gray-600 text-center">
       Bitte geben Sie Ihren Nutzernamen ein, um einen Link zum Zurücksetzen des
       Passworts zu erhalten.
@@ -59,7 +59,7 @@
       {/if}
       <button
         type="submit"
-        class="w-full bg-blue-600 text-white py-2 rounded-md"
+        class="bg-[#d5bdaf] hover:bg-d6ccc2 hover:text-black hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 mt-5 w-full"
         >Send Reset Link</button
       >
     </form>
