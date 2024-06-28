@@ -58,4 +58,4 @@ Dieses Projekt ist eine vollständige Webanwendung zur Verwaltung von Lagerbest�
 
 Nach dem Einrichten der Datenbank, des Backends und des Frontends sollte die Anwendung nun lokal auf Ihrem System laufen. Sie können die Webanwendung in Ihrem Browser öffnen und mit der Verwaltung von Lagerbeständen beginnen.
 
-Falls Sie Fragen haben oder auf Probleme stoßen, zögern Sie nicht, die Dokumentation zu konsultieren oder Unterstützung in den entsprechenden Community-Foren zu suchen. Viel Erfolg!
+Falls Sie Fragen haben oder auf Probleme stoßen, zögern Sie nicht, einen von uns beiden zu kontaktieren.
