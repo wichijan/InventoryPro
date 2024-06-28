@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { API_URL } from "$lib/_services/ShelfService";
   import Swal from "sweetalert2";
 
   let code = "";
   let password = "";
-  let passwordError = "";
+  let passwordError: string = "";
 
   const validatePassword = () => {
     const regex =
@@ -29,6 +30,7 @@
         icon: "success",
         title: "Die Registrierung war erfolgreich",
       });
+      goto("/auth/login");
     } else {
       Swal.fire({
         icon: "error",
@@ -39,8 +41,8 @@
   }
 </script>
 
-<main class="flex items-center justify-center min-h-screen bg-gray-100 p-6">
-  <div class="max-w-md w-full bg-white rounded-lg shadow-md">
+<main class="flex items-center justify-center min-h-screen bg-white p-6">
+  <div class="max-w-md w-full bg-tertiary rounded-lg shadow-md">
     <div class="p-6">
       <h2 class="text-2xl font-bold mb-6 text-center">Registration</h2>
       <div class="mb-4">
@@ -68,7 +70,7 @@
         <p class="text-red-500 text-sm mt-2">{passwordError}</p>
       </div>
       <button
-        class="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        class="bg-[#d5bdaf] hover:bg-d6ccc2 hover:text-black hover:shadow-lg duration-500 text-white rounded-md px-3 py-1 mt-5 w-full"
         on:click={finalRegister}
       >
         Register

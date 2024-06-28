@@ -13,7 +13,6 @@
   }
 
   function acceptRequest(requestId) {
-    //using swal to tell user if successful
     fetch(API_URL + "items/transfer-accept/" + requestId, {
       method: "POST",
       credentials: "include",

@@ -11,6 +11,15 @@
   let username = "";
   let usertypename = "";
 
+  let telephoneError: string = "";
+
+  const validatePhonenumber = () => {
+    const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+    telephoneError = regex.test(phonenumber)
+      ? ""
+      : "False Telefonnummer! Die Telefonnummer muss in dem Format +1234567890 or 1234567890 sein.";
+  };
+
   function createUser() {
     if (
       email &&
@@ -132,10 +141,12 @@
     <input
       id="phonenumber"
       type="text"
+      on:input={validatePhonenumber}
       required
       bind:value={phonenumber}
       class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
     />
+    <p class="text-red-500 text-sm mt-2">{telephoneError}</p>
   </div>
 
   <div class="mb-4">
