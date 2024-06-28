@@ -2,13 +2,7 @@
   import { goto } from "$app/navigation";
   import {
     PersonCircle,
-    ListNested,
-    Building,
-    People,
     Archive,
-    Backpack2,
-    FilesAlt,
-    Speedometer2,
     SendCheck,
   } from "svelte-bootstrap-icons";
 

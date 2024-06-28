@@ -47,7 +47,7 @@
 
   {#if items}
     {#if items.length === 0}
-      <div class="text-center text-gray-700">No items found</div>
+      <div class="text-center text-gray-700">Keine Items gefunden</div>
     {:else}
       <div
         class="relative overflow-x-auto shadow-lg rounded-lg w-full mt-5 ml-1 bg-white"
@@ -204,5 +204,7 @@
         </table>
       </div>
     {/if}
+  {:else}
+    <div class="text-center text-gray-700">Keine Items gefunden</div>
   {/if}
 </div>
