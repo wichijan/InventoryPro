@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { Archive } from "svelte-bootstrap-icons";
 
   export let data;
 
@@ -7,8 +8,6 @@
 
   let userItems = userInfo.BorrowedItems ?? [];
   let userReservations = userInfo.Reservations ?? [];
-  console.log(userInfo);
-  //filter out where Reservation -> ItemID is null
   userReservations = userReservations.filter(
     (r) => r.Reservation.ItemID !== null
   );
@@ -31,11 +30,17 @@
                 goto(`/items/${item.ID}`);
               }}
             >
-              <img
-                src={item.Picture ?? ""}
-                alt={item.Name}
-                class="w-24 h-24 mr-6 rounded-lg object-cover"
-              />
+              {#if item.Picture}
+                <img
+                  src={item.Picture ?? ""}
+                  alt={item.Name}
+                  class="w-16 h-16 mr-6 rounded-lg object-cover"
+                />
+              {:else}
+                <Archive
+                  class="w-16 h-16 mr-6 rounded-lg object-cover text-black"
+                />
+              {/if}
               <div>
                 <h3 class="text-xl font-medium">{item.Name ?? "No Name"}</h3>
                 <p class="text-gray-600">
@@ -73,11 +78,17 @@
                 goto(`/items/${Item.ID}`);
               }}
             >
-              <img
-                src={Item.Picture ?? ""}
-                alt={Item.Name}
-                class="w-24 h-24 mr-6 rounded-lg object-cover"
-              />
+              {#if Item.Picture}
+                <img
+                  src={Item.Picture ?? ""}
+                  alt={Item.Name}
+                  class="w-16 h-16 mr-6 rounded-lg object-cover"
+                />
+              {:else}
+                <Archive
+                  class="w-16 h-16 mr-6 rounded-lg object-cover text-black"
+                />
+              {/if}
               <div>
                 <h3 class="text-xl font-medium">{Item.Name || "Kein Name"}</h3>
                 <p class="text-gray-600">

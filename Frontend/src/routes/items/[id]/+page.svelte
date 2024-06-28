@@ -7,6 +7,8 @@
   import { browser } from "$app/environment";
   import { jsPDF } from "jspdf";
 
+  import { Archive, Book } from "svelte-bootstrap-icons";
+
   export let data;
 
   let user: any;
@@ -338,11 +340,17 @@
       </h2>
       <div class="flex flex-row justify-between">
         <div class="flex-shrink-0 w-1/3">
-          <img
-            src="{API_URL}items-picture/{item.ID}"
-            alt="{item.Name} Bild"
-            class="rounded-lg shadow-md w-full object-cover"
-          />
+          {#if item.Picture}
+            <img
+              src="{API_URL}items-picture/{item.ID}"
+              alt="{item.Name} Bild"
+              class="rounded-lg shadow-md w-full object-cover"
+            />
+          {:else if item.ItemTypes === "book"}
+            <Book class=" text-gray-400 w-full h-full px-5 py-5" />
+          {:else}
+            <Archive class=" text-gray-400 w-full h-full px-5 py-5" />
+          {/if}
         </div>
         <div class="flex-grow ml-10">
           <div class="text-gray-700 text-lg mb-4">Name: {item.Name}</div>

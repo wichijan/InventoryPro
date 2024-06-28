@@ -33,6 +33,7 @@
     LastName: userInfo.LastName ?? "",
     JobTitle: userInfo.JobTitle ?? "",
     PhoneNumber: userInfo.PhoneNumber ?? "",
+    UserTypeName: userInfo.UserTypeName ?? "",
   };
 
   let password = "";
@@ -96,17 +97,61 @@
     <h2 class="text-2xl font-semibold mb-4 text-center">User Information</h2>
     <div class="bg-gray-100 shadow-lg rounded-lg p-6 mb-8">
       <div class="flex items-center mb-6">
-        {#if userInfo.ProfilePicture}
-          <img
-            src={userInfo.ProfilePicture ?? ""}
-            alt="Profile of {userInfo.Username}"
-            class="w-24 h-24 rounded-full mr-6 object-cover"
-          />
-        {:else}
-          <PersonCircle
-            class="w-20 h-20 rounded-full mr-6 object-cover text-black"
-          />
-        {/if}
+        <button
+          on:click={() => {
+            Swal.fire({
+              title: "Bild hochladen",
+              html: `
+        <form id="uploadForm" enctype="multipart/form-data">
+          <input type="hidden" id="itemID" name="id" value="null" />
+          <input type="file" id="file" name="file" accept="image/jpeg" required>
+        </form>
+      `,
+              showCancelButton: true,
+              confirmButtonText: `Hochladen`,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append(
+                  "file",
+                  document.getElementById("file").files[0]
+                );
+                //formData.append("id", document.getElementById("itemID").value);
+                fetch(`${API_URL}users-picture`, {
+                  method: "POST",
+                  credentials: "include",
+                  body: formData,
+                }).then((response) => {
+                  if (response.ok) {
+                    Swal.fire({
+                      title: "Success",
+                      text: "Bild wurde erfolgreich hochgeladen",
+                      icon: "success",
+                    }).then(() => {});
+                  } else {
+                    Swal.fire({
+                      title: "Error",
+                      text: "An error occurred while uploading the picture",
+                      icon: "error",
+                    });
+                  }
+                });
+              }
+            });
+          }}
+        >
+          {#if userInfo.ProfilePicture}
+            <img
+              src="{API_URL}users-picture"
+              alt="Profile of {userInfo.Username}"
+              class="w-24 h-24 rounded-full mr-6 object-cover"
+            />
+          {:else}
+            <PersonCircle
+              class="w-20 h-20 rounded-full mr-6 object-cover text-black"
+            />
+          {/if}
+        </button>
         <div>
           <h3 class="text-xl font-medium">{userInfo.Username ?? "Username"}</h3>
           <p class="text-gray-600">{userInfo.UserTypeName ?? "User Type"}</p>

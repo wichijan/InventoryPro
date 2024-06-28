@@ -156,7 +156,6 @@
   }
 
   function uploadPic(itemID) {
-    //Using swal, to ask for pic via form
     Swal.fire({
       title: "Bild hochladen",
       html: `
