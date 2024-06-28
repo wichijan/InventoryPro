@@ -29,8 +29,8 @@
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: userid,
-          password: password,
+          UserId: userid,
+          Password: password,
         }),
       }).then((response) => {
         if (response.ok) {
