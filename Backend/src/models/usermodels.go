@@ -111,6 +111,11 @@ type PasswordResetEmail struct {
 	Password string
 }
 
+type PasswordResetEmailODT struct {
+	UserId   string
+	Password string
+}
+
 type RegistrationCode struct {
 	Password string `json:"password" binding:"required"`
 }

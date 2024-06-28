@@ -58,7 +58,7 @@ func PrepareResetPasswordBody(userId *string) (string, error) {
 					Instructions: "Klick den Button, um dein Passwort zu ändern:",
 					Button: hermes.Button{
 						Text:  "Änder dein Passwort",
-						Link:  "http://" + URL + "/reset-password?userId=" + *userId,
+						Link:  "http://" + URL + "/auth/forgot-password/" + *userId,
 						Color: "#334155",
 					},
 				},

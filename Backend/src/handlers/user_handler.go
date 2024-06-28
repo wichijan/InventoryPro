@@ -662,7 +662,7 @@ func EmailForgetPasswordHandler(userCtrl controllers.UserControllerI) gin.Handle
 func RequestForgetPasswordHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Register user
-		var newPassword models.PasswordResetEmail
+		var newPassword models.PasswordResetEmailODT
 		err := c.ShouldBind(&newPassword)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid request body"))
@@ -671,12 +671,23 @@ func RequestForgetPasswordHandler(userCtrl controllers.UserControllerI) gin.Hand
 		if utils.ContainsEmptyString(
 			newPassword.Password,
 		) {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid username or password"))
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid password"))
 			return
 		}
 
+		userId, err := uuid.Parse(newPassword.UserId)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid user ID"))
+			return
+		}
+
+		newData := models.PasswordResetEmail{
+			UserId:   &userId,
+			Password: newPassword.Password,
+		}
+
 		// user is logged in after registration
-		inv_err := userCtrl.UpdateUserPassword(newPassword.UserId, newPassword.Password)
+		inv_err := userCtrl.UpdateUserPassword(newData.UserId, newData.Password)
 		if inv_err != nil {
 			utils.HandleErrorAndAbort(c, inv_err)
 			return

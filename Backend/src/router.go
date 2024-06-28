@@ -236,7 +236,7 @@ func createRouter(dbConnection *sql.DB, hub *websocket.Hub, mgInstance *mailgun.
 	publicRoutes.Handle(http.MethodPost, "/auth/register/:code", handlers.RegisterUserWithCodeHandler(controller.UserController))
 
 	securedRoutes.Handle(http.MethodPost, "/auth/reset-password", handlers.ResetPasswordHandler(controller.UserController))
-	securedRoutes.Handle(http.MethodPost, "/request-forgot-password", handlers.RequestForgetPasswordHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/request-forgot-password", handlers.RequestForgetPasswordHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/email-forget-password", handlers.EmailForgetPasswordHandler(controller.UserController))
 
 	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
