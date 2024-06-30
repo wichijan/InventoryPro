@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
   import { API_URL } from "$lib/_services/ShelfService";
   import Swal from "sweetalert2";
   export let data;
@@ -43,6 +44,8 @@
           Swal.fire({
             icon: "success",
             title: "Schnellregal wurde erstellt",
+          }).then(() => {
+            browser ? location.reload() : null;
           });
         } else {
           Swal.fire({

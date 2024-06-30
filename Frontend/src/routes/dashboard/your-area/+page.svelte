@@ -77,6 +77,8 @@
           text: "User information updated successfully",
           icon: "success",
           confirmButtonText: "Ok",
+        }).then(() => {
+          browser ? location.reload() : null;
         });
       })
       .catch((error) => {

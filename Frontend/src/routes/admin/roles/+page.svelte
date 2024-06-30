@@ -132,7 +132,7 @@
       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
       on:click={() => {
         Swal.fire({
-          title: "Create Rollenname",
+          title: "Rollenname erstellen",
           html: `
             <input id="RoleName" class="swal2-input" placeholder="Rollenname" />
           `,
@@ -151,14 +151,14 @@
               body: JSON.stringify({
                 roleName,
               }),
-            }).then((res) => {
+            }).then(async (res) => {
               if (res.ok) {
-                const newRoleName = res.json();
+                const newRoleName = await res.json();
                 Swal.fire("Created!", "", "success");
                 roles = [
                   ...roles,
                   {
-                    ID: newRoleName.ID,
+                    ID: newRoleName,
                     RoleName: roleName,
                   },
                 ];
