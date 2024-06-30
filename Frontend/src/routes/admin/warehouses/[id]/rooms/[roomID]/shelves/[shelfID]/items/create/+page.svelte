@@ -92,7 +92,6 @@
             text: "Item wurde erfolgreich erstellt",
             icon: "success",
           }).then(() => {
-            //ask if user wants to upload a picture, if not redirect to shelf
             Swal.fire({
               title: "Möchtest du ein Bild hochladen?",
               showDenyButton: true,

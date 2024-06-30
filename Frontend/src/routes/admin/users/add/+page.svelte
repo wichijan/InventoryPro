@@ -48,7 +48,6 @@
       }).then(async (response) => {
         if (response.ok) {
           const code = await response.json();
-          //returns a code
           Swal.fire({
             icon: "success",
             title:
@@ -56,7 +55,6 @@
               code.RegistrationCode,
             footer: "Der Code wurde in die Zwischenablage kopiert",
           });
-          //copy it to clipboard
           browser ? navigator.clipboard.writeText(code.RegistrationCode) : null;
         } else {
           Swal.fire({

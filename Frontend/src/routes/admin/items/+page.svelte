@@ -88,7 +88,6 @@
                 ) {
                   showItems = defaultItems;
                 } else {
-                  //check if input string is in any of the fields
                   showItems = showItems.filter((item) => {
                     let damaged = item.Damaged ? "Kaputt" : "Unversehen";
                     return (
@@ -148,7 +147,6 @@
               on:click={() => {
                 sort = sort === 0 ? 1 : 0;
                 let e = document.getElementById("sort");
-                //sort the items in the right way
                 items = items.sort((a, b) => {
                   if (e.value === "name") {
                     if (sort === 0) {

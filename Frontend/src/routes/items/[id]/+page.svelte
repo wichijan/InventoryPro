@@ -326,9 +326,6 @@
     doc.text("Subject: " + item.Subject, 10, 140);
     doc.text("Reservations: " + item.Reservations, 10, 150);
 
-    //open the pdf in a new tab and download it
-    //Not allowed to navigate top frame to data URL: error
-
     if (browser) {
       let output = doc.output("datauristring");
       let x = window.open();

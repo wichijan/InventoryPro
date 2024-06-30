@@ -8,7 +8,6 @@
   let selectedRoom = null;
   let quickshelfName = "";
 
-  //sort warehoues by room count
   $: warehouses = warehouses.sort((a, b) => {
     let aRooms = a.Rooms ? a.Rooms.length : 0;
     let bRooms = b.Rooms ? b.Rooms.length : 0;

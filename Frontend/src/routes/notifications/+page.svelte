@@ -21,7 +21,6 @@
 
     isUserAdmin().then((isAdmin) => {
       if (!isAdmin) {
-        //remove all notifications where is not item move request
         if (notifications) {
           notifications.forEach((notification) => {
             const object = buildObject(notification);

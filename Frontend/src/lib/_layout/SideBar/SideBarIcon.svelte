@@ -13,7 +13,6 @@
   let notificationStyle = "";
 
   onMount(() => {
-    // Check nCount and set notificationDisplay and notificationStyle accordingly
     if (nCount !== -1 && nCount !== 0) {
       notificationDisplay = true;
       notificationStyle = `bg-red-500 text-white`;

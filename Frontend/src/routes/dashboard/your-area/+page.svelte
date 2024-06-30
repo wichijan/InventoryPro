@@ -116,7 +116,6 @@
                   "file",
                   document.getElementById("file").files[0]
                 );
-                //formData.append("id", document.getElementById("itemID").value);
                 fetch(`${API_URL}users-picture`, {
                   method: "POST",
                   credentials: "include",

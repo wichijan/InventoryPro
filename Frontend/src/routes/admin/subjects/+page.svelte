@@ -44,7 +44,7 @@
             <tr
               class="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-300 transition-colors cursor-pointer"
               on:click={() => {
-                //usign swal to update
+  
                 Swal.fire({
                   title: "Update Fach",
                   html: `
