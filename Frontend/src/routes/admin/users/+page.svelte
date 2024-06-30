@@ -228,7 +228,9 @@
                   credentials: "include",
                 }).then((response) => {
                   if (response.ok) {
-                    Swal.fire("User abgelehnt!", "", "success");
+                    Swal.fire("User abgelehnt!", "", "success").then(() => {
+                      browser ? location.reload() : null;
+                    });
                   } else {
                     Swal.fire("Error denying user", "", "error");
                   }

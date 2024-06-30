@@ -47,7 +47,11 @@
               "Deleted!",
               "Dein Schnellregal wurde gelöscht.",
               "success"
-            );
+            ).then(() => {
+              quickshelves = quickshelves.filter(
+                (quickshelf) => quickshelf.QuickShelfID !== quickShelfID
+              );
+            });
           } else {
             Swal.fire("Error", "Failed to delete quickshelf", "error");
           }
@@ -83,7 +87,9 @@
               "Cleared!",
               "Dein Schnellregal wurde geleert.",
               "success"
-            );
+            ).then(() => {
+              quickshelf.Items = [];
+            });
           } else {
             Swal.fire("Error", "Failed to clear quickshelf", "error");
           }
