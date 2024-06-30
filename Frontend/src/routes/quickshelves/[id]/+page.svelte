@@ -191,7 +191,7 @@
                     class="text-red-500"
                     on:click|stopPropagation={(e) => {
                       e.stopPropagation();
-                      fetch(`${API_URL}items/remove-item-from-quickshelf`, {
+                      fetch(`${API_URL}items/remove-item-to-quick-shelf`, {
                         credentials: "include",
                         method: "DELETE",
                         headers: {
@@ -199,7 +199,7 @@
                         },
                         body: JSON.stringify({
                           QuickShelfId: quickShelf.QuickShelfID,
-                          ItemID: item.ID,
+                          ItemId: item.ID,
                         }),
                       }).then((res) => {
                         if (res.status !== 200) {

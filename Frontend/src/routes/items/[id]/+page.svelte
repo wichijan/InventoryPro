@@ -259,6 +259,24 @@
           Swal.showValidationMessage("Die Menge muss größer als 0 sein");
           return false;
         }
+        if (new Date(fromDate) > new Date(toDate)) {
+          Swal.showValidationMessage(
+            "Das Startdatum muss vor dem Enddatum liegen"
+          );
+          return false;
+        }
+        if (new Date(fromDate) < new Date()) {
+          Swal.showValidationMessage(
+            "Das Startdatum muss in der Zukunft liegen"
+          );
+          return false;
+        }
+        if (parseInt(quantity) > item.QuantityInShelf) {
+          Swal.showValidationMessage(
+            "Die Menge ist größer als die verfügbare Menge"
+          );
+          return false;
+        }
 
         return { quantity, fromDate, toDate };
       },

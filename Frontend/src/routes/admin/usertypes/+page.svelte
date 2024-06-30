@@ -126,9 +126,9 @@
       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
       on:click={() => {
         Swal.fire({
-          title: "Create Typnamen",
+          title: "Typname erstellen",
           html: `
-            <input id="typeName" class="swal2-input" placeholder="Typnamen" />
+            <input id="typeName" class="swal2-input" placeholder="Typname" />
           `,
           showCancelButton: true,
           confirmButtonText: `Create`,

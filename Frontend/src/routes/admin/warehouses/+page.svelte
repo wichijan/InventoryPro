@@ -73,12 +73,15 @@
                   Name: name,
                   Description: description,
                 }),
-              }).then((response) => {
+              }).then(async (response) => {
                 if (response.ok) {
+                  const warehouseID = await response.json();
                   Swal.fire("Warehouse created!", "", "success");
                   warehouse.push({
+                    ID: warehouseID,
                     Name: name,
                     Description: description,
+                    Rooms: [],
                   });
                   warehouse = warehouse;
                 } else {

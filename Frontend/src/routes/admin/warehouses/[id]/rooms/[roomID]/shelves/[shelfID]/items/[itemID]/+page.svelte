@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
   import { API_URL } from "$lib/_services/ShelfService";
   import { onMount } from "svelte";
@@ -62,7 +63,9 @@
             title: "Success",
             text: "Item wurde erfolgreich aktualisiert",
             icon: "success",
-          }).then(() => {});
+          }).then(() => {
+            browser ? location.reload() : null;
+          });
         } else {
           Swal.fire({
             title: "Error",

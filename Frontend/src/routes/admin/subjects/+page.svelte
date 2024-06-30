@@ -44,7 +44,6 @@
             <tr
               class="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-300 transition-colors cursor-pointer"
               on:click={() => {
-  
                 Swal.fire({
                   title: "Update Fach",
                   html: `
@@ -136,7 +135,7 @@
       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
       on:click={() => {
         Swal.fire({
-          title: "Create Fach",
+          title: "Fach erstellen",
           html: `
             <input id="name" class="swal2-input" placeholder="Name" />
             <input id="description" class="swal2-input" placeholder="Beschreibung" />
@@ -158,14 +157,14 @@
                 Name: name,
                 Description: description,
               }),
-            }).then((res) => {
+            }).then(async (res) => {
               if (res.ok) {
-                const newSubject = res.json();
+                const newSubject = await res.json();
                 Swal.fire("Created!", "", "success");
                 subjects = [
                   ...subjects,
                   {
-                    ID: newSubject.ID,
+                    ID: newSubject,
                     Name: name,
                     Description: description,
                   },

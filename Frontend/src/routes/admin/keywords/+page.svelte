@@ -135,7 +135,7 @@
       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
       on:click={() => {
         Swal.fire({
-          title: "Erstellen eines keywords",
+          title: "Erstellung eines keywords",
           html: `
           <input id="Keyword" class="swal2-input" placeholder="Keyword" />
         `,
@@ -154,14 +154,14 @@
               body: JSON.stringify({
                 Name: Keyword,
               }),
-            }).then((res) => {
+            }).then(async (res) => {
               if (res.ok) {
-                const newkeyword = res.json();
+                const newkeyword = await res.json();
                 Swal.fire("Created!", "", "success");
                 keywords = [
                   ...keywords,
                   {
-                    ID: newkeyword.ID,
+                    ID: newkeyword,
                     Keyword: Keyword,
                   },
                 ];
