@@ -4830,10 +4830,10 @@ const docTemplate = `{
                         }
                     }
                 },
-                "quickShelfID": {
+                "name": {
                     "type": "string"
                 },
-                "quickShelfName": {
+                "quickShelfID": {
                     "type": "string"
                 },
                 "roomID": {
