@@ -367,7 +367,7 @@ func DeleteItemHandler(itemCtrl controllers.ItemControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		itemId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid room id"))
+			utils.HandleErrorAndAbort(c, inv_errors.INV_BAD_REQUEST.WithDetails("Invalid item id"))
 			return
 		}
 

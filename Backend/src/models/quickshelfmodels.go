@@ -33,9 +33,9 @@ type QuickShelfCreate struct {
 }
 
 type QuickShelfWithItems struct {
-	QuickShelfID   uuid.UUID `alias:"quick_shelves.quick_shelf_id"`
-	QuickShelfName *string   `alias:"quick_shelves.name"`
-	RoomID         uuid.UUID `alias:"quick_shelves.room_id"`
+	QuickShelfID uuid.UUID `alias:"quick_shelves.quick_shelf_id" sql:"primary_key"`
+	Name         *string   `alias:"quick_shelves.name"`
+	RoomID       uuid.UUID `alias:"quick_shelves.room_id"`
 
 	Items []struct {
 		model.Items
