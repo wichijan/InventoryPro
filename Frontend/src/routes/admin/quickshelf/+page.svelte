@@ -71,7 +71,7 @@
       confirmButtonText: "Ja, leere es!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`${API_URL}clear-quick-shelves/${quickshelf.QuickShelfID}`, {
+        fetch(`${API_URL}items/clear-quick-shelf/${quickshelf.QuickShelfID}`, {
           method: "DELETE",
           credentials: "include",
           headers: {

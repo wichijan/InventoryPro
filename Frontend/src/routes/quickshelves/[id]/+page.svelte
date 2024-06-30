@@ -13,6 +13,7 @@
   export let data;
 
   const quickShelf = data.quickShelf;
+  const itemsInShelf = data.itemsInQuickShelf;
   let items = quickShelf.Items;
   const defaultItems = JSON.parse(JSON.stringify(items));
 
@@ -78,9 +79,6 @@
                       item.Description.toLowerCase().includes(
                         e.target.value.toLowerCase()
                       ) ||
-                      item.QuantityInShelf.toString().includes(
-                        e.target.value.toLowerCase()
-                      ) ||
                       damaged
                         .toLowerCase()
                         .includes(e.target.value.toLowerCase()) ||
@@ -106,12 +104,6 @@
                     } else {
                       return a.Name > b.Name ? -1 : 1;
                     }
-                  } else if (e.target.value === "quantity") {
-                    if (sort === 0) {
-                      return a.QuantityInShelf < b.QuantityInShelf ? -1 : 1;
-                    } else {
-                      return a.QuantityInShelf > b.QuantityInShelf ? -1 : 1;
-                    }
                   } else {
                     if (sort === 0) {
                       return a.Damaged < b.Damaged ? -1 : 1;
@@ -123,7 +115,6 @@
               }}
             >
               <option value="name">Name</option>
-              <option value="quantity">Anzahl</option>
               <option value="status">Status</option>
             </select>
             <button
@@ -137,12 +128,6 @@
                       return a.Name < b.Name ? -1 : 1;
                     } else {
                       return a.Name > b.Name ? -1 : 1;
-                    }
-                  } else if (e.value === "quantity") {
-                    if (sort === 0) {
-                      return a.QuantityInShelf < b.QuantityInShelf ? -1 : 1;
-                    } else {
-                      return a.QuantityInShelf > b.QuantityInShelf ? -1 : 1;
                     }
                   } else {
                     if (sort === 0) {
@@ -167,7 +152,6 @@
             <tr>
               <th scope="col" class="px-6 py-3">Name</th>
               <th scope="col" class="px-6 py-3">Beschreibung</th>
-              <th scope="col" class="px-6 py-3">Anzahl im Regal</th>
               <th scope="col" class="px-6 py-3">Status</th>
               <th scope="col" class="px-6 py-3">Verfügbar</th>
               <th scope="col" class="px-6 py-3 text-right">Klassen</th>
@@ -188,12 +172,12 @@
                     ? item.Description.substring(0, cutOffDescription) + "..."
                     : item.Description}</td
                 >
-                <td class="px-6 py-4">{item.QuantityInShelf}</td>
+
                 <td class="px-6 py-4"
                   >{item.Damaged ? "Kaputt" : "Unversehen"}</td
                 >
                 <td class="px-6 py-4 text-center"
-                  >{#if item.UsersBorrowed && item.QuantityInShelf === 0}
+                  >{#if item.UsersBorrowed}
                     <XCircle class="h-6 w-6 text-red-500 mx-auto" />
                   {:else}
                     <CheckCircle class="h-6 w-6 text-green-500 mx-auto" />
@@ -214,7 +198,7 @@
                           "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                          QuickShelfID: quickShelf.QuickShelfID,
+                          QuickShelfId: quickShelf.QuickShelfID,
                           ItemID: item.ID,
                         }),
                       }).then((res) => {
@@ -236,7 +220,7 @@
                       });
                     }}
                   >
-                    Löschen
+                    Konvertieren
                   </button>
                 </td>
               </tr>

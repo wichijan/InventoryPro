@@ -27,9 +27,22 @@ export const load = async ({ fetch, params }) => {
         const data = await response.json();
         return data;
     }
+    async function getItemsInQuickShelf(): Promise<any> {
+        const response = await fetch(API_URL + 'items/quick-shelf/' + params.id, {
+            method: 'GET',
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        return data;
+    }
 
     return {
         quickShelf: await getQuickShelf(),
+        itemsInQuickShelf: await getItemsInQuickShelf(),
         warehouses: await getAllWarehousesWithRooms()
     };
 }
