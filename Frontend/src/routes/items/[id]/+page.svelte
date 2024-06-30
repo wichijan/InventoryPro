@@ -7,7 +7,7 @@
   import { browser } from "$app/environment";
   import { jsPDF } from "jspdf";
 
-  import { Archive, Book } from "svelte-bootstrap-icons";
+  import { Archive, Book, FilePdf } from "svelte-bootstrap-icons";
 
   export let data;
 
@@ -341,8 +341,6 @@
   }
 
   async function putItemInQuickShelf() {
-    //ask via swal wich quickshelf the item should be added to
-
     Swal.fire({
       title: "In welches Schnellregal soll das Item hinzugefügt werden?",
       html: `
@@ -412,29 +410,6 @@
           });
       }
     });
-
-    // await fetch(API_URL + "items/add-item-to-quick-shelf", {
-    //   method: "POST",
-    //   credentials: "include",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     QuickShelfId: quickshelfID,
-    //     ItemID: item.ID,
-    //   }),
-    // }).then((response) => {
-    //   if (response.ok) {
-    //     Swal.fire(
-    //       "Das Item wurde erfolgreich dem Schnellregal hinzugefügt",
-    //       "",
-    //       "success"
-    //     );
-    //     location.reload();
-    //   } else {
-    //     Swal.fire("Error!", "", "error");
-    //   }
-    // });
   }
   function getWarehouseAndRoomName(quickshelf) {
     let warehouses = data.warehouses;
@@ -457,8 +432,11 @@
 {#if item}
   <div class="flex flex-col items-center w-full my-10">
     <div class="bg-gray-50 p-8 rounded-lg shadow-lg w-full max-w-4xl">
-      <h2 class="text-3xl font-semibold text-gray-800 mb-4">
+      <h2 class="flex text-3xl font-semibold text-gray-800 mb-4">
         Generelle Information
+        <button on:click={toPdf} class="ml-4">
+          <FilePdf class="w-8 h-8 my-auto" />
+        </button>
       </h2>
       <div class="flex flex-row justify-between">
         <div class="flex-shrink-0 w-1/3">
