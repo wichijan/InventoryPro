@@ -8,7 +8,6 @@
   let quickshelves = data.quickshelves;
   let warehouses = data.warehouses;
 
-
   function getWarehouseAndRoomName(quickshelf) {
     for (let warehouse of warehouses) {
       if (warehouse.Rooms) {
@@ -51,6 +50,9 @@
             }}
           >
             <div class="p-4 space-y-2">
+              <h3 class="font-semibold text-xl">
+                Name: {quickshelf.Name || "Unbekannt"}
+              </h3>
               <h3 class="font-semibold text-xl">
                 Warehouse: {getWarehouseAndRoomName(quickshelf)
                   ?.warehouseName || "Unbekannt"}

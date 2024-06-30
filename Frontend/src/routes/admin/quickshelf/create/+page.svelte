@@ -37,6 +37,7 @@
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          Name: quickshelfName,
           RoomId: selectedRoom.ID,
         }),
       }).then((response) => {

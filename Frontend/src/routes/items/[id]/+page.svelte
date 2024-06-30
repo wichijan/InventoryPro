@@ -363,7 +363,7 @@
           <select id="quickshelf" class="swal2-select w-1/2">
             ${quickshelves.map(
               (qs) =>
-                `<option value="${qs.QuickShelfID}">${getWarehouseAndRoomName(qs).warehouseName} - ${getWarehouseAndRoomName(qs).roomName}</option>`
+                `<option value="${qs.QuickShelfID}">${getWarehouseAndRoomName(qs).warehouseName} - ${getWarehouseAndRoomName(qs).roomName} - ${qs.Name}</option>`
             )}
           </select>
         `,

@@ -191,36 +191,51 @@
                     class="text-red-500"
                     on:click|stopPropagation={(e) => {
                       e.stopPropagation();
-                      fetch(`${API_URL}items/remove-item-to-quick-shelf`, {
-                        credentials: "include",
-                        method: "DELETE",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                          QuickShelfId: quickShelf.QuickShelfID,
-                          ItemId: item.ID,
-                        }),
-                      }).then((res) => {
-                        if (res.status !== 200) {
-                          Swal.fire({
-                            title: "Fehler",
-                            text: "Item konnte nicht zurück konvertiert werden",
-                            icon: "error",
+                      Swal.fire({
+                        title: "Bist du sicher?",
+                        text: "Möchtest du das Item zurück ins Regal konvertieren?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Ja",
+                        cancelButtonText: "Nein",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          fetch(`${API_URL}items/remove-item-to-quick-shelf`, {
+                            credentials: "include",
+                            method: "DELETE",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                              QuickShelfId: quickShelf.QuickShelfID,
+                              ItemId: item.ID,
+                            }),
+                          }).then((res) => {
+                            if (res.status !== 200) {
+                              Swal.fire({
+                                title: "Fehler",
+                                text: "Item konnte nicht zurück konvertiert werden",
+                                icon: "error",
+                              });
+                            } else {
+                              Swal.fire({
+                                title: "Erfolg",
+                                text: "Item wurde zurück konvertiert",
+                                icon: "success",
+                              });
+                              items = items.filter((i) => i.ID !== item.ID);
+                              showItems = showItems.filter(
+                                (i) => i.ID !== item.ID
+                              );
+                            }
                           });
-                        } else {
-                          Swal.fire({
-                            title: "Erfolg",
-                            text: "Item wurde zurück konvertiert",
-                            icon: "success",
-                          });
-                          items = items.filter((i) => i.ID !== item.ID);
-                          showItems = showItems.filter((i) => i.ID !== item.ID);
                         }
                       });
                     }}
                   >
-                    Konvertieren
+                    Zurück zum Regal
                   </button>
                 </td>
               </tr>
