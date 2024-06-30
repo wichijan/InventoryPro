@@ -110,8 +110,16 @@
   <div class="container mx-auto py-8">
     <div class="flex flex-row flex-wrap w-full">
       {#each quickshelves as quickshelf}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div class="w-full p-4">
-          <div class="bg-white rounded-lg shadow-lg w-full text-left">
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <div
+            class="bg-white rounded-lg shadow-lg w-full text-left cursor-pointer"
+            on:click={() => {
+              goto(`/quickshelves/${quickshelf.QuickShelfID}`);
+            }}
+          >
             <div class="p-4 space-y-2">
               <h3 class="font-semibold text-xl">
                 Warehouse: {getWarehouseAndRoomName(quickshelf)
@@ -126,7 +134,7 @@
             <div class="p-4">
               <button
                 class="bg-red-500 text-white rounded-lg py-2 px-2 shadow-lg hover:bg-red-400 duration-300"
-                on:click={() => {
+                on:click|stopPropagation={() => {
                   clearQuickShelf(quickshelf);
                 }}
               >
@@ -134,7 +142,7 @@
               </button>
               <button
                 class="bg-red-500 text-white rounded-lg py-2 px-2 shadow-lg hover:bg-red-400 duration-300"
-                on:click={() => {
+                on:click|stopPropagation={() => {
                   deleteQuickShelf(quickshelf.QuickShelfID);
                 }}
               >

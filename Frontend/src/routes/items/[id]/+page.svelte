@@ -54,6 +54,7 @@
   };
 
   let item: Item = data.item;
+  let quickshelves = data.quickshelves;
 
   let errorText = "";
   $: errorText = errorText;
@@ -326,9 +327,130 @@
     doc.text("Reservations: " + item.Reservations, 10, 150);
 
     //open the pdf in a new tab and download it
-    browser
-      ? (window.location = doc.output("datauristring"))
-      : doc.save("item.pdf");
+    //Not allowed to navigate top frame to data URL: error
+
+    if (browser) {
+      let output = doc.output("datauristring");
+      let x = window.open();
+      x.document.open();
+      x.document.write(
+        "<iframe src='" + output + "' width='100%' height='100%'></iframe>"
+      );
+      x.document.close();
+    }
+  }
+
+  async function putItemInQuickShelf() {
+    //ask via swal wich quickshelf the item should be added to
+
+    Swal.fire({
+      title: "In welches Schnellregal soll das Item hinzugefügt werden?",
+      html: `
+          <!-- Select quickshelf -->
+          <select id="quickshelf" class="swal2-select w-1/2">
+            ${quickshelves.map(
+              (qs) =>
+                `<option value="${qs.QuickShelfID}">${getWarehouseAndRoomName(qs).warehouseName} - ${getWarehouseAndRoomName(qs).roomName}</option>`
+            )}
+          </select>
+        `,
+      showCancelButton: true,
+      confirmButtonText: "Hinzufügen",
+      cancelButtonText: "Abbrechen",
+      preConfirm: () => {
+        const quickshelfID = document.getElementById("quickshelf").value;
+
+        if (!quickshelfID) {
+          Swal.showValidationMessage("Alle Felder müssen ausgefüllt werden");
+          return false;
+        }
+
+        return { quickshelfID };
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const { quickshelfID } = result.value;
+        fetch(`${API_URL}items/add-item-to-quick-shelf`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            QuickShelfId: quickshelfID,
+            ItemID: item.ID,
+            Quantity: Number(1),
+          }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              Swal.fire({
+                title: "Hinzugefügt",
+                text: "Das Item wurde erfolgreich dem Schnellregal hinzugefügt",
+                icon: "success",
+                confirmButtonText: "Ok",
+              });
+              setTimeout(() => {
+                browser ? window.location.reload() : null;
+              }, 2000);
+            } else {
+              Swal.fire({
+                title: "Fehler",
+                text: "Das Item konnte nicht hinzugefügt werden",
+                icon: "error",
+                confirmButtonText: "Ok",
+              });
+            }
+          })
+          .catch((error) => {
+            Swal.fire({
+              title: "Fehler",
+              text: "Ein Fehler ist aufgetreten",
+              icon: "error",
+              confirmButtonText: "Ok",
+            });
+          });
+      }
+    });
+
+    // await fetch(API_URL + "items/add-item-to-quick-shelf", {
+    //   method: "POST",
+    //   credentials: "include",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     QuickShelfId: quickshelfID,
+    //     ItemID: item.ID,
+    //   }),
+    // }).then((response) => {
+    //   if (response.ok) {
+    //     Swal.fire(
+    //       "Das Item wurde erfolgreich dem Schnellregal hinzugefügt",
+    //       "",
+    //       "success"
+    //     );
+    //     location.reload();
+    //   } else {
+    //     Swal.fire("Error!", "", "error");
+    //   }
+    // });
+  }
+  function getWarehouseAndRoomName(quickshelf) {
+    let warehouses = data.warehouses;
+    for (let warehouse of warehouses) {
+      if (warehouse.Rooms) {
+        for (let room of warehouse.Rooms) {
+          if (room.ID === quickshelf.RoomID) {
+            return {
+              warehouseName: warehouse.Name,
+              roomName: room.Name,
+            };
+          }
+        }
+      }
+    }
+    return null;
   }
 </script>
 
@@ -362,8 +484,10 @@
           </div>
           {#if item.UsersBorrowed && item.UsersBorrowed.length > 0}
             <div class="text-gray-700 text-lg mb-4">
-              Ausgeliehen von: {#each item.UsersBorrowed as user}
-                {user.BorrowedByUserName},
+              Ausgeliehen von: {#each item.UsersBorrowed as user, index}
+                {user.BorrowedByUserName}
+                {#if index !== item.UsersBorrowed.length - 1},
+                {/if}
               {/each}
             </div>
           {/if}
@@ -386,7 +510,9 @@
               Hinweis: {item.HintText}
             </div>
           {/if}
-          <div class="flex space-x-4 mt-6">
+          <div
+            class="flex flex-col space-y-5 sm:space-y-0 sm:space-x-4 mt-6 sm:flex-row"
+          >
             <button
               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition"
               on:click={borrow}
@@ -400,7 +526,6 @@
               >
                 Zurückgeben
               </button>
-              <!-- An anderen user schicken -->
               <button
                 class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition"
                 on:click={() => {
@@ -500,15 +625,15 @@
               >
                 Senden an User
               </button>
+              <button
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition"
+                on:click={() => {
+                  putItemInQuickShelf();
+                }}
+              >
+                Ins Schnellregal
+              </button>
             {/if}
-            <button
-              class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition"
-              on:click={() => {
-                toPdf();
-              }}
-            >
-              Export zu PDF
-            </button>
           </div>
         </div>
       </div>

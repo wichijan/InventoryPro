@@ -41,7 +41,7 @@
   }
 </script>
 
-<main class="flex items-center justify-center min-h-screen bg-white p-6">
+<main class="flex items-center justify-center min-h-screen p-6">
   <div class="max-w-md w-full bg-tertiary rounded-lg shadow-md">
     <div class="p-6">
       <h2 class="text-2xl font-bold mb-6 text-center">Registration</h2>

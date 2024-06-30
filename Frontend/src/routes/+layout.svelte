@@ -154,7 +154,7 @@
     <Navbar />
   </div>
   <div
-    class=" mt-3 bg-tertiary px-5 py-1 rounded-md ml-[5.25rem] mr-5"
+    class="mt-3 bg-tertiary px-5 py-2 rounded-md sm:ml-[5.25rem] mx-auto w-[93%]"
     id="breadcrumbs"
   >
     {#key breadcrumbs}
@@ -168,10 +168,10 @@
       {/each}
     {/key}
   </div>
-  <div class="flex-grow flex-1 overflow-hidden pl-12">
+  <div class="flex-grow flex-1 overflow-hidden sm:pl-12 w-screen h-full py-4">
     <slot />
   </div>
-  <div class="flex min-w-screen h-full"><Footer /></div>
+  <div class="flex min-w-screen h-full pb-16 sm:pb-0"><Footer /></div>
 </div>
 
 <CookieConsent />

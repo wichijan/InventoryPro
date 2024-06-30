@@ -59,5 +59,31 @@ export const load = async ({ fetch, params }) => {
     }
 
 
-    return { item: await getItem(), users: await getAllUsers() };
+    async function getQuickshelves() {
+        const response = await fetch(API_URL + 'quick-shelves', {
+            method: 'GET',
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        return data;
+    }
+    async function getAllWarehousesWithRooms(): Promise<any> {
+        const response = await fetch(API_URL + 'warehouses-with-rooms', {
+            method: 'GET',
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        return data;
+    }
+
+
+    return { item: await getItem(), users: await getAllUsers(), quickshelves: await getQuickshelves(), warehouses: await getAllWarehousesWithRooms() };
 }

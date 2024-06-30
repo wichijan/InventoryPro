@@ -187,7 +187,6 @@
               <th scope="col" class="px-6 py-3">Beschreibung</th>
               <th scope="col" class="px-6 py-3">Anzahl im Regal</th>
               <th scope="col" class="px-6 py-3">Status</th>
-              <th scope="col" class="px-6 py-3 text-right">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -208,82 +207,6 @@
                 <td class="px-6 py-4"
                   >{item.Damaged ? "Kaputt" : "Unversehen"}</td
                 >
-                <td class="px-6 py-4 text-right">
-                  <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm"
-                    on:click|stopPropagation={() => {
-                      Swal.fire({
-                        title: "Schnellregal",
-                        html: `
-                          <select id="quickshelf" class="swal2-input w-full">
-                            ${quickshelves
-                              .map(
-                                (quickshelf) =>
-                                  `<option value="${quickshelf.QuickShelfID}">${getWarehouseAndRoomName(quickshelf).warehouseName} - ${getWarehouseAndRoomName(quickshelf).roomName}</option>`
-                              )
-                              .join("")}
-                          </select>
-                          <input
-                            id="quantity"
-                            class="swal2-input"
-                            placeholder="Menge"
-                          />
-                        `,
-                        showCancelButton: true,
-                        confirmButtonText: `Update`,
-                      }).then((result) => {
-                        if (result.isConfirmed) {
-                          const quickshelfID =
-                            document.getElementById("quickshelf").value;
-                          const quantity =
-                            document.getElementById("quantity").value;
-                          if (quantity < 1) {
-                            Swal.fire(
-                              "Die Menge muss größer als 0 sein",
-                              "",
-                              "error"
-                            );
-                            return;
-                          }
-                          if (quantity > item.QuantityInShelf) {
-                            Swal.fire(
-                              "Die Menge ist größer als die Anzahl im Regal",
-                              "",
-                              "error"
-                            );
-                            return;
-                          }
-
-                          fetch(API_URL + "add-items-to-quick-shelf", {
-                            method: "POST",
-                            credentials: "include",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                              QuickShelfId: quickshelfID,
-                              ItemID: item.ID,
-                              Quantity: Number(quantity),
-                            }),
-                          }).then((response) => {
-                            if (response.ok) {
-                              Swal.fire(
-                                "Das Item wurde erfolgreich dem Schnellregal hinzugefügt",
-                                "",
-                                "success"
-                              );
-                              location.reload();
-                            } else {
-                              Swal.fire("Error!", "", "error");
-                            }
-                          });
-                        }
-                      });
-                    }}
-                  >
-                    Schnellregal
-                  </button>
-                </td>
               </tr>
             {/each}
           </tbody>

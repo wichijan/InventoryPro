@@ -11,8 +11,8 @@
 
   $: item = item;
 
-  let subjects = data.subjects;
-  let keywords = data.keywords;
+  let subjects = data.subjects ? data.subjects : [];
+  let keywords = data.keywords ? data.keywords : [];
 
   let itemType = item.ItemTypes;
   function handleSave() {
